@@ -1,0 +1,12 @@
+{
+  "name": "battle-heroes",
+  "version": "0.1.0",
+  "description": "Battle Heroes is a game based on Pixel Heroes NFT collections",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PixelHeroesDAO/battle-heroes.git"
+  },
+  "author": "Boo Cháng <booandchang@gmail.com> (https://github.com/boo-chang)",
+  "license": "MIT",
+  "private": true
+}
