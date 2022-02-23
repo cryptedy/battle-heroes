@@ -6,7 +6,9 @@
     Login...
   </p>
 
-  <button v-else @click="loginWithMetaMask">Login</button>
+  <button v-else @click="loginWithMetaMask">
+    {{ $t('message.login') }}
+  </button>
 </template>
 
 <script>
