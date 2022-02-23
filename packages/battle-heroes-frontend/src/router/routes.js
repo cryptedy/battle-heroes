@@ -7,11 +7,25 @@ export default [
   {
     path: '/',
     name: 'home',
+    meta: { middleware: ['guest'] },
     component: view('Home')
   },
   {
-    path: '/test',
-    name: 'test',
-    component: view('Test')
+    path: '/lobbies',
+    name: 'lobbies',
+    meta: { middleware: ['auth'] },
+    component: view('Lobbies')
+  },
+  {
+    path: '/login',
+    name: 'login',
+    meta: { middleware: ['guest'] },
+    component: view('Login')
+  },
+  {
+    path: '/logout',
+    name: 'logout',
+    meta: { middleware: ['auth'] },
+    component: view('Logout')
   }
 ]

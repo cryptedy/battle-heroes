@@ -1,6 +1,5 @@
 // app
-export const APP_INIT_SUCCESS = 'APP_INIT_SUCCESS'
-export const APP_INIT_FAILURE = 'APP_INIT_FAILURE'
+export const APP_INITIALIZED = 'APP_INITIALIZED'
 
 // NFT
 export const SET_NFTS = 'SET_NFTS'

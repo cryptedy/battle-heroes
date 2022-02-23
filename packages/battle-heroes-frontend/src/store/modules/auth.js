@@ -52,7 +52,7 @@ export const actions = {
     }
   },
 
-  async fetchUser({ commit }) {
+  async getUser({ commit }) {
     try {
       const user = await AuthService.getUser()
 

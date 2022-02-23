@@ -1,9 +1,5 @@
 <template>
-  <h1>{{ appTitle }}</h1>
-
-  <div v-if="appIinitializeError">An error occured.</div>
-
-  <div v-else-if="!appInitialized">
+  <div v-if="!initialized">
     <Spinner />
     Launching your app...
   </div>
@@ -32,8 +28,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      appInitialized: 'app/initialized',
-      appIinitializeError: 'app/initializeError'
+      initialized: 'app/initialized'
     })
   }
 }
