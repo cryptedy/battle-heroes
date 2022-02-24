@@ -6,7 +6,7 @@ const axios = require('axios')
 
 const { OPENSEA_API_URL } = require('./utils/constants')
 
-const port = process.env.PORT || 8081
+const port = process.env.PORT || 3000
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080'
 
 app.use(
