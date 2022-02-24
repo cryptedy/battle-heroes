@@ -3,13 +3,14 @@
 
   <h2>Lobby</h2>
 
-  <p>{{ user.name }}</p>
+  <p>
+    <strong>{{ user.name }}</strong> -
+    <router-link :to="{ name: 'logout' }"> Logout </router-link>
+  </p>
+  <p>Rank: Novice Hero</p>
   <p><img :src="user.image_url" /></p>
   <p>User ID: {{ user.id }}</p>
   <p>Address: {{ user.address }}</p>
-  <p>
-    <router-link :to="{ name: 'logout' }"> Logout </router-link>
-  </p>
 
   <ul>
     <li v-for="userPixelHero in userPixelHeroes" :key="userPixelHero.token_id">
@@ -96,3 +97,16 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.columns {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.column {
+  flex: 33.33%;
+}
+</style>
