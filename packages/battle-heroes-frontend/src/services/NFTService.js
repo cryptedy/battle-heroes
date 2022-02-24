@@ -26,7 +26,7 @@ class NFTService {
   async getUserNFTTokenIds(collectionId, address) {
     const currentPage = 1
     const offset = currentPage - 1
-    const perPage = 20
+    const perPage = 500
 
     const { total, result: NFTs } = await this.getNFTsForContract(
       collectionId,
