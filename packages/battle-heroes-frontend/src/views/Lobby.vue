@@ -1,7 +1,7 @@
 <template>
   <Header />
 
-  <h2>Lobbies</h2>
+  <h2>Lobby</h2>
 
   <p>{{ user.name }}</p>
   <p><img :src="user.image_url" /></p>
@@ -67,7 +67,7 @@ import Header from '@/components/Header'
 import { COLLECTION } from '@/utils/constants'
 
 export default {
-  name: 'Lobbies',
+  name: 'Lobby',
 
   components: {
     Header

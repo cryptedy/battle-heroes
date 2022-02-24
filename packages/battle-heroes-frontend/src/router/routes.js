@@ -11,10 +11,10 @@ export default [
     component: view('Home')
   },
   {
-    path: '/lobbies',
-    name: 'lobbies',
+    path: '/lobby',
+    name: 'lobby',
     meta: { middleware: ['auth'] },
-    component: view('Lobbies')
+    component: view('Lobby')
   },
   {
     path: '/login',
