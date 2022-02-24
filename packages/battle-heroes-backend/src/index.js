@@ -3,17 +3,59 @@ const cors = require('cors')
 const app = express()
 const server = require('http').createServer(app)
 const axios = require('axios')
+const { PORT, CORS_OPTIONS, OPENSEA_API_URL } = require('./utils/constants')
+const io = require('socket.io')(server, { cors: CORS_OPTIONS })
 
-const { OPENSEA_API_URL } = require('./utils/constants')
+const users = []
+const bot = {
+  name: 'bot',
+  image_url: ''
+}
+const findUser = socketId => users.find(user => user.socketId === socketId)
 
-const port = process.env.PORT || 3000
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080'
-
-app.use(
-  cors({
-    origin: new URL(frontendUrl).origin
+io.on('connection', socket => {
+  socket.emit('message', {
+    user: bot,
+    message: 'Welcome to chat!'
   })
-)
+
+  socket.on('join', user => {
+    user.socketId = socket.id
+
+    users.push(user)
+
+    socket.broadcast.emit('message', {
+      user: bot,
+      message: `${user.name} user join chat`
+    })
+
+    io.emit('users', users)
+  })
+
+  socket.on('chatMessage', chatMessage => {
+    io.emit('message', {
+      user: findUser(socket.id),
+      message: chatMessage
+    })
+  })
+
+  socket.on('disconnect', () => {
+    const index = users.findIndex(user => user.socketId === socket.id)
+
+    if (index != -1) {
+      const user = users.splice(index, 1)[0]
+
+      io.emit('message', {
+        user: bot,
+        message: `${user.name} user has left the chat`
+      })
+
+      io.emit('users', users)
+    }
+  })
+})
+
+app.use(cors(CORS_OPTIONS))
 
 app.get('/api/user/:address', async (req, res) => {
   const profile = {
@@ -37,6 +79,6 @@ app.get('/api/user/:address', async (req, res) => {
   }
 })
 
-server.listen(port, () => {
+server.listen(PORT, () => {
   console.log(`Listening on ${server.address().port}`)
 })
