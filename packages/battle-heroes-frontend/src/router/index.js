@@ -33,6 +33,18 @@ async function beforeEach(to, from, next) {
     return next(error)
   }
 
+  if (!store.getters['app/initialized']) {
+    try {
+      await store.dispatch('NFT/getNFTs')
+
+      if (store.getters['auth/check']) {
+        await store.dispatch('auth/getUserNFTTokenIds')
+      }
+    } catch (error) {
+      //
+    }
+  }
+
   next()
 }
 
