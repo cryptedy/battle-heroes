@@ -7,6 +7,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# dotenv environment variable files
+.env
+.env.local
+.env.*.local
+
 # Editor directories and files
 .idea
 .vscode
