@@ -13,8 +13,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspace battle-heroes-frontend build",
-    "start": "yarn workspace battle-heroes-backend start"
+    "dev": "yarn workspace battle-heroes-backend dev",
+    "start": "yarn workspace battle-heroes-backend start",
+    "serve": "yarn workspace battle-heroes-frontend serve",
+    "build": "yarn workspace battle-heroes-frontend build"
   },
   "dependencies": {
     "axios": "^0.26.0"
