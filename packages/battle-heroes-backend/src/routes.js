@@ -1,10 +1,10 @@
 const { Router } = require('express')
 const axios = require('axios')
-const { OPENSEA_API_URL } = require('../../utils/constants')
+const { OPENSEA_API_URL } = require('./utils/constants')
 
 const router = Router()
 
-router.get('/:address', async (req, res) => {
+router.get('/api/users/:address', async (req, res) => {
   const profile = {
     name: null,
     image_url: null

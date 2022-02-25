@@ -6,6 +6,6 @@ const { CORS_OPTIONS } = require('./utils/constants')
 
 const app = express()
 
-app.use(cors(CORS_OPTIONS)).use('/api', require('./routes/api'))
+app.use(cors(CORS_OPTIONS)).use('/', require('./routes'))
 
 module.exports = app
