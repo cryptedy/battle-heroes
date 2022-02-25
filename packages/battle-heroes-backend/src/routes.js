@@ -1,3 +1,5 @@
+'use strict'
+
 const { Router } = require('express')
 const axios = require('axios')
 const { OPENSEA_API_URL } = require('./utils/constants')
