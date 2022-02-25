@@ -1,3 +1,5 @@
+'use strict'
+
 const constants = require('../../../battle-heroes-utils/constants')
 
 const PORT = process.env.PORT || 3000

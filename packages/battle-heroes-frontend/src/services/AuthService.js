@@ -28,7 +28,7 @@ class AuthService {
   }
 
   async getProfile(address) {
-    return axios.get(`${API_URL}/user/${address}`)
+    return axios.get(`${API_URL}/users/${address}`)
   }
 
   async createUser(user) {

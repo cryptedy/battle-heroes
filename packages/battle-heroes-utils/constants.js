@@ -1,3 +1,5 @@
+'use strict'
+
 const COLLECTION = Object.freeze({
   PIXEL_HEROES: 1,
   PIXEL_HEROES_X: 2
