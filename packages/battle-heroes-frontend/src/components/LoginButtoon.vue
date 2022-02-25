@@ -42,7 +42,7 @@ export default {
 
         await this.login()
         await this.getNFTs()
-        await this.getUserNFTTokenIds()
+        this.getUserNFTTokenIds()
 
         this.$router.push(
           {
