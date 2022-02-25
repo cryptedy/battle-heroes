@@ -38,7 +38,7 @@ async function beforeEach(to, from, next) {
       await store.dispatch('NFT/getNFTs')
 
       if (store.getters['auth/check']) {
-        await store.dispatch('auth/getUserNFTTokenIds')
+        store.dispatch('auth/getUserNFTTokenIds')
       }
     } catch (error) {
       //
