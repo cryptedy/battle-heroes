@@ -1,7 +1,8 @@
 'use strict'
 
 const app = require('./app')
-const server = require('./server')(app)
+const httpServer = require('./server')(app)
+require('./socket')(httpServer)
 const { PORT } = require('./utils/constants')
 
-server.listen(PORT)
+httpServer.listen(PORT)
