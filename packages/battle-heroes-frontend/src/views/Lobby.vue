@@ -26,9 +26,9 @@
 
   <div>
     <KeepAlive>
-      <Chat v-if="activeTab === 1" @message="onMessage" />
+      <Chat v-if="activeTab === 1" key="1" @message="onMessage" />
 
-      <UserNFTs v-else-if="activeTab === 2" />
+      <UserNFTs v-else-if="activeTab === 2" key="2" />
     </KeepAlive>
   </div>
 </template>

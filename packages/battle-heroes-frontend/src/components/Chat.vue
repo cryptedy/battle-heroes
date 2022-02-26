@@ -51,10 +51,7 @@ import { mapGetters } from 'vuex'
 import { BACKEND_URL } from '@/utils/constants'
 
 const socket = io(BACKEND_URL, {
-  reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: 5
+  autoConnect: false
 })
 
 export default {
@@ -90,6 +87,8 @@ export default {
   },
 
   mounted() {
+    socket.connect()
+
     socket.on('connect', () => this.onConnectionStateUpdate())
     socket.on('disconnect', () => this.onConnectionStateUpdate())
     socket.on('message', content => this.onMessage(content))
