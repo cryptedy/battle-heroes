@@ -1,6 +1,4 @@
 <template>
-  <h3>User's NFTs</h3>
-
   <ul>
     <li v-for="userPixelHero in userPixelHeroes" :key="userPixelHero.token_id">
       <p>

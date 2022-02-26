@@ -1,5 +1,4 @@
 <template>
-  <h3>Hero's Chat</h3>
   <div>
     <h4>Online members</h4>
     <span v-for="user in users" :key="user.id" style="margin-left: 8px">
@@ -33,8 +32,9 @@
     <p v-else>Failed to connect to the server</p>
   </div>
 
-  <form style="margin-bottom: 24px" @submit.prevent="sendChatMessage">
+  <form @submit.prevent="sendChatMessage">
     <input
+      ref="input"
       v-model="chatMessage"
       v-focus
       placeholder="Send message"
@@ -78,6 +78,13 @@ export default {
     ...mapGetters({
       user: 'auth/user'
     })
+  },
+
+  activated() {
+    this.$refs.input.focus()
+
+    // TODO: no effect
+    this.$nextTick(() => this.scrollToBottom())
   },
 
   mounted() {
@@ -124,6 +131,8 @@ export default {
 
       this.message = ''
 
+      this.$nextTick(() => this.scrollToBottom())
+
       this.$emit('message')
     },
 
@@ -135,6 +144,13 @@ export default {
       socket.emit('chatMessage', this.chatMessage)
 
       this.chatMessage = ''
+    },
+
+    scrollToBottom() {
+      window.scrollTo(
+        0,
+        document.body.scrollHeight || document.documentElement.scrollHeight
+      )
     }
   }
 }

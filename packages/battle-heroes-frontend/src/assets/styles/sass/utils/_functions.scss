@@ -1,0 +1,31 @@
+@function deep-map-get($map, $keys...) {
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+  @return $map;
+}
+
+@function color($type, $shade: dark) {
+  @return deep-map-get($colors, $shade, $type);
+}
+
+@function palette($name, $shade: 500) {
+  @return deep-map-get($palettes, $name, $shade);
+}
+
+@function strip-units($number) {
+  @return $number / ($number * 0 + 1);
+}
+
+@function line-height($leading, $font-size) {
+  @return strip-units($leading) / strip-units($font-size);
+}
+
+@function letter-spacing($tracking) {
+  $letter-spacing: ($tracking / 1000) * 1;
+  @if ($letter-spacing == 0) {
+    @return 0;
+  } @else {
+    @return $letter-spacing + em;
+  }
+}

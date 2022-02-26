@@ -12,7 +12,7 @@
     stroke-dasharray: 265;
     stroke-dashoffset: 0;
     transform-origin: center;
-    stroke: blue;
+    stroke: palette(blue, 500);
     animation: dash 1s ease-in-out infinite;
   }
 }

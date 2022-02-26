@@ -1,27 +1,24 @@
 <template>
-  <Header />
-
-  <h2>Lobby</h2>
-
   <p>
     <strong>{{ user.name }}</strong> -
-    <router-link :to="{ name: 'logout' }"> Logout </router-link>
+    <RouterLink :to="{ name: 'logout' }"> Logout </RouterLink>
   </p>
+
   <img :src="user.image_url" width="32" height="32" />
   <p>Rank: Novice Hero</p>
   <p>User ID: {{ user.id }}</p>
   <p>Address: {{ user.address }}</p>
 
   <p>
-    <a style="color: blue" @click="changeTab(1)">
+    <a href="#" @click="changeTab(1)">
       <strong v-if="activeTab === 1"> Chat </strong>
       <span v-else> Chat </span>
       <span> ({{ unreadMessagesCount }}) </span>
     </a>
     |
-    <a style="color: blue" @click="changeTab(2)">
-      <strong v-if="activeTab === 2"> Your Heroes </strong>
-      <span v-else> Your Heroes </span>
+    <a href="#" @click="changeTab(2)">
+      <strong v-if="activeTab === 2"> Your NFTs </strong>
+      <span v-else> Your NFTs </span>
     </a>
   </p>
 
@@ -39,7 +36,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import Chat from '@/components/Chat'
-import Header from '@/components/Header'
 import UserNFTs from '@/components/UserNFTs'
 
 export default {
@@ -47,7 +43,6 @@ export default {
 
   components: {
     Chat,
-    Header,
     UserNFTs
   },
 
@@ -81,14 +76,7 @@ export default {
     },
 
     onMessage() {
-      if (this.activeTab === 1) {
-        this.$nextTick(() => {
-          window.scrollTo(
-            0,
-            document.body.scrollHeight || document.documentElement.scrollHeight
-          )
-        })
-      } else {
+      if (this.activeTab !== 1) {
         this.unreadMessagesCount++
       }
     }

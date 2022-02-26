@@ -1,26 +1,17 @@
 <template>
   <p v-if="!isMetaMaskEnabled">Please install MetaMask</p>
 
-  <p v-else-if="loading">
-    <Spinner />
-    Login...
-  </p>
-
-  <button v-else @click="loginWithMetaMask">
+  <button v-else :disabled="loading" @click="loginWithMetaMask">
+    <BaseSpinner v-if="loading" />
     {{ $t('message.login') }}
   </button>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import Spinner from '@/components/Spinner'
 
 export default {
   name: 'LoginButtoon',
-
-  components: {
-    Spinner
-  },
 
   data() {
     return {

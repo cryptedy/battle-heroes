@@ -1,23 +1,35 @@
 <template>
-  <div v-if="!initialized">
-    <Spinner />
-    Launching your app...
-  </div>
+  <BaseGrid>
+    <BaseGridRow>
+      <BaseGridColumn v-if="!initialized">
+        <BaseSpinner />
+        Launching your app...
+      </BaseGridColumn>
 
-  <div v-else>
-    <router-view />
-  </div>
+      <template v-else>
+        <BaseGridColumn>
+          <AppHeader />
+        </BaseGridColumn>
+
+        <BaseGridColumn>
+          <RouterView />
+        </BaseGridColumn>
+      </template>
+    </BaseGridRow>
+  </BaseGrid>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import Spinner from '@/components/Spinner'
+import AppHeader from '@/components/AppHeader'
 
 const appTitle = process.env.VUE_APP_TITLE
 
 export default {
+  name: 'App',
+
   components: {
-    Spinner
+    AppHeader
   },
 
   data() {

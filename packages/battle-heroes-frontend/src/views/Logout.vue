@@ -1,18 +1,13 @@
 <template>
-  <Spinner />
+  <BaseSpinner />
   Logout...
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import Spinner from '@/components/Spinner'
 
 export default {
   name: 'Logout',
-
-  components: {
-    Spinner
-  },
 
   async created() {
     this.logout().finally(() => {

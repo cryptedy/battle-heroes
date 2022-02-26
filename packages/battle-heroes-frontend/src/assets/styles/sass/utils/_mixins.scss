@@ -1,0 +1,18 @@
+@mixin clearfix {
+  &:before,
+    &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+@mixin truncate($leading, $truncate-lines, $max-wdth: 100%) {
+  overflow: hidden;
+  max-height: $leading * $truncate-lines;
+  max-width: $max-wdth;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

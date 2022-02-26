@@ -1,8 +1,8 @@
 <template>
   <h1>
-    <router-link :to="{ name: 'home' }">
+    <RouterLink :to="{ name: 'home' }">
       {{ appTitle }}
-    </router-link>
+    </RouterLink>
   </h1>
 
   <p>Battle Heroes is a game based on Pixel Heroes NFT collections.</p>
@@ -12,6 +12,8 @@
 const appTitle = process.env.VUE_APP_TITLE
 
 export default {
+  name: 'AppHeader',
+
   data() {
     return {
       appTitle: appTitle
