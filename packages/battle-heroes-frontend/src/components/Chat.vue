@@ -1,10 +1,12 @@
 <template>
   <div>
     <h4>Online members</h4>
-    <span v-for="user in users" :key="user.id" style="margin-left: 8px">
+    <span v-for="user in users" :key="user.id" style="margin-right: 8px">
       <img :src="user.image_url" width="32" height="32" />
     </span>
   </div>
+
+  <hr />
 
   <div>
     <h4>Chat logs</h4>
