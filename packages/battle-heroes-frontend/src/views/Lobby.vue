@@ -13,7 +13,6 @@
     <a href="#" @click="changeTab(1)">
       <strong v-if="activeTab === 1"> Chat </strong>
       <span v-else> Chat </span>
-      <span> ({{ unreadMessagesCount }}) </span>
     </a>
     |
     <a href="#" @click="changeTab(2)">
@@ -24,13 +23,8 @@
 
   <hr />
 
-  <div>
-    <KeepAlive>
-      <Chat v-if="activeTab === 1" key="1" @message="onMessage" />
-
-      <UserNFTs v-else-if="activeTab === 2" key="2" />
-    </KeepAlive>
-  </div>
+  <Chat v-if="activeTab === 1" />
+  <UserNFTs v-else-if="activeTab === 2" />
 </template>
 
 <script>
@@ -50,8 +44,7 @@ export default {
     return {
       isMetaMaskEnabled: window.ethereum !== undefined,
       loading: false,
-      activeTab: 1,
-      unreadMessagesCount: 0
+      activeTab: 1
     }
   },
 
@@ -61,24 +54,9 @@ export default {
     })
   },
 
-  watch: {
-    // eslint-disable-next-line no-unused-vars
-    activeTab(value, oldValue) {
-      if (value === 1) {
-        this.unreadMessagesCount = 0
-      }
-    }
-  },
-
   methods: {
     changeTab(tab) {
       this.activeTab = tab
-    },
-
-    onMessage() {
-      if (this.activeTab !== 1) {
-        this.unreadMessagesCount++
-      }
     }
   }
 }

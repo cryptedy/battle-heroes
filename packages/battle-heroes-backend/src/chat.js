@@ -10,9 +10,9 @@ const bot = {
 const findUser = socketId => users.find(user => user.socketId === socketId)
 
 module.exports = (io, socket) => {
-  socket.emit('message', {
+  socket.emit('chat:message', {
     user: bot,
-    message: 'Welcome to chat!'
+    text: 'Welcome to chat!'
   })
 
   const onJoin = user => {
@@ -20,18 +20,18 @@ module.exports = (io, socket) => {
 
     users.push(user)
 
-    socket.broadcast.emit('message', {
+    socket.broadcast.emit('chat:message', {
       user: bot,
-      message: `${user.name} user join chat`
+      text: `${user.name} user join chat`
     })
 
-    io.emit('users', users)
+    io.emit('chat:users', users)
   }
 
-  const onChatMessage = message => {
-    io.emit('message', {
+  const onNewMessage = message => {
+    io.emit('chat:message', {
       user: findUser(socket.id),
-      message: message
+      text: message
     })
   }
 
@@ -41,16 +41,16 @@ module.exports = (io, socket) => {
     if (index != -1) {
       const user = users.splice(index, 1)[0]
 
-      io.emit('message', {
+      io.emit('chat:message', {
         user: bot,
-        message: `${user.name} user has left the chat`
+        text: `${user.name} user has left the chat`
       })
 
-      io.emit('users', users)
+      io.emit('chat:users', users)
     }
   }
 
-  socket.on('join', onJoin)
-  socket.on('chatMessage', onChatMessage)
+  socket.on('chat:join', onJoin)
+  socket.on('chat:newMessage', onNewMessage)
   socket.on('disconnect', onDisconnect)
 }

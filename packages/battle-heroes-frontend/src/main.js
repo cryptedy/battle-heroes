@@ -1,11 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
 import store from './store'
+import router from './router'
 import plugins from './plugins'
 import components from './components'
 import directives from './directives'
-import '@/assets/styles/sass/app.scss'
+import './assets/styles/sass/app.scss'
 
 createApp(App)
   .use(store)

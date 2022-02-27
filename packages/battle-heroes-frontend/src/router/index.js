@@ -50,7 +50,9 @@ async function beforeEach(to, from, next) {
 
 // eslint-disable-next-line no-unused-vars
 async function afterEach(to, from) {
-  await store.dispatch('app/initialized')
+  if (!store.getters['app/initialized']) {
+    await store.dispatch('app/initialized')
+  }
 }
 
 function scrollBehavior(to, from, savedPosition) {
