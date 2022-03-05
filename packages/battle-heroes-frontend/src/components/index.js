@@ -1,9 +1,16 @@
 import BaseGrid from './BaseGrid'
 import BaseGridRow from './BaseGridRow'
 import BaseSpinner from './BaseSpinner'
+import BaseAccordion from './BaseAccordion'
 import BaseGridColumn from './BaseGridColumn'
 
-const components = [BaseGrid, BaseGridRow, BaseSpinner, BaseGridColumn]
+const components = [
+  BaseGrid,
+  BaseGridRow,
+  BaseSpinner,
+  BaseAccordion,
+  BaseGridColumn
+]
 
 export default {
   install(app) {

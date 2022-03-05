@@ -1,52 +1,36 @@
 <template>
-  <p v-if="!connected">
-    <BaseSpinner />
-    Connecting to server...
-  </p>
-
-  <template v-else>
-    <div>
-      <h4>Online members</h4>
-
-      <span v-for="user in users" :key="user.id" style="margin-right: 8px">
-        <img :src="user.image_url" width="32" height="32" />
+  <ul>
+    <li v-for="({ user, text }, index) in messages" :key="index">
+      <span
+        v-if="!user.image_url"
+        style="
+          display: inline-block;
+          background-color: gray;
+          width: 32px;
+          height: 32px;
+          color: white;
+          font-size: 10px;
+        "
+      >
+        BOT
       </span>
-    </div>
+      <img v-else :src="user.image_url" width="32" height="32" />
+      {{ user.name }}
+      -
+      {{ text }}
+      <hr />
+    </li>
+  </ul>
 
-    <hr />
-
-    <div>
-      <h4>Chat messages</h4>
-
-      <ul>
-        <li v-for="({ user, text }, index) in messages" :key="index">
-          <span
-            v-if="!user.image_url"
-            style="
-              display: inline-block;
-              background-color: gray;
-              width: 32px;
-              height: 32px;
-            "
-          ></span>
-          <img v-else :src="user.image_url" width="32" height="32" />
-          {{ user.name }}
-          -
-          {{ text }}
-        </li>
-      </ul>
-    </div>
-
-    <form @submit.prevent="sendMessage">
-      <input
-        ref="input"
-        v-model="message"
-        v-focus
-        placeholder="Send message"
-        type="text"
-      />
-    </form>
-  </template>
+  <form @submit.prevent="sendMessage">
+    <input
+      ref="input"
+      v-model="message"
+      v-focus
+      placeholder="Send message"
+      type="text"
+    />
+  </form>
 </template>
 
 <script>
@@ -63,11 +47,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      user: 'auth/user',
-      users: 'chat/users',
-      messages: 'chat/messages',
-      connected: 'socket/connected',
-      currentTransport: 'socket/currentTransport'
+      messages: 'chat/messages'
     })
   },
 
@@ -82,21 +62,12 @@ export default {
   },
 
   mounted() {
-    this.$socket.connect()
-    this.$socket.on('connect', () => this.$socket.emit('chat:join', this.user))
-
     // TODO: no effect
     this.$nextTick(() => this.scrollToBottom())
   },
 
-  beforeUnmount() {
-    this.$socket.off('connect')
-  },
-
   methods: {
     sendMessage() {
-      if (!this.connected) alert('Not connected')
-
       if (this.message.length === 0 || this.message.match('^( |　)+$')) return
 
       this.$socket.emit('chat:newMessage', this.message)
