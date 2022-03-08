@@ -23,7 +23,8 @@ export default {
   methods: {
     ...mapActions({
       login: 'auth/login',
-      getNFTs: 'NFT/getNFTs'
+      setLoaded: 'app/setLoaded',
+      setLoading: 'app/setLoading'
     }),
 
     async loginWithMetaMask() {
@@ -31,7 +32,9 @@ export default {
         this.loading = true
 
         await this.login()
-        await this.getNFTs()
+
+        this.setLoading({ loading: false })
+        this.setLoaded({ loaded: false })
 
         this.$router.push(
           {

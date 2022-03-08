@@ -33,6 +33,10 @@ export const getters = {
 }
 
 export const mutations = {
+  [types.RESET_NFT_STATE](state) {
+    Object.assign(state, initialState())
+  },
+
   [types.SET_NFTS](state, { collectionId, NFTs }) {
     const NFTsObject = {}
     const tokenIds = []
@@ -66,6 +70,10 @@ export const mutations = {
 }
 
 export const actions = {
+  reset({ commit }) {
+    commit(types.RESET_NFT_STATE)
+  },
+
   async getNFTs({ commit }) {
     for (const collectionId of Object.keys(COLLECTIONS)) {
       try {

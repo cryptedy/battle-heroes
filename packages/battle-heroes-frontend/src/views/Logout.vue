@@ -1,27 +1,32 @@
 <template>
-  <BaseSpinner />
-  Logout...
+  <SplashScreen message="Logout..." />
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import SplashScreen from '@/components/SplashScreen'
 
 export default {
   name: 'Logout',
+
+  components: {
+    SplashScreen
+  },
 
   async created() {
     this.logout().finally(() => {
       this.$router
         .push({ name: 'login' }, () => {})
         .then(() => {
-          // TODO: reset all state
+          this.resetState()
         })
     })
   },
 
   methods: {
     ...mapActions({
-      logout: 'auth/logout'
+      logout: 'auth/logout',
+      resetState: 'resetState'
     })
   }
 }

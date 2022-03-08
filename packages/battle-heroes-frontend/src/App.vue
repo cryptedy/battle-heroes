@@ -1,5 +1,5 @@
 <template>
-  <SplashScreen v-if="!initialized" />
+  <SplashScreen v-if="showSplashScreen" />
 
   <router-view v-else />
 </template>
@@ -19,14 +19,41 @@ export default {
 
   data() {
     return {
-      appTitle: appTitle
+      appTitle: appTitle,
+      loading: false
     }
   },
 
   computed: {
     ...mapGetters({
-      initialized: 'app/initialized'
-    })
+      user: 'auth/user',
+      check: 'auth/check',
+      appLoaded: 'app/loaded',
+      appLoading: 'app/loading'
+    }),
+
+    showSplashScreen() {
+      return (this.appLoading || this.loading) && !this.appLoaded
+    }
+  },
+
+  watch: {
+    // eslint-disable-next-line no-unused-vars
+    check(value, oldValue) {
+      if (value) {
+        this.$socket.connect()
+      } else {
+        this.$socket.disconnect()
+      }
+    }
+  },
+
+  mounted() {
+    this.$socket.on('connect', () => this.$socket.emit('chat:join', this.user))
+  },
+
+  beforeUnmount() {
+    this.$socket.off('connect')
   }
 }
 </script>

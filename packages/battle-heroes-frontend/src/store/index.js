@@ -19,5 +19,13 @@ const webSocketPlugin = createWebSocketPlugin(socket)
 export default createStore({
   modules,
   plugins: [webSocketPlugin],
-  strict: process.env.NODE_ENV !== 'production'
+  strict: process.env.NODE_ENV !== 'production',
+  actions: {
+    async resetState({ dispatch }) {
+      for (const moduleName in modules) {
+        // call the reset action of each module
+        await dispatch(`${moduleName}/reset`)
+      }
+    }
+  }
 })

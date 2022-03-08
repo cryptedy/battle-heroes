@@ -12,12 +12,20 @@ export const getters = {
 }
 
 export const mutations = {
+  [types.RESET_SOCKET_STATE](state) {
+    Object.assign(state, initialState())
+  },
+
   [types.SET_CONNECTED](state, { connected }) {
     state.connected = connected
   }
 }
 
 export const actions = {
+  reset({ commit }) {
+    commit(types.RESET_SOCKET_STATE)
+  },
+
   async onConnect({ commit }) {
     console.log('onConnect')
 

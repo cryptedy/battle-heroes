@@ -19,32 +19,32 @@
     <template v-else>
       <p>
         <a href="#" @click="changeTab(1)">
-          <strong v-if="activeTab === 1"> HEROES </strong>
-          <span v-else> HEROES </span>
-        </a>
-        -
-        <a href="#" @click="changeTab(2)">
-          <strong v-if="activeTab === 2"> PLAYERS </strong>
+          <strong v-if="activeTab === 1"> PLAYERS </strong>
           <span v-else> PLAYERS </span>
         </a>
         -
+        <a href="#" @click="changeTab(2)">
+          <strong v-if="activeTab === 2"> MESSAGES </strong>
+          <span v-else> MESSAGES </span>
+        </a>
+        -
         <a href="#" @click="changeTab(3)">
-          <strong v-if="activeTab === 3"> CHAT </strong>
-          <span v-else> CHAT </span>
+          <strong v-if="activeTab === 3"> HEROES </strong>
+          <span v-else> HEROES </span>
         </a>
       </p>
 
-      <UserNFTs v-if="activeTab === 1" />
-      <Players v-if="activeTab === 2" />
-      <Chat v-else-if="activeTab === 3" />
+      <Players v-if="activeTab === 1" />
+      <Messages v-else-if="activeTab === 2" />
+      <UserNFTs v-if="activeTab === 3" />
     </template>
   </LayoutMain>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import Chat from '@/components/Chat'
 import Players from '@/components/Players'
+import Messages from '@/components/Messages'
 import UserNFTs from '@/components/UserNFTs'
 import LayoutMain from '@/components/LayoutMain'
 
@@ -52,8 +52,8 @@ export default {
   name: 'Lobby',
 
   components: {
-    Chat,
     Players,
+    Messages,
     UserNFTs,
     LayoutMain
   },
@@ -71,15 +71,6 @@ export default {
       user: 'auth/user',
       connected: 'socket/connected'
     })
-  },
-
-  mounted() {
-    this.$socket.connect()
-    this.$socket.on('connect', () => this.$socket.emit('chat:join', this.user))
-  },
-
-  beforeUnmount() {
-    this.$socket.off('connect')
   },
 
   methods: {

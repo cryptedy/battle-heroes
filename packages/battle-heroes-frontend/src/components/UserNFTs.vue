@@ -1,5 +1,9 @@
 <template>
-  <ul>
+  <h2>
+    <strong>Pixel Heroes</strong>
+  </h2>
+  <p v-if="!userPixelHeroes.length > 0">No data</p>
+  <ul v-else>
     <li v-for="userPixelHero in userPixelHeroes" :key="userPixelHero.token_id">
       <p>
         <strong>#{{ userPixelHero.token_id }}</strong>
@@ -22,7 +26,11 @@
     </li>
   </ul>
 
-  <ul>
+  <h2>
+    <strong>Pixel Heroes X</strong>
+  </h2>
+  <p v-if="!userPixelHeroesX.length > 0">No data</p>
+  <ul v-else>
     <li
       v-for="userPixelHeroX in userPixelHeroesX"
       :key="userPixelHeroX.token_id"

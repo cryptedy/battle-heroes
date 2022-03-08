@@ -25,6 +25,14 @@ async function onError(error) {
 }
 
 async function beforeEach(to, from, next) {
+  if (!store.getters['app/loaded'] && !store.getters['app/loading']) {
+    store.dispatch('app/setLoading', { loading: true })
+  }
+
+  if (!store.getters['app/loaded']) {
+    await store.dispatch('NFT/getNFTs')
+  }
+
   const middleware = getMiddleware(to)
 
   try {
@@ -33,25 +41,15 @@ async function beforeEach(to, from, next) {
     return next(error)
   }
 
-  if (!store.getters['app/initialized']) {
-    try {
-      await store.dispatch('NFT/getNFTs')
-
-      // if (store.getters['auth/check']) {
-      //   await store.dispatch('auth/getUserNFTs')
-      // }
-    } catch (error) {
-      //
-    }
-  }
-
   next()
 }
 
 // eslint-disable-next-line no-unused-vars
 async function afterEach(to, from) {
-  if (!store.getters['app/initialized']) {
-    await store.dispatch('app/initialized')
+  store.dispatch('app/setLoading', { loading: false })
+
+  if (!store.getters['app/loaded']) {
+    store.dispatch('app/setLoaded', { loaded: true })
   }
 }
 

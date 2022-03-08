@@ -37,7 +37,7 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Chat',
+  name: 'Messages',
 
   data() {
     return {

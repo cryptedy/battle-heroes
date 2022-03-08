@@ -13,6 +13,10 @@ export const getters = {
 }
 
 export const mutations = {
+  [types.RESET_CHAT_STATE](state) {
+    Object.assign(state, initialState())
+  },
+
   [types.SET_CHAT_USERS](state, { users }) {
     state.users = users
   },
@@ -23,6 +27,10 @@ export const mutations = {
 }
 
 export const actions = {
+  reset({ commit }) {
+    commit(types.RESET_CHAT_STATE)
+  },
+
   async setUsers({ commit }, { users }) {
     console.log('chat/setUsers', users)
 

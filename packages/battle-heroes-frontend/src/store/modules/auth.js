@@ -13,6 +13,10 @@ export const getters = {
 }
 
 export const mutations = {
+  [types.RESET_AUTH_STATE](state) {
+    Object.assign(state, initialState())
+  },
+
   [types.SET_USER](state, { user }) {
     state.user = user
   },
@@ -24,6 +28,10 @@ export const mutations = {
 }
 
 export const actions = {
+  reset({ commit }) {
+    commit(types.RESET_AUTH_STATE)
+  },
+
   async login({ commit, dispatch }) {
     try {
       const user = await AuthService.login()
