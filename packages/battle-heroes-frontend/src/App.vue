@@ -1,27 +1,12 @@
 <template>
-  <BaseGrid>
-    <BaseGridRow>
-      <BaseGridColumn v-if="!initialized">
-        <BaseSpinner />
-        Launching your app...
-      </BaseGridColumn>
+  <SplashScreen v-if="!initialized" />
 
-      <template v-else>
-        <BaseGridColumn>
-          <AppHeader />
-        </BaseGridColumn>
-
-        <BaseGridColumn>
-          <RouterView />
-        </BaseGridColumn>
-      </template>
-    </BaseGridRow>
-  </BaseGrid>
+  <router-view v-else />
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import AppHeader from '@/components/AppHeader'
+import SplashScreen from '@/components/SplashScreen'
 
 const appTitle = process.env.VUE_APP_TITLE
 
@@ -29,7 +14,7 @@ export default {
   name: 'App',
 
   components: {
-    AppHeader
+    SplashScreen
   },
 
   data() {

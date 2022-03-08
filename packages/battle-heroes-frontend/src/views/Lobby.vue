@@ -1,47 +1,44 @@
 <template>
-  <p>
-    <strong>{{ user.name }}</strong> -
-    <RouterLink :to="{ name: 'logout' }"> Logout </RouterLink>
-  </p>
-  <img :src="user.image_url" width="32" height="32" />
-  <BaseAccordion>
-    <template #trigger="scopeProps">
-      <a href="#">
-        <span v-if="scopeProps.show"> ▼ </span>
-        <span v-else> ▶ </span>
-        My Heroes
-      </a>
-    </template>
-    <template #contents>
-      <UserNFTs />
-    </template>
-  </BaseAccordion>
-  <p>Rank: Novice Hero</p>
-  <p>User ID: {{ user.id }}</p>
-  <p>Address: {{ user.address }}</p>
-
-  <hr />
-
-  <p v-if="!connected">
-    <BaseSpinner />
-    Connecting to server...
-  </p>
-
-  <template v-else>
+  <LayoutMain>
     <p>
-      <a href="#" @click="changeTab(1)">
-        <strong v-if="activeTab === 1"> PLAYERS </strong>
-        <span v-else> PLAYERS </span>
-      </a>
-      <a href="#" @click="changeTab(2)">
-        <strong v-if="activeTab === 2"> CHAT </strong>
-        <span v-else> CHAT </span>
-      </a>
+      <strong>{{ user.name }}</strong> -
+      <router-link :to="{ name: 'logout' }"> Logout </router-link>
+    </p>
+    <img :src="user.image_url" width="32" height="32" />
+    <p>Rank: Novice Hero</p>
+    <p>User ID: {{ user.id }}</p>
+    <p>Address: {{ user.address }}</p>
+
+    <hr />
+
+    <p v-if="!connected">
+      <BaseSpinner />
+      Connecting to server...
     </p>
 
-    <Players v-if="activeTab === 1" />
-    <Chat v-else-if="activeTab === 2" />
-  </template>
+    <template v-else>
+      <p>
+        <a href="#" @click="changeTab(1)">
+          <strong v-if="activeTab === 1"> HEROES </strong>
+          <span v-else> HEROES </span>
+        </a>
+        -
+        <a href="#" @click="changeTab(2)">
+          <strong v-if="activeTab === 2"> PLAYERS </strong>
+          <span v-else> PLAYERS </span>
+        </a>
+        -
+        <a href="#" @click="changeTab(3)">
+          <strong v-if="activeTab === 3"> CHAT </strong>
+          <span v-else> CHAT </span>
+        </a>
+      </p>
+
+      <UserNFTs v-if="activeTab === 1" />
+      <Players v-if="activeTab === 2" />
+      <Chat v-else-if="activeTab === 3" />
+    </template>
+  </LayoutMain>
 </template>
 
 <script>
@@ -49,6 +46,7 @@ import { mapGetters } from 'vuex'
 import Chat from '@/components/Chat'
 import Players from '@/components/Players'
 import UserNFTs from '@/components/UserNFTs'
+import LayoutMain from '@/components/LayoutMain'
 
 export default {
   name: 'Lobby',
@@ -56,7 +54,8 @@ export default {
   components: {
     Chat,
     Players,
-    UserNFTs
+    UserNFTs,
+    LayoutMain
   },
 
   data() {

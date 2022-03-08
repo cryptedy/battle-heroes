@@ -23,8 +23,7 @@ export default {
   methods: {
     ...mapActions({
       login: 'auth/login',
-      getNFTs: 'NFT/getNFTs',
-      getUserNFTTokenIds: 'auth/getUserNFTTokenIds'
+      getNFTs: 'NFT/getNFTs'
     }),
 
     async loginWithMetaMask() {
@@ -33,7 +32,6 @@ export default {
 
         await this.login()
         await this.getNFTs()
-        this.getUserNFTTokenIds()
 
         this.$router.push(
           {

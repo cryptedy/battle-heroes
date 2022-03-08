@@ -4,7 +4,7 @@ import { COLLECTIONS, METADATA_URL, IMAGE_URL } from '@/utils/constants'
 
 class NFTService {
   async getNFTs(collectionId) {
-    const NFTs = {}
+    const NFTs = []
 
     const { data: metadata } = await this.getMetadata(collectionId)
 
@@ -12,30 +12,30 @@ class NFTService {
       const { name, edition, attributes } = data
       const tokenId = edition
 
-      NFTs[tokenId] = {
+      NFTs.push({
         token_id: tokenId,
         name: name,
         image_url: `${IMAGE_URL}/${collectionId}/${tokenId}.png`,
         attributes: attributes
-      }
+      })
     })
 
     return NFTs
   }
 
-  async getUserNFTTokenIds(collectionId, address) {
+  async getNFTsForAddress(collectionId, address) {
     const currentPage = 1
     const offset = currentPage - 1
     const perPage = 500
 
-    const { total, result: NFTs } = await this.getNFTsForContract(
+    const { total, result: firstNFTs } = await this.getNFTsForContract(
       collectionId,
       address,
       offset,
       perPage
     )
 
-    const paginatedUserNFTs = await this.getPaginatedUserNFTs(
+    const paginatedNFTs = await this.getPaginatedNFTsForAddress(
       collectionId,
       address,
       currentPage,
@@ -43,12 +43,14 @@ class NFTService {
       perPage
     )
 
-    const userNFTs = NFTs.concat(...paginatedUserNFTs)
+    const NFTs = firstNFTs.concat(...paginatedNFTs)
 
-    return userNFTs.map(NFT => Number.parseInt(NFT.token_id))
+    NFTs.forEach(NFT => (NFT.token_id = Number.parseInt(NFT.token_id)))
+
+    return NFTs
   }
 
-  async getPaginatedUserNFTs(
+  async getPaginatedNFTsForAddress(
     collectionId,
     address,
     currentPage,
@@ -56,7 +58,7 @@ class NFTService {
     perPage
   ) {
     const lastPage = Math.ceil(total / perPage)
-    const paginatedUserNFTs = []
+    const paginatedNFTs = []
 
     for (let page = currentPage + 1; page <= lastPage; page++) {
       const offset = (page - 1) * perPage
@@ -68,10 +70,10 @@ class NFTService {
         perPage
       )
 
-      paginatedUserNFTs.push(NFTs)
+      paginatedNFTs.push(NFTs)
     }
 
-    return paginatedUserNFTs
+    return paginatedNFTs
   }
 
   async getNFTsForContract(collectionId, address, offset = 0, limit = 500) {

@@ -1,14 +1,8 @@
 import * as types from '../mutation-types'
-import NFTService from '@/services/NFTService'
 import AuthService from '@/services/AuthService'
-import { COLLECTION, COLLECTIONS } from '@/utils/constants'
 
 const initialState = () => ({
-  user: null,
-  tokenIds: {
-    [COLLECTION.PIXEL_HEROES]: [],
-    [COLLECTION.PIXEL_HEROES_X]: []
-  }
+  user: null
 })
 
 export const state = initialState()
@@ -26,60 +20,55 @@ export const mutations = {
   [types.DELETE_USER](state) {
     const { user } = initialState()
     state.user = user
-  },
-
-  [types.SET_USER_TOKEN_IDS](state, { collectionId, userNFTTokenIds }) {
-    state.tokenIds[collectionId] = userNFTTokenIds.sort((a, b) => a - b)
-  },
-
-  [types.DELETE_USER_TOKEN_IDS](state, { collectionId }) {
-    const { tokenIds } = initialState()
-    state.tokenIds[collectionId] = tokenIds[collectionId]
   }
 }
 
 export const actions = {
-  async login({ commit }) {
+  async login({ commit, dispatch }) {
     try {
       const user = await AuthService.login()
 
       if (user) {
         commit(types.SET_USER, { user })
+
+        await dispatch(
+          'NFT/getNFTsForAddress',
+          {
+            address: user.address
+          },
+          {
+            root: true
+          }
+        )
       }
     } catch (error) {
-      console.log(error)
       commit(types.DELETE_USER)
+
+      throw new Error(error)
     }
   },
 
-  async getUser({ commit }) {
+  async getUser({ commit, dispatch }) {
     try {
       const user = await AuthService.getUser()
 
       if (user) {
+        await dispatch(
+          'NFT/getNFTsForAddress',
+          {
+            address: user.address
+          },
+          {
+            root: true
+          }
+        )
+
         commit(types.SET_USER, { user })
       }
     } catch (error) {
-      console.log(error)
       commit(types.DELETE_USER)
-    }
-  },
 
-  async getUserNFTTokenIds({ commit, rootGetters }) {
-    for (const collectionId of Object.keys(COLLECTIONS)) {
-      try {
-        const userAddress = rootGetters['auth/user'].address
-
-        const userNFTTokenIds = await NFTService.getUserNFTTokenIds(
-          collectionId,
-          userAddress
-        )
-
-        commit(types.SET_USER_TOKEN_IDS, { collectionId, userNFTTokenIds })
-      } catch (error) {
-        console.log(error)
-        commit(types.DELETE_USER_TOKEN_IDS, { collectionId })
-      }
+      throw new Error(error)
     }
   },
 
@@ -87,7 +76,7 @@ export const actions = {
     try {
       await AuthService.logout()
     } catch (error) {
-      console.log(error)
+      throw new Error(error)
     } finally {
       commit(types.DELETE_USER)
     }

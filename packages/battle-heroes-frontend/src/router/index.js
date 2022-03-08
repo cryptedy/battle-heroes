@@ -37,9 +37,9 @@ async function beforeEach(to, from, next) {
     try {
       await store.dispatch('NFT/getNFTs')
 
-      if (store.getters['auth/check']) {
-        store.dispatch('auth/getUserNFTTokenIds')
-      }
+      // if (store.getters['auth/check']) {
+      //   await store.dispatch('auth/getUserNFTs')
+      // }
     } catch (error) {
       //
     }
@@ -117,16 +117,6 @@ function parseMiddleware(middleware) {
 
 function getMiddleware(to) {
   const middleware = [...globalMiddleware]
-
-  // to.matched.forEach(match => {
-  //   if (match.meta.middleware) {
-  //     if (Array.isArray(match.meta.middleware)) {
-  //       middleware.push(...match.meta.middleware)
-  //     } else {
-  //       middleware.push(match.meta.middleware)
-  //     }
-  //   }
-  // })
 
   if (to.meta.middleware) {
     if (Array.isArray(to.meta.middleware)) {

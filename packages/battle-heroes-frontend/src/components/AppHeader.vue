@@ -1,8 +1,8 @@
 <template>
   <h1>
-    <RouterLink :to="{ name: 'home' }">
+    <router-link :to="{ name: 'home' }">
       {{ appTitle }}
-    </RouterLink>
+    </router-link>
   </h1>
 
   <p>Battle Heroes is a game based on Pixel Heroes NFT collections.</p>
