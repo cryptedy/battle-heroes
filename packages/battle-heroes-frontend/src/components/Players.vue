@@ -1,8 +1,9 @@
 <template>
   <ul>
-    <li v-for="user in users" :key="user.id" style="margin-right: 8px">
-      <img :src="user.image_url" width="32" height="32" />
-      {{ user.name }}
+    <li v-for="player in players" :key="player.id" style="margin-right: 8px">
+      <img :src="player.image_url" width="32" height="32" />
+      {{ player.name }}
+      {{ $filters.playerState(player.state) }}
       <hr />
     </li>
   </ul>
@@ -16,7 +17,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      users: 'chat/users'
+      players: 'game/players'
     })
   }
 }

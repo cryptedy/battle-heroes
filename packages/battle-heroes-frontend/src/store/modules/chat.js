@@ -1,14 +1,12 @@
 import * as types from '../mutation-types'
 
 const initialState = () => ({
-  users: [],
   messages: []
 })
 
 export const state = initialState()
 
 export const getters = {
-  users: state => state.users,
   messages: state => state.messages
 }
 
@@ -17,12 +15,12 @@ export const mutations = {
     Object.assign(state, initialState())
   },
 
-  [types.SET_CHAT_USERS](state, { users }) {
-    state.users = users
+  [types.SET_MESSAGES](state, { messages }) {
+    state.messages = messages
   },
 
-  [types.SET_CHAT_MESSAGE](state, { user, text }) {
-    state.messages.push({ user, text })
+  [types.SET_MESSAGE](state, { player, text, posted_at }) {
+    state.messages.push({ player, text, posted_at })
   }
 }
 
@@ -31,15 +29,15 @@ export const actions = {
     commit(types.RESET_CHAT_STATE)
   },
 
-  async setUsers({ commit }, { users }) {
-    console.log('chat/setUsers', users)
+  setMessages({ commit }, { messages }) {
+    console.log('chat/setMessages', { messages })
 
-    commit(types.SET_CHAT_USERS, { users })
+    commit(types.SET_MESSAGES, { messages })
   },
 
-  setMessage({ commit }, { user, text }) {
-    console.log('chat/setMessage', { user, text })
+  setMessage({ commit }, { player, text, posted_at }) {
+    console.log('chat/setMessage', { player, text, posted_at })
 
-    commit(types.SET_CHAT_MESSAGE, { user, text })
+    commit(types.SET_MESSAGE, { player, text, posted_at })
   }
 }

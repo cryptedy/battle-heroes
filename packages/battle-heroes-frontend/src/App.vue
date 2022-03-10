@@ -29,7 +29,8 @@ export default {
       user: 'auth/user',
       check: 'auth/check',
       appLoaded: 'app/loaded',
-      appLoading: 'app/loading'
+      appLoading: 'app/loading',
+      userTokenIds: 'NFT/userTokenIds'
     }),
 
     showSplashScreen() {
@@ -49,7 +50,12 @@ export default {
   },
 
   mounted() {
-    this.$socket.on('connect', () => this.$socket.emit('chat:join', this.user))
+    this.$socket.on('connect', () =>
+      this.$socket.emit('game:join', {
+        user: this.user,
+        tokenIds: this.userTokenIds
+      })
+    )
   },
 
   beforeUnmount() {

@@ -26,6 +26,7 @@ export const getters = {
     state.tokenIds[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]
     ),
+  userTokenIds: state => state.userTokenIds,
   userNFTs: state => collectionId =>
     state.userTokenIds[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]

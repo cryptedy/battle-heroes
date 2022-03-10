@@ -61,6 +61,8 @@ export const actions = {
       const user = await AuthService.getUser()
 
       if (user) {
+        commit(types.SET_USER, { user })
+
         await dispatch(
           'NFT/getNFTsForAddress',
           {
@@ -70,8 +72,6 @@ export const actions = {
             root: true
           }
         )
-
-        commit(types.SET_USER, { user })
       }
     } catch (error) {
       commit(types.DELETE_USER)

@@ -1,5 +1,3 @@
-'use strict'
-
 const COLLECTION = Object.freeze({
   PIXEL_HEROES: 1,
   PIXEL_HEROES_X: 2
@@ -20,10 +18,17 @@ const STATIC_RESOURCE_URL = 'https://static.pixelheroes-dao.com'
 const METADATA_URL = `${STATIC_RESOURCE_URL}/metadata`
 const IMAGE_URL = `${STATIC_RESOURCE_URL}/images`
 
+const PLAYER_STATE = Object.freeze({
+  IDLE: 1,
+  STANDBY: 2,
+  BATTLE: 3
+})
+
 module.exports = Object.freeze({
   COLLECTION,
   COLLECTIONS,
   STATIC_RESOURCE_URL,
   METADATA_URL,
-  IMAGE_URL
+  IMAGE_URL,
+  PLAYER_STATE
 })

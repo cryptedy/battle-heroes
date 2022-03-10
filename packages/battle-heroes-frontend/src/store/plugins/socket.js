@@ -22,11 +22,17 @@ export default function createWebSocketPlugin(socket) {
       store.dispatch('socket/onReconnectFailed')
     )
 
+    // game event
+    socket.on('game:players', players =>
+      store.dispatch('game/setPlayers', { players })
+    )
+
     // chat event
-    // TODO: separate file
-    socket.on('chat:users', users => store.dispatch('chat/setUsers', { users }))
-    socket.on('chat:message', ({ user, text }) =>
-      store.dispatch('chat/setMessage', { user, text })
+    socket.on('chat:messages', messages =>
+      store.dispatch('chat/setMessages', { messages })
+    )
+    socket.on('chat:message', ({ player, text, posted_at }) =>
+      store.dispatch('chat/setMessage', { player, text, posted_at })
     )
   }
 }

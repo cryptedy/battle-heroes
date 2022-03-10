@@ -1,23 +1,12 @@
 <template>
   <ul>
-    <li v-for="({ user, text }, index) in messages" :key="index">
-      <span
-        v-if="!user.image_url"
-        style="
-          display: inline-block;
-          background-color: gray;
-          width: 32px;
-          height: 32px;
-          color: white;
-          font-size: 10px;
-        "
-      >
-        BOT
-      </span>
-      <img v-else :src="user.image_url" width="32" height="32" />
-      {{ user.name }}
+    <li v-for="(message, index) in messages" :key="index">
+      <img :src="message.player.image_url" width="32" height="32" />
+      {{ message.player.name }}
       -
-      {{ text }}
+      {{ message.text }}
+      -
+      {{ message.posted_at }}
       <hr />
     </li>
   </ul>
@@ -25,7 +14,7 @@
   <form @submit.prevent="sendMessage">
     <input
       ref="input"
-      v-model="message"
+      v-model="newMessage"
       v-focus
       placeholder="Send message"
       type="text"
@@ -41,7 +30,7 @@ export default {
 
   data() {
     return {
-      message: ''
+      newMessage: ''
     }
   },
 
@@ -68,11 +57,12 @@ export default {
 
   methods: {
     sendMessage() {
-      if (this.message.length === 0 || this.message.match('^( |　)+$')) return
+      if (this.newMessage.length === 0 || this.newMessage.match('^( |　)+$'))
+        return
 
-      this.$socket.emit('chat:newMessage', this.message)
+      this.$socket.emit('chat:newMessage', this.newMessage)
 
-      this.message = ''
+      this.newMessage = ''
     },
 
     scrollToBottom() {

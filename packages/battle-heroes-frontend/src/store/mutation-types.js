@@ -19,7 +19,12 @@ export const DELETE_USER = 'DELETE_USER'
 export const RESET_SOCKET_STATE = 'RESET_SOCKET_STATE'
 export const SET_CONNECTED = 'SET_CONNECTED'
 
+// game
+export const RESET_GAME_STATE = 'RESET_GAME_STATE'
+export const SET_PLAYERS = 'SET_PLAYERS'
+export const DELETE_PLAYERS = 'DELETE_PLAYERS'
+
 // chat
 export const RESET_CHAT_STATE = 'RESET_CHAT_STATE'
-export const SET_CHAT_USERS = 'SET_CHAT_USERS'
-export const SET_CHAT_MESSAGE = 'SET_CHAT_MESSAGE'
+export const SET_MESSAGES = 'SET_MESSAGES'
+export const SET_MESSAGE = 'SET_MESSAGE'

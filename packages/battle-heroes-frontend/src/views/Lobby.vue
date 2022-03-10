@@ -24,8 +24,8 @@
         </a>
         -
         <a href="#" @click="changeTab(2)">
-          <strong v-if="activeTab === 2"> MESSAGES </strong>
-          <span v-else> MESSAGES </span>
+          <strong v-if="activeTab === 2"> CHAT </strong>
+          <span v-else> CHAT </span>
         </a>
         -
         <a href="#" @click="changeTab(3)">
@@ -35,7 +35,7 @@
       </p>
 
       <Players v-if="activeTab === 1" />
-      <Messages v-else-if="activeTab === 2" />
+      <Chat v-else-if="activeTab === 2" />
       <UserNFTs v-if="activeTab === 3" />
     </template>
   </LayoutMain>
@@ -43,8 +43,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Chat from '@/components/Chat'
 import Players from '@/components/Players'
-import Messages from '@/components/Messages'
 import UserNFTs from '@/components/UserNFTs'
 import LayoutMain from '@/components/LayoutMain'
 
@@ -52,8 +52,8 @@ export default {
   name: 'Lobby',
 
   components: {
+    Chat,
     Players,
-    Messages,
     UserNFTs,
     LayoutMain
   },
@@ -69,6 +69,7 @@ export default {
   computed: {
     ...mapGetters({
       user: 'auth/user',
+      player: 'game/player',
       connected: 'socket/connected'
     })
   },
