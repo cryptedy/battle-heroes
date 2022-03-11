@@ -1,6 +1,6 @@
 import axios from 'axios'
-import * as types from '../mutation-types'
 import { COLLECTIONS, API_URL } from '@/utils/constants'
+import { RESET_NFT_STATE, SET_NFTS, DELETE_NFTS } from '../mutation-types'
 
 const initialState = () => {
   const NFTs = {}
@@ -32,11 +32,11 @@ export const getters = {
 }
 
 export const mutations = {
-  [types.RESET_NFT_STATE](state) {
+  [RESET_NFT_STATE](state) {
     Object.assign(state, initialState())
   },
 
-  [types.SET_NFTS](state, { collectionId, NFTs }) {
+  [SET_NFTS](state, { collectionId, NFTs }) {
     const NFTsObject = {}
     const tokenIds = []
 
@@ -49,7 +49,7 @@ export const mutations = {
     state.tokenIds[collectionId] = tokenIds.sort((a, b) => a - b)
   },
 
-  [types.DELETE_NFTS](state, { collectionId }) {
+  [DELETE_NFTS](state, { collectionId }) {
     const { NFTs, tokenIds } = initialState()
 
     state.NFTs[collectionId] = NFTs[collectionId]
@@ -59,7 +59,7 @@ export const mutations = {
 
 export const actions = {
   reset({ commit }) {
-    commit(types.RESET_NFT_STATE)
+    commit(RESET_NFT_STATE)
   },
 
   async getNFTs({ commit }) {
@@ -69,9 +69,9 @@ export const actions = {
           `${API_URL}/collections/${collectionId}`
         )
 
-        commit(types.SET_NFTS, { collectionId, NFTs })
+        commit(SET_NFTS, { collectionId, NFTs })
       } catch (error) {
-        commit(types.DELETE_NFTS, { collectionId })
+        commit(DELETE_NFTS, { collectionId })
 
         throw new Error(error)
       }

@@ -1,7 +1,7 @@
 import axios from 'axios'
-import * as types from '../mutation-types'
 import { API_URL } from '@/utils/constants'
 import Moralis from 'moralis/dist/moralis.min.js'
+import { RESET_AUTH_STATE, SET_PLAYER, DELETE_PLAYER } from '../mutation-types'
 
 const SIGNING_MESSAGE = `Login to ${process.env.VUE_APP_TITLE}`
 
@@ -42,15 +42,15 @@ export const getters = {
 }
 
 export const mutations = {
-  [types.RESET_AUTH_STATE](state) {
+  [RESET_AUTH_STATE](state) {
     Object.assign(state, initialState())
   },
 
-  [types.SET_PLAYER](state, { player }) {
+  [SET_PLAYER](state, { player }) {
     state.player = player
   },
 
-  [types.DELETE_PLAYER](state) {
+  [DELETE_PLAYER](state) {
     const { player } = initialState()
     state.player = player
   }
@@ -58,7 +58,7 @@ export const mutations = {
 
 export const actions = {
   reset({ commit }) {
-    commit(types.RESET_AUTH_STATE)
+    commit(RESET_AUTH_STATE)
   },
 
   async login({ commit }) {
@@ -71,9 +71,9 @@ export const actions = {
 
       const player = await createPlayer(this.$socket, user)
 
-      commit(types.SET_PLAYER, { player })
+      commit(SET_PLAYER, { player })
     } catch (error) {
-      commit(types.DELETE_PLAYER)
+      commit(DELETE_PLAYER)
 
       throw new Error(error)
     }
@@ -87,9 +87,9 @@ export const actions = {
 
       const player = await createPlayer(this.$socket, user)
 
-      commit(types.SET_PLAYER, { player })
+      commit(SET_PLAYER, { player })
     } catch (error) {
-      commit(types.DELETE_PLAYER)
+      commit(DELETE_PLAYER)
 
       throw new Error(error)
     }
@@ -101,7 +101,7 @@ export const actions = {
     } catch (error) {
       throw new Error(error)
     } finally {
-      commit(types.DELETE_PLAYER)
+      commit(DELETE_PLAYER)
     }
   }
 }

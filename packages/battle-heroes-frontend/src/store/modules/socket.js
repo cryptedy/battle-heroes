@@ -1,5 +1,5 @@
 import socket from '@/utils/socket'
-import * as types from '../mutation-types'
+import { RESET_SOCKET_STATE, SET_CONNECTED } from '../mutation-types'
 
 const initialState = () => ({
   connected: false
@@ -12,30 +12,30 @@ export const getters = {
 }
 
 export const mutations = {
-  [types.RESET_SOCKET_STATE](state) {
+  [RESET_SOCKET_STATE](state) {
     Object.assign(state, initialState())
   },
 
-  [types.SET_CONNECTED](state, { connected }) {
+  [SET_CONNECTED](state, { connected }) {
     state.connected = connected
   }
 }
 
 export const actions = {
   reset({ commit }) {
-    commit(types.RESET_SOCKET_STATE)
+    commit(RESET_SOCKET_STATE)
   },
 
   async onConnect({ commit }) {
     console.log('onConnect')
 
-    commit(types.SET_CONNECTED, { connected: socket.connected })
+    commit(SET_CONNECTED, { connected: socket.connected })
   },
 
   async onDisconnect({ commit }) {
     console.log('onDisconnect')
 
-    commit(types.SET_CONNECTED, { connected: socket.connected })
+    commit(SET_CONNECTED, { connected: socket.connected })
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -52,7 +52,7 @@ export const actions = {
   async onReconnect({ commit }, { attempt }) {
     console.log('onReconnect', attempt)
 
-    commit(types.SET_CONNECTED, { connected: socket.connected })
+    commit(SET_CONNECTED, { connected: socket.connected })
   },
 
   // eslint-disable-next-line no-unused-vars
