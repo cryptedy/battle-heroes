@@ -1,5 +1,7 @@
 export default function createWebSocketPlugin(socket) {
   return store => {
+    store.$socket = socket
+
     // socket events
     socket.on('connect', () => store.dispatch('socket/onConnect'))
     socket.on('disconnect', () => store.dispatch('socket/onDisconnect'))
@@ -24,7 +26,7 @@ export default function createWebSocketPlugin(socket) {
 
     // game event
     socket.on('game:players', players =>
-      store.dispatch('game/setPlayers', { players })
+      store.dispatch('player/setPlayers', { players })
     )
 
     // chat event

@@ -1,13 +1,13 @@
 <template>
   <LayoutMain>
     <p>
-      <strong>{{ user.name }}</strong> -
+      <strong>{{ player.name }}</strong> -
       <router-link :to="{ name: 'logout' }"> Logout </router-link>
     </p>
-    <img :src="user.image_url" width="32" height="32" />
-    <p>Rank: Novice Hero</p>
-    <p>User ID: {{ user.id }}</p>
-    <p>Address: {{ user.address }}</p>
+    <img :src="player.image_url" width="32" height="32" />
+    <p>Level: {{ player.level }}</p>
+    <p>Player ID: {{ player.id }}</p>
+    <p>Address: {{ player.address }}</p>
 
     <hr />
 
@@ -36,7 +36,7 @@
 
       <Players v-if="activeTab === 1" />
       <Chat v-else-if="activeTab === 2" />
-      <UserNFTs v-if="activeTab === 3" />
+      <PlayerNFTs v-if="activeTab === 3" />
     </template>
   </LayoutMain>
 </template>
@@ -45,8 +45,8 @@
 import { mapGetters } from 'vuex'
 import Chat from '@/components/Chat'
 import Players from '@/components/Players'
-import UserNFTs from '@/components/UserNFTs'
 import LayoutMain from '@/components/LayoutMain'
+import PlayerNFTs from '@/components/PlayerNFTs'
 
 export default {
   name: 'Lobby',
@@ -54,8 +54,8 @@ export default {
   components: {
     Chat,
     Players,
-    UserNFTs,
-    LayoutMain
+    LayoutMain,
+    PlayerNFTs
   },
 
   data() {
@@ -68,8 +68,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      user: 'auth/user',
-      player: 'game/player',
+      player: 'auth/player',
       connected: 'socket/connected'
     })
   },

@@ -26,11 +26,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      user: 'auth/user',
-      check: 'auth/check',
       appLoaded: 'app/loaded',
-      appLoading: 'app/loading',
-      userTokenIds: 'NFT/userTokenIds'
+      appLoading: 'app/loading'
     }),
 
     showSplashScreen() {
@@ -38,28 +35,12 @@ export default {
     }
   },
 
-  watch: {
-    // eslint-disable-next-line no-unused-vars
-    check(value, oldValue) {
-      if (value) {
-        this.$socket.connect()
-      } else {
-        this.$socket.disconnect()
-      }
-    }
-  },
-
   mounted() {
-    this.$socket.on('connect', () =>
-      this.$socket.emit('game:join', {
-        user: this.user,
-        tokenIds: this.userTokenIds
-      })
-    )
+    this.$socket.connect()
   },
 
   beforeUnmount() {
-    this.$socket.off('connect')
+    this.$socket.disconnect()
   }
 }
 </script>

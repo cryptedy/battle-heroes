@@ -1,23 +1,21 @@
+import axios from 'axios'
 import * as types from '../mutation-types'
-import NFTService from '@/services/NFTService'
-import { COLLECTION, COLLECTIONS } from '@/utils/constants'
+import { COLLECTIONS, API_URL } from '@/utils/constants'
 
-const initialState = () => ({
-  NFTs: {
-    [COLLECTION.PIXEL_HEROES]: {},
-    [COLLECTION.PIXEL_HEROES_X]: {}
-  },
+const initialState = () => {
+  const NFTs = {}
+  const tokenIds = {}
 
-  tokenIds: {
-    [COLLECTION.PIXEL_HEROES]: [],
-    [COLLECTION.PIXEL_HEROES_X]: []
-  },
-
-  userTokenIds: {
-    [COLLECTION.PIXEL_HEROES]: [],
-    [COLLECTION.PIXEL_HEROES_X]: []
+  for (const collectionId of Object.keys(COLLECTIONS)) {
+    NFTs[collectionId] = {}
+    tokenIds[collectionId] = []
   }
-})
+
+  return {
+    NFTs,
+    tokenIds
+  }
+}
 
 export const state = initialState()
 
@@ -26,11 +24,11 @@ export const getters = {
     state.tokenIds[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]
     ),
-  userTokenIds: state => state.userTokenIds,
-  userNFTs: state => collectionId =>
-    state.userTokenIds[collectionId].map(
+  byPlayer: state => (collectionId, player) => {
+    return player.token_ids[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]
     )
+  }
 }
 
 export const mutations = {
@@ -56,17 +54,6 @@ export const mutations = {
 
     state.NFTs[collectionId] = NFTs[collectionId]
     state.tokenIds[collectionId] = tokenIds[collectionId]
-  },
-
-  [types.SET_USER_NFTs](state, { collectionId, NFTs }) {
-    state.userTokenIds[collectionId] = NFTs.map(NFT => NFT.token_id).sort(
-      (a, b) => a - b
-    )
-  },
-
-  [types.DELETE_USER_NFTs](state, { collectionId }) {
-    const { tokenIds } = initialState()
-    state.userTokenIds[collectionId] = tokenIds[collectionId]
   }
 }
 
@@ -78,24 +65,13 @@ export const actions = {
   async getNFTs({ commit }) {
     for (const collectionId of Object.keys(COLLECTIONS)) {
       try {
-        const NFTs = await NFTService.getNFTs(collectionId)
+        const { data: NFTs } = await axios.get(
+          `${API_URL}/collections/${collectionId}`
+        )
+
         commit(types.SET_NFTS, { collectionId, NFTs })
       } catch (error) {
         commit(types.DELETE_NFTS, { collectionId })
-
-        throw new Error(error)
-      }
-    }
-  },
-
-  async getNFTsForAddress({ commit }, { address }) {
-    for (const collectionId of Object.keys(COLLECTIONS)) {
-      try {
-        const NFTs = await NFTService.getNFTsForAddress(collectionId, address)
-
-        commit(types.SET_USER_NFTs, { collectionId, NFTs })
-      } catch (error) {
-        commit(types.DELETE_USER_NFTs, { collectionId })
 
         throw new Error(error)
       }

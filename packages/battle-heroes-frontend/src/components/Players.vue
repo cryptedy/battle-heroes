@@ -3,6 +3,9 @@
     <li v-for="player in players" :key="player.id" style="margin-right: 8px">
       <img :src="player.image_url" width="32" height="32" />
       {{ player.name }}
+      - Lv. {{ player.level }}
+      -
+      {{ player.token_ids[1].length + player.token_ids[2].length }} heros -
       {{ $filters.playerState(player.state) }}
       <hr />
     </li>
@@ -17,7 +20,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      players: 'game/players'
+      players: 'player/all'
     })
   }
 }

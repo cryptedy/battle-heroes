@@ -1,6 +1,14 @@
 const { createStore } = require('redux')
+const { COLLECTIONS } = require('./constants')
+
+const NFTs = {}
+
+for (const collectionId of Object.keys(COLLECTIONS)) {
+  NFTs[collectionId] = []
+}
 
 const initialState = {
+  NFTs,
   players: [],
   messages: []
 }
@@ -9,6 +17,11 @@ function reducer(state, action) {
   const { payload, type } = action
 
   switch (type) {
+    case 'SET_NFTs':
+      return {
+        ...state,
+        NFTs: payload
+      }
     case 'SET_PLAYER':
       return {
         ...state,

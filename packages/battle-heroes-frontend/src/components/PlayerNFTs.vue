@@ -2,21 +2,21 @@
   <h2>
     <strong>Pixel Heroes</strong>
   </h2>
-  <p v-if="!userPixelHeroes.length > 0">No data</p>
+  <p v-if="!pixelHeroes.length > 0">No data</p>
   <ul v-else>
-    <li v-for="userPixelHero in userPixelHeroes" :key="userPixelHero.token_id">
+    <li v-for="pixelHero in pixelHeroes" :key="pixelHero.token_id">
       <p>
-        <strong>#{{ userPixelHero.token_id }}</strong>
+        <strong>#{{ pixelHero.token_id }}</strong>
       </p>
       <img
-        :src="userPixelHero.image_url"
-        :alt="userPixelHero.name"
+        :src="pixelHero.image_url"
+        :alt="pixelHero.name"
         width="64"
         height="64"
       />
       <ul>
         <li
-          v-for="attribute in userPixelHero.attributes"
+          v-for="attribute in pixelHero.attributes"
           :key="attribute.trait_type"
         >
           {{ attribute.trait_type }}: {{ attribute.value }}
@@ -29,24 +29,21 @@
   <h2>
     <strong>Pixel Heroes X</strong>
   </h2>
-  <p v-if="!userPixelHeroesX.length > 0">No data</p>
+  <p v-if="!pixelHeroesX.length > 0">No data</p>
   <ul v-else>
-    <li
-      v-for="userPixelHeroX in userPixelHeroesX"
-      :key="userPixelHeroX.token_id"
-    >
+    <li v-for="pixelHeroX in pixelHeroesX" :key="pixelHeroX.token_id">
       <p>
-        <strong>#{{ userPixelHeroX.token_id }}</strong>
+        <strong>#{{ pixelHeroX.token_id }}</strong>
       </p>
       <img
-        :src="userPixelHeroX.image_url"
-        :alt="userPixelHeroX.name"
+        :src="pixelHeroX.image_url"
+        :alt="pixelHeroX.name"
         width="64"
         height="64"
       />
       <ul>
         <li
-          v-for="attributeX in userPixelHeroX.attributes"
+          v-for="attributeX in pixelHeroX.attributes"
           :key="attributeX.trait_type"
         >
           {{ attributeX.trait_type }}: {{ attributeX.value }}
@@ -62,19 +59,20 @@ import { mapGetters } from 'vuex'
 import { COLLECTION } from '@/utils/constants'
 
 export default {
-  name: 'UserNFTs',
+  name: 'PlayerNFTs',
 
   computed: {
     ...mapGetters({
-      userNFTs: 'NFT/userNFTs'
+      player: 'auth/player',
+      byPlayer: 'NFT/byPlayer'
     }),
 
-    userPixelHeroes() {
-      return this.userNFTs(COLLECTION.PIXEL_HEROES)
+    pixelHeroes() {
+      return this.byPlayer(COLLECTION.PIXEL_HEROES, this.player)
     },
 
-    userPixelHeroesX() {
-      return this.userNFTs(COLLECTION.PIXEL_HEROES_X)
+    pixelHeroesX() {
+      return this.byPlayer(COLLECTION.PIXEL_HEROES_X, this.player)
     }
   }
 }

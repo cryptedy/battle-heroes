@@ -1,8 +1,19 @@
 const axios = require('axios')
 const { Router } = require('express')
 const { OPENSEA_API_URL } = require('./constants')
+const store = require('./store')
 
 const router = Router()
+
+router.get('/api/collections/:id', async (req, res) => {
+  try {
+    const { NFTs } = store.getState()
+
+    res.json(NFTs[req.params.id])
+  } catch (error) {
+    res.json({})
+  }
+})
 
 router.get('/api/users/:address', async (req, res) => {
   const profile = {
