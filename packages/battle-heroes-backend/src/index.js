@@ -44,7 +44,11 @@ const main = async () => {
     cors: corsOptions
   })
 
-  const onConnection = socket => game(io, socket)
+  const onConnection = socket => {
+    console.log('onConnection', socket.id)
+
+    game(io, socket)
+  }
 
   io.on('connection', onConnection)
 

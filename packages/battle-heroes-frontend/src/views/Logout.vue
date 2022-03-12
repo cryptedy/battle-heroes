@@ -14,19 +14,17 @@ export default {
   },
 
   async created() {
-    this.logout().finally(() => {
-      this.$router
-        .push({ name: 'login' }, () => {})
-        .then(() => {
-          this.resetState()
-        })
-    })
+    await this.logoutGame()
+
+    await this.logout()
+
+    this.$router.push({ name: 'login' }, () => {})
   },
 
   methods: {
     ...mapActions({
       logout: 'auth/logout',
-      resetState: 'resetState'
+      logoutGame: 'game/logout'
     })
   }
 }

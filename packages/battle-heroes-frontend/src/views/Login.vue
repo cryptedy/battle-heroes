@@ -1,19 +1,19 @@
 <template>
   <LayoutHome>
-    <LoginButtoon />
+    <LoginButton />
   </LayoutHome>
 </template>
 
 <script>
 import LayoutHome from '@/components/LayoutHome'
-import LoginButtoon from '@/components/LoginButtoon'
+import LoginButton from '@/components/LoginButton'
 
 export default {
   name: 'Login',
 
   components: {
     LayoutHome,
-    LoginButtoon
+    LoginButton
   }
 }
 </script>

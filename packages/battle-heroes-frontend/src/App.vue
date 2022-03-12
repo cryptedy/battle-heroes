@@ -1,5 +1,5 @@
 <template>
-  <SplashScreen v-if="showSplashScreen" />
+  <SplashScreen v-if="isAppLoading" />
 
   <router-view v-else />
 </template>
@@ -19,23 +19,17 @@ export default {
 
   data() {
     return {
-      appTitle: appTitle,
-      loading: false
+      appTitle: appTitle
     }
   },
 
   computed: {
     ...mapGetters({
-      appLoaded: 'app/loaded',
-      appLoading: 'app/loading'
-    }),
-
-    showSplashScreen() {
-      return (this.appLoading || this.loading) && !this.appLoaded
-    }
+      isAppLoading: 'app/isLoading'
+    })
   },
 
-  mounted() {
+  async mounted() {
     this.$socket.connect()
   },
 

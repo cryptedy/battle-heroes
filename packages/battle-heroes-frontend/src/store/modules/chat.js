@@ -1,4 +1,4 @@
-import { RESET_CHAT_STATE, SET_MESSAGES, SET_MESSAGE } from '../mutation-types'
+import { SET_MESSAGES, DELETE_MESSAGES, ADD_MESSAGE } from '../mutation-types'
 
 const initialState = () => ({
   messages: []
@@ -11,33 +11,39 @@ export const getters = {
 }
 
 export const mutations = {
-  [RESET_CHAT_STATE](state) {
-    Object.assign(state, initialState())
-  },
-
   [SET_MESSAGES](state, { messages }) {
     state.messages = messages
   },
 
-  [SET_MESSAGE](state, { player, text, posted_at }) {
+  [DELETE_MESSAGES](state) {
+    const { messages } = initialState()
+
+    state.messages = messages
+  },
+
+  [ADD_MESSAGE](state, { message }) {
+    const { player, text, posted_at } = message
+
     state.messages.push({ player, text, posted_at })
   }
 }
 
 export const actions = {
-  reset({ commit }) {
-    commit(RESET_CHAT_STATE)
-  },
-
-  setMessages({ commit }, { messages }) {
-    console.log('chat/setMessages', { messages })
+  setMessages({ commit }, messages) {
+    console.log('chat/setMessages', messages)
 
     commit(SET_MESSAGES, { messages })
   },
 
-  setMessage({ commit }, { player, text, posted_at }) {
-    console.log('chat/setMessage', { player, text, posted_at })
+  async deleteMessages({ commit }) {
+    console.log('chat/deleteMessages')
 
-    commit(SET_MESSAGE, { player, text, posted_at })
+    commit(DELETE_MESSAGES)
+  },
+
+  addMessage({ commit }, message) {
+    console.log('chat/addMessage', message)
+
+    commit(ADD_MESSAGE, { message })
   }
 }

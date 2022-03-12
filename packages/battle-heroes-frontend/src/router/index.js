@@ -2,7 +2,7 @@ import store from '@/store'
 import routes from './routes'
 import { createRouter, createWebHistory } from 'vue-router'
 
-const globalMiddleware = ['check-auth']
+const globalMiddleware = ['auth-check']
 
 const routeMiddleware = resolveMiddleware(
   require.context('@/middleware', false, /.*\.js$/)
@@ -25,11 +25,11 @@ async function onError(error) {
 }
 
 async function beforeEach(to, from, next) {
-  if (!store.getters['app/loaded'] && !store.getters['app/loading']) {
-    store.dispatch('app/setLoading', { loading: true })
+  if (!store.getters['app/isLoaded']) {
+    await store.dispatch('app/setLoading', true)
   }
 
-  if (!store.getters['app/loaded']) {
+  if (!store.getters['NFT/isLoaded']) {
     await store.dispatch('NFT/getNFTs')
   }
 
@@ -46,10 +46,12 @@ async function beforeEach(to, from, next) {
 
 // eslint-disable-next-line no-unused-vars
 async function afterEach(to, from) {
-  store.dispatch('app/setLoading', { loading: false })
+  if (store.getters['app/isLoading']) {
+    store.dispatch('app/setLoading', false)
+  }
 
-  if (!store.getters['app/loaded']) {
-    store.dispatch('app/setLoaded', { loaded: true })
+  if (!store.getters['app/isLoaded']) {
+    store.dispatch('app/setLoaded', true)
   }
 }
 

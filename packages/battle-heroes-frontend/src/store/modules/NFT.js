@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { COLLECTIONS, API_URL } from '@/utils/constants'
-import { RESET_NFT_STATE, SET_NFTS, DELETE_NFTS } from '../mutation-types'
+import { SET_NFTS, DELETE_NFTS } from '../mutation-types'
 
 const initialState = () => {
   const NFTs = {}
@@ -20,6 +20,10 @@ const initialState = () => {
 export const state = initialState()
 
 export const getters = {
+  isLoaded: state =>
+    Object.keys(COLLECTIONS).filter(
+      collectionId => state.tokenIds[collectionId].length > 0
+    ).length === Object.keys(COLLECTIONS).length,
   all: state => collectionId =>
     state.tokenIds[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]
@@ -32,10 +36,6 @@ export const getters = {
 }
 
 export const mutations = {
-  [RESET_NFT_STATE](state) {
-    Object.assign(state, initialState())
-  },
-
   [SET_NFTS](state, { collectionId, NFTs }) {
     const NFTsObject = {}
     const tokenIds = []
@@ -58,12 +58,12 @@ export const mutations = {
 }
 
 export const actions = {
-  reset({ commit }) {
-    commit(RESET_NFT_STATE)
-  },
-
   async getNFTs({ commit }) {
+    console.log('NFT/getNFTs')
+
     for (const collectionId of Object.keys(COLLECTIONS)) {
+      console.log('NFT/getNFTs', collectionId)
+
       try {
         const { data: NFTs } = await axios.get(
           `${API_URL}/collections/${collectionId}`

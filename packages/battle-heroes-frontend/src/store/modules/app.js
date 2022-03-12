@@ -1,4 +1,4 @@
-import { RESET_APP_STATE, SET_LOADING, SET_LOADED } from '../mutation-types'
+import { SET_LOADING, SET_LOADED } from '../mutation-types'
 
 const initialState = () => {
   return {
@@ -10,15 +10,11 @@ const initialState = () => {
 export const state = initialState()
 
 export const getters = {
-  loading: state => state.loading,
-  loaded: state => state.loaded
+  isLoading: state => state.loading,
+  isLoaded: state => state.loaded
 }
 
 export const mutations = {
-  [RESET_APP_STATE](state) {
-    Object.assign(state, initialState())
-  },
-
   [SET_LOADING](state, { loading }) {
     state.loading = loading
   },
@@ -29,15 +25,15 @@ export const mutations = {
 }
 
 export const actions = {
-  reset({ commit }) {
-    commit(RESET_APP_STATE)
-  },
+  async setLoading({ commit }, loading) {
+    console.log('app/setLoading', loading)
 
-  async setLoading({ commit }, { loading }) {
     commit(SET_LOADING, { loading })
   },
 
-  async setLoaded({ commit }, { loaded }) {
+  async setLoaded({ commit }, loaded) {
+    console.log('app/setLoaded', loaded)
+
     commit(SET_LOADED, { loaded })
   }
 }

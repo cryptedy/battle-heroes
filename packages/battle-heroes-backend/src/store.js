@@ -22,12 +22,12 @@ function reducer(state, action) {
         ...state,
         NFTs: payload
       }
-    case 'SET_PLAYER':
+    case 'ADD_PLAYER':
       return {
         ...state,
         players: [...state.players, payload]
       }
-    case 'DELETE_PLAYER':
+    case 'REMOVE_PLAYER':
       return {
         ...state,
         players: state.players.filter(
@@ -38,6 +38,15 @@ function reducer(state, action) {
       return {
         ...state,
         messages: [...state.messages, payload]
+      }
+    case 'UPDATE_PLAYER_STATE':
+      return {
+        ...state,
+        players: state.players.map(player =>
+          player.socket_id === payload.id
+            ? { ...player, state: payload.state }
+            : player
+        )
       }
     default:
       return state

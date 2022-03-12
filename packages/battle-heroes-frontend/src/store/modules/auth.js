@@ -1,107 +1,85 @@
-import axios from 'axios'
-import { API_URL } from '@/utils/constants'
 import Moralis from 'moralis/dist/moralis.min.js'
-import { RESET_AUTH_STATE, SET_PLAYER, DELETE_PLAYER } from '../mutation-types'
+import { SET_USER, DELETE_USER } from '../mutation-types'
 
 const SIGNING_MESSAGE = `Login to ${process.env.VUE_APP_TITLE}`
 
-const createUser = async MoralisUser => {
-  const address = MoralisUser.get('ethAddress')
-
-  const { data: profile } = await axios.get(`${API_URL}/users/${address}`)
-
+const createUser = MoralisUser => {
   return {
     id: MoralisUser.id,
-    address: address,
-    name: profile.name,
-    image_url: profile.image_url
+    address: MoralisUser.get('ethAddress')
   }
 }
 
-const createPlayer = (socket, user) => {
-  return new Promise((resolve, reject) => {
-    socket.emit('game:join', { user }, payload => {
-      const { status, message, player } = payload
-
-      if (!status) return reject(message)
-
-      resolve(player)
-    })
-  })
-}
-
 const initialState = () => ({
-  player: null
+  user: null
 })
 
 export const state = initialState()
 
 export const getters = {
-  player: state => state.player,
-  check: (state, getters) => getters.player !== null
+  user: state => state.user,
+  isLogin: (state, getters) => getters.user !== null
 }
 
 export const mutations = {
-  [RESET_AUTH_STATE](state) {
-    Object.assign(state, initialState())
+  [SET_USER](state, { user }) {
+    state.user = user
   },
 
-  [SET_PLAYER](state, { player }) {
-    state.player = player
-  },
-
-  [DELETE_PLAYER](state) {
-    const { player } = initialState()
-    state.player = player
+  [DELETE_USER](state) {
+    const { user } = initialState()
+    state.user = user
   }
 }
 
 export const actions = {
-  reset({ commit }) {
-    commit(RESET_AUTH_STATE)
-  },
-
   async login({ commit }) {
+    console.log('auth/login')
+
     try {
       const MoralisUser = await Moralis.authenticate({
         signingMessage: SIGNING_MESSAGE
       })
 
-      const user = await createUser(MoralisUser)
+      if (MoralisUser) {
+        const user = createUser(MoralisUser)
 
-      const player = await createPlayer(this.$socket, user)
-
-      commit(SET_PLAYER, { player })
+        commit(SET_USER, { user })
+      }
     } catch (error) {
-      commit(DELETE_PLAYER)
+      commit(DELETE_USER)
 
       throw new Error(error)
     }
   },
 
-  async getPlayer({ commit }) {
+  async loginWithToken({ commit }) {
+    console.log('auth/loginWithToken')
+
     try {
       const MoralisUser = Moralis.User.current()
 
-      const user = await createUser(MoralisUser)
+      if (MoralisUser) {
+        const user = createUser(MoralisUser)
 
-      const player = await createPlayer(this.$socket, user)
-
-      commit(SET_PLAYER, { player })
+        commit(SET_USER, { user })
+      }
     } catch (error) {
-      commit(DELETE_PLAYER)
+      commit(DELETE_USER)
 
       throw new Error(error)
     }
   },
 
   async logout({ commit }) {
+    console.log('auth/logout')
+
     try {
       await Moralis.User.logOut()
     } catch (error) {
       throw new Error(error)
     } finally {
-      commit(DELETE_PLAYER)
+      commit(DELETE_USER)
     }
   }
 }

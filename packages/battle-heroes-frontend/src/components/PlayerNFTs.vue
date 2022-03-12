@@ -63,8 +63,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      player: 'auth/player',
-      byPlayer: 'NFT/byPlayer'
+      byPlayer: 'NFT/byPlayer',
+      player: 'player/userPlayer'
     }),
 
     pixelHeroes() {

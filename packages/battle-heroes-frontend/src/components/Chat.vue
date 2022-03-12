@@ -1,7 +1,8 @@
 <template>
   <ul>
     <li v-for="(message, index) in messages" :key="index">
-      <img :src="message.player.image_url" width="32" height="32" />
+      <BasePlayerAvatar :player="message.player" />
+
       {{ message.player.name }}
       -
       {{ message.text }}

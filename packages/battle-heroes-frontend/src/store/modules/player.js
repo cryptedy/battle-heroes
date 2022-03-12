@@ -1,8 +1,4 @@
-import {
-  RESET_PLAYER_STATE,
-  SET_PLAYERS,
-  DELETE_PLAYERS
-} from '../mutation-types'
+import { SET_PLAYERS, DELETE_PLAYERS } from '../mutation-types'
 
 const initialState = () => ({
   players: {},
@@ -14,14 +10,15 @@ export const state = initialState()
 export const getters = {
   all: state => state.playerIds.map(playerId => state.players[playerId]),
   find: (state, getters) => playerId =>
-    getters.all.find(player => player.id === playerId)
+    getters.all.find(player => player.id === playerId),
+  userPlayer: (state, getters, rootState, rootGetters) => {
+    if (!rootGetters['auth/isLogin']) return null
+
+    return getters.find(rootGetters['auth/user'].id) || null
+  }
 }
 
 export const mutations = {
-  [RESET_PLAYER_STATE](state) {
-    Object.assign(state, initialState())
-  },
-
   [SET_PLAYERS](state, { players }) {
     players.forEach(player => {
       state.players = { ...state.players, [player.id]: player }
@@ -31,21 +28,23 @@ export const mutations = {
   },
 
   [DELETE_PLAYERS](state) {
-    const { players, ids } = initialState()
+    const { players, playerIds } = initialState()
 
     state.players = players
-    state.ids = ids
+    state.playerIds = playerIds
   }
 }
 
 export const actions = {
-  reset({ commit }) {
-    commit(RESET_PLAYER_STATE)
+  async setPlayers({ commit }, players) {
+    console.log('player/setPlayers', players)
+
+    commit(SET_PLAYERS, { players })
   },
 
-  async setPlayers({ commit }, payload) {
-    console.log('player/setPlayers', payload)
+  async deletePlayers({ commit }) {
+    console.log('player/deletePlayers')
 
-    commit(SET_PLAYERS, payload)
+    commit(DELETE_PLAYERS)
   }
 }

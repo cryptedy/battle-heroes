@@ -11,7 +11,7 @@
 import { mapActions } from 'vuex'
 
 export default {
-  name: 'LoginButtoon',
+  name: 'LoginButton',
 
   data() {
     return {
@@ -23,8 +23,7 @@ export default {
   methods: {
     ...mapActions({
       login: 'auth/login',
-      setLoaded: 'app/setLoaded',
-      setLoading: 'app/setLoading'
+      setAppLoading: 'app/setLoading'
     }),
 
     async loginWithMetaMask() {
@@ -33,8 +32,7 @@ export default {
 
         await this.login()
 
-        this.setLoading({ loading: false })
-        this.setLoaded({ loaded: false })
+        this.setAppLoading(true)
 
         this.$router.push(
           {
