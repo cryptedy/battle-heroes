@@ -4,7 +4,16 @@
       <BasePlayerAvatar :player="player" />
 
       {{ player.name }}
-      - Lv. {{ player.level }}
+      -
+      <span
+        v-if="player.socket_ids.length > 0"
+        style="font-weight: bold; color: green"
+      >
+        ONLINE
+      </span>
+      <span v-else style="font-weight: bold; color: grey"> OFFLINE </span>
+      - Lv.
+      {{ player.level }}
       -
       {{ player.token_ids[1].length + player.token_ids[2].length }} heros -
       {{ $filters.playerState(player.state) }}

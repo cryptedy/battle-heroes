@@ -23,30 +23,22 @@ function reducer(state, action) {
         NFTs: payload
       }
     case 'ADD_PLAYER':
+      console.log(payload)
       return {
         ...state,
-        players: [...state.players, payload]
+        players: [...state.players, payload.player]
       }
-    case 'REMOVE_PLAYER':
+    case 'UPDATE_PLAYER':
       return {
         ...state,
-        players: state.players.filter(
-          player => player.socket_id !== payload.socket_id
+        players: state.players.map(player =>
+          player.id === payload.id ? { ...player, payload } : player
         )
       }
     case 'SET_MESSAGE':
       return {
         ...state,
-        messages: [...state.messages, payload]
-      }
-    case 'UPDATE_PLAYER_STATE':
-      return {
-        ...state,
-        players: state.players.map(player =>
-          player.socket_id === payload.id
-            ? { ...player, state: payload.state }
-            : player
-        )
+        messages: [...state.messages, payload.message]
       }
     default:
       return state
