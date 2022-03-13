@@ -3,7 +3,7 @@ const store = require('./store')
 
 const router = Router()
 
-router.get('/api/collections/:id', async (req, res) => {
+router.get('/api/collections/:id/NFTs', async (req, res) => {
   try {
     const { NFTs } = store.getState()
 

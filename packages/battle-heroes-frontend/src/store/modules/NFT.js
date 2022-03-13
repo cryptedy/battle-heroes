@@ -67,7 +67,7 @@ export const actions = {
 
       try {
         const { data: NFTs } = await axios.get(
-          `${API_URL}/collections/${collectionId}`
+          `${API_URL}/collections/${collectionId}/NFTs`
         )
 
         commit(SET_NFTS, { collectionId, NFTs })
