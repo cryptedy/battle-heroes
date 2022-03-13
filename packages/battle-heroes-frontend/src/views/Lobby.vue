@@ -37,8 +37,8 @@
 
       <p>
         <a href="#" @click="changeTab(1)">
-          <strong v-if="activeTab === 1"> PLAYERS </strong>
-          <span v-else> PLAYERS </span>
+          <strong v-if="activeTab === 1"> PLAYERS({{ playerCount }}) </strong>
+          <span v-else> PLAYERS({{ playerCount }}) </span>
         </a>
         -
         <a href="#" @click="changeTab(2)">
@@ -89,7 +89,8 @@ export default {
   computed: {
     ...mapGetters({
       isGameLogin: 'game/isLogin',
-      player: 'player/userPlayer'
+      player: 'player/userPlayer',
+      playerCount: 'player/count'
     })
   },
 
