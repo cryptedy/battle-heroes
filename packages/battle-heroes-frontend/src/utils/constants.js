@@ -1,6 +1,6 @@
 import constants from '../../../battle-heroes-utils/constants'
 
-export const COLLECTION = constants.COLLECTION
+export const COLLECTION_ID = constants.COLLECTION_ID
 export const COLLECTIONS = constants.COLLECTIONS
 export const PLAYER_STATE = constants.PLAYER_STATE
 

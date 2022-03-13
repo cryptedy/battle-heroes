@@ -3,8 +3,8 @@ const { COLLECTIONS } = require('./constants')
 
 const NFTs = {}
 
-for (const collectionId of Object.keys(COLLECTIONS)) {
-  NFTs[collectionId] = []
+for (const collection of COLLECTIONS) {
+  NFTs[collection.id] = []
 }
 
 const initialState = {

@@ -21,9 +21,9 @@ const corsOptions = {
 const main = async () => {
   const NFTs = {}
 
-  for (const collectionId of Object.keys(COLLECTIONS)) {
+  for (const collection of COLLECTIONS) {
     try {
-      NFTs[collectionId] = await getNFTs(collectionId)
+      NFTs[collection.id] = await getNFTs(collection.id)
     } catch (error) {
       throw new Error(error)
     }

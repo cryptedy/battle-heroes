@@ -2,86 +2,6 @@ const axios = require('axios')
 const Moralis = require('moralis/node')
 const { COLLECTIONS, METADATA_URL, IMAGE_URL } = require('./constants')
 
-const getTraits = NFTs => {
-  const traits = {}
-
-  for (const NFT of NFTs) {
-    for (const attribute of NFT.attributes) {
-      const { trait_type, value } = attribute
-
-      if (!traits[trait_type]) {
-        traits[trait_type] = {}
-      }
-
-      if (!traits[trait_type][value]) {
-        traits[trait_type][value] = { quantity: 0 }
-      }
-
-      traits[trait_type][value].quantity++
-    }
-  }
-
-  return traits
-}
-
-const getRarity = NFTs => {
-  const traits = getTraits(NFTs)
-
-  const rarity = {}
-
-  for (const traitType of Object.keys(traits)) {
-    rarity[traitType] = {}
-
-    for (const traitValue of Object.keys(traits[traitType])) {
-      if (!rarity[traitType][traitValue]) {
-        const traitQuantity = traits[traitType][traitValue].quantity
-        const collectionQuantity = NFTs.length
-        const rarityPercentage = traitQuantity / collectionQuantity
-
-        rarity[traitType][traitValue] = {
-          quantity: traitQuantity,
-          rarity: rarityPercentage,
-          score: 1 / rarityPercentage
-        }
-      }
-    }
-  }
-
-  return rarity
-}
-
-const addRarity = NFTs => {
-  const rarity = getRarity(NFTs)
-
-  NFTs.forEach(NFT => {
-    let NFTScore = 0
-
-    for (const attribute of NFT.attributes) {
-      const { trait_type, value } = attribute
-
-      const traitScore = rarity[trait_type][value].score
-
-      attribute.quantity = rarity[trait_type][value].quantity
-      attribute.rarity = rarity[trait_type][value].rarity
-      attribute.score = traitScore
-
-      NFTScore += traitScore
-    }
-
-    NFT.score = NFTScore
-  })
-
-  const scores = NFTs.map(NFT => NFT.score)
-    .sort((a, b) => a - b)
-    .reverse()
-
-  NFTs.forEach(
-    NFT => (NFT.rank = scores.findIndex(score => score === NFT.score) + 1)
-  )
-
-  return NFTs
-}
-
 const getNFTs = async collectionId => {
   const NFTs = []
 
@@ -93,13 +13,14 @@ const getNFTs = async collectionId => {
 
     NFTs.push({
       token_id: tokenId,
-      name: name,
+      name,
       image_url: `${IMAGE_URL}/${collectionId}/${tokenId}.png`,
-      attributes: attributes
+      attributes
     })
   })
 
   addRarity(NFTs)
+  addRank(NFTs)
 
   return NFTs
 }
@@ -172,12 +93,101 @@ const getNFTsForContract = async (
   })
 }
 
+const getTraits = NFTs => {
+  const traits = {}
+
+  for (const NFT of NFTs) {
+    for (const attribute of NFT.attributes) {
+      const { trait_type: type, value } = attribute
+
+      if (!Object.prototype.hasOwnProperty.call(traits, type)) {
+        traits[type] = {}
+      }
+
+      if (!Object.prototype.hasOwnProperty.call(traits[type], value)) {
+        traits[type][value] = { quantity: 0 }
+      }
+
+      traits[type][value].quantity++
+    }
+  }
+
+  return traits
+}
+
+const getRarity = NFTs => {
+  const traits = getTraits(NFTs)
+
+  const rarity = {}
+
+  for (const type of Object.keys(traits)) {
+    rarity[type] = {}
+
+    for (const value of Object.keys(traits[type])) {
+      if (!Object.prototype.hasOwnProperty.call(rarity[type], value)) {
+        const traitQuantity = traits[type][value].quantity
+        const collectionQuantity = NFTs.length
+        const rarityPercentage = traitQuantity / collectionQuantity
+
+        rarity[type][value] = {
+          quantity: traitQuantity,
+          rarity: rarityPercentage,
+          score: 1 / rarityPercentage
+        }
+      }
+    }
+  }
+
+  return rarity
+}
+
+const addRarity = NFTs => {
+  const rarity = getRarity(NFTs)
+
+  NFTs.forEach(NFT => {
+    let NFTScore = 0
+
+    for (const attribute of NFT.attributes) {
+      const { trait_type: type, value } = attribute
+
+      const traitScore = rarity[type][value].score
+
+      attribute.quantity = rarity[type][value].quantity
+      attribute.rarity = rarityFormat(rarity[type][value].rarity)
+      attribute.score = scoreFormat(traitScore)
+
+      NFTScore += traitScore
+    }
+
+    NFT.score = scoreFormat(NFTScore)
+  })
+
+  return NFTs
+}
+
+const addRank = NFTs => {
+  const scores = NFTs.map(NFT => NFT.score)
+    .sort((a, b) => a - b)
+    .reverse()
+
+  NFTs.forEach(
+    NFT => (NFT.rank = scores.findIndex(score => score === NFT.score) + 1)
+  )
+
+  return NFTs
+}
+
+const rarityFormat = rarity => (rarity * 100).toFixed(1)
+
+const scoreFormat = score => score.toFixed(2)
+
 const getMetadata = async collectionId => {
   return axios.get(`${METADATA_URL}/${collectionId}/index.json`)
 }
 
 const getContractAddress = collectionId => {
-  return COLLECTIONS[collectionId].contract_address
+  return COLLECTIONS.find(collection => collection.id === collectionId)
+    .contract_address
 }
 
 module.exports = {

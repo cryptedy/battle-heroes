@@ -5,7 +5,7 @@
     -
     <span style="color: red">Rank: #{{ nft.rank }}</span>
     -
-    <span style="color: blue">Score: {{ nft.score.toFixed(2) }}</span>
+    <span style="color: blue">Score: {{ nft.score }}</span>
   </p>
 
   <base-accordion :open="false">
@@ -26,13 +26,9 @@
             <strong>{{ attribute.value }}</strong>
           </p>
           <p>
-            <span style="color: blue">
-              Score: +{{ attribute.score.toFixed(2) }}
-            </span>
+            <span style="color: blue"> Score: +{{ attribute.score }} </span>
             -
-            <span style="color: red">
-              {{ (attribute.rarity * 100).toFixed(1) }}%
-            </span>
+            <span style="color: red"> {{ attribute.rarity }}% </span>
             have this trait
           </p>
         </li>

@@ -62,13 +62,13 @@ module.exports = (io, socket) => {
 
     const tokenIds = {}
 
-    for (const collectionId of Object.keys(COLLECTIONS)) {
-      tokenIds[collectionId] = []
+    for (const collection of COLLECTIONS) {
+      tokenIds[collection.id] = []
 
       try {
-        const NFTs = await getNFTsForAddress(collectionId, user.address)
+        const NFTs = await getNFTsForAddress(collection.id, user.address)
 
-        tokenIds[collectionId] = NFTs.map(NFT => NFT.token_id).sort(
+        tokenIds[collection.id] = NFTs.map(NFT => NFT.token_id).sort(
           (a, b) => a - b
         )
       } catch (error) {

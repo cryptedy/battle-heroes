@@ -24,7 +24,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { COLLECTION } from '@/utils/constants'
+import { COLLECTION_ID } from '@/utils/constants'
 
 export default {
   name: 'PlayerNFTs',
@@ -36,11 +36,11 @@ export default {
     }),
 
     pixelHeroes() {
-      return this.byPlayer(COLLECTION.PIXEL_HEROES, this.player)
+      return this.byPlayer(COLLECTION_ID.PIXEL_HEROES, this.player)
     },
 
     pixelHeroesX() {
-      return this.byPlayer(COLLECTION.PIXEL_HEROES_X, this.player)
+      return this.byPlayer(COLLECTION_ID.PIXEL_HEROES_X, this.player)
     }
   }
 }

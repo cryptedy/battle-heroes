@@ -6,9 +6,9 @@ const initialState = () => {
   const NFTs = {}
   const tokenIds = {}
 
-  for (const collectionId of Object.keys(COLLECTIONS)) {
-    NFTs[collectionId] = {}
-    tokenIds[collectionId] = []
+  for (const collection of COLLECTIONS) {
+    NFTs[collection.id] = {}
+    tokenIds[collection.id] = []
   }
 
   return {
@@ -21,9 +21,8 @@ export const state = initialState()
 
 export const getters = {
   isLoaded: state =>
-    Object.keys(COLLECTIONS).filter(
-      collectionId => state.tokenIds[collectionId].length > 0
-    ).length === Object.keys(COLLECTIONS).length,
+    COLLECTIONS.filter(collection => state.tokenIds[collection.id].length > 0)
+      .length === COLLECTIONS.length,
   all: state => collectionId =>
     state.tokenIds[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]
@@ -61,7 +60,9 @@ export const actions = {
   async getNFTs({ commit }) {
     console.log('NFT/getNFTs')
 
-    for (const collectionId of Object.keys(COLLECTIONS)) {
+    for (const collection of COLLECTIONS) {
+      const collectionId = collection.id
+
       console.log('NFT/getNFTs', collectionId)
 
       try {

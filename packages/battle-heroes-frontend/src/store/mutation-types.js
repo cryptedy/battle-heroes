@@ -10,6 +10,10 @@ export const DELETE_NFTS = 'DELETE_NFTS'
 export const SET_USER = 'SET_USER'
 export const DELETE_USER = 'DELETE_USER'
 
+// collecttion
+export const SET_COLLECTIONS = 'SET_COLLECTIONS'
+export const DELETE_COLLECTIONS = 'DELETE_COLLECTIONS'
+
 // socket
 export const SET_CONNECTED = 'SET_CONNECTED'
 
