@@ -1,3 +1,4 @@
+import BaseNFT from './BaseNFT'
 import BaseGrid from './BaseGrid'
 import BaseGridRow from './BaseGridRow'
 import BaseSpinner from './BaseSpinner'
@@ -6,6 +7,7 @@ import BaseGridColumn from './BaseGridColumn'
 import BasePlayerAvatar from './BasePlayerAvatar'
 
 const components = [
+  BaseNFT,
   BaseGrid,
   BaseGridRow,
   BaseSpinner,

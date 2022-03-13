@@ -1,0 +1,55 @@
+<template>
+  <img :src="nft.image_url" :alt="nft.name" width="64" height="64" />
+  <p>
+    <strong>{{ nft.name }}</strong>
+    -
+    <span style="color: red">Rank: #{{ nft.rank }}</span>
+    -
+    <span style="color: blue">Score: {{ nft.score.toFixed(2) }}</span>
+  </p>
+
+  <base-accordion :open="false">
+    <template #trigger="scopeProps">
+      <a style="color: blue; cursor: pointer">
+        <span v-if="scopeProps.show">▼</span>
+        <span v-else>▶</span>
+        Attributes
+      </a>
+    </template>
+    <template #contents>
+      <ul>
+        <li v-for="attribute in nft.attributes" :key="attribute.trait_type">
+          <hr />
+          <p>
+            <strong>{{ attribute.trait_type }}</strong>
+            =>
+            <strong>{{ attribute.value }}</strong>
+          </p>
+          <p>
+            <span style="color: blue">
+              Score: +{{ attribute.score.toFixed(2) }}
+            </span>
+            -
+            <span style="color: red">
+              {{ (attribute.rarity * 100).toFixed(1) }}%
+            </span>
+            have this trait
+          </p>
+        </li>
+      </ul>
+    </template>
+  </base-accordion>
+</template>
+
+<script>
+export default {
+  name: 'BaseNFT',
+
+  props: {
+    nft: {
+      type: Object,
+      required: true
+    }
+  }
+}
+</script>

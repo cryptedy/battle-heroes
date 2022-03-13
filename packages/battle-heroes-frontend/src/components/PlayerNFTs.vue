@@ -5,24 +5,8 @@
   <p v-if="!pixelHeroes.length > 0">No data</p>
   <ul v-else>
     <li v-for="pixelHero in pixelHeroes" :key="pixelHero.token_id">
-      <p>
-        <strong>#{{ pixelHero.token_id }}</strong>
-      </p>
-      <img
-        :src="pixelHero.image_url"
-        :alt="pixelHero.name"
-        width="64"
-        height="64"
-      />
-      <ul>
-        <li
-          v-for="attribute in pixelHero.attributes"
-          :key="attribute.trait_type"
-        >
-          {{ attribute.trait_type }}: {{ attribute.value }}
-        </li>
-      </ul>
       <hr />
+      <BaseNFT :nft="pixelHero" />
     </li>
   </ul>
 
@@ -32,24 +16,8 @@
   <p v-if="!pixelHeroesX.length > 0">No data</p>
   <ul v-else>
     <li v-for="pixelHeroX in pixelHeroesX" :key="pixelHeroX.token_id">
-      <p>
-        <strong>#{{ pixelHeroX.token_id }}</strong>
-      </p>
-      <img
-        :src="pixelHeroX.image_url"
-        :alt="pixelHeroX.name"
-        width="64"
-        height="64"
-      />
-      <ul>
-        <li
-          v-for="attributeX in pixelHeroX.attributes"
-          :key="attributeX.trait_type"
-        >
-          {{ attributeX.trait_type }}: {{ attributeX.value }}
-        </li>
-      </ul>
       <hr />
+      <BaseNFT :nft="pixelHeroX" />
     </li>
   </ul>
 </template>

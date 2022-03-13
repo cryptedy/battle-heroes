@@ -1,10 +1,8 @@
 <template>
-  <div ref="accordion">
-    <div @click="toggle">
-      <slot name="trigger" :show="shown" />
-    </div>
-    <slot v-if="shown" name="contents" />
-  </div>
+  <span @click="toggle">
+    <slot name="trigger" :show="shown" />
+  </span>
+  <slot v-if="shown" name="contents" />
 </template>
 
 <script>
@@ -25,14 +23,6 @@ export default {
   },
 
   methods: {
-    hide() {
-      this.shown = false
-    },
-
-    show() {
-      this.shown = true
-    },
-
     toggle() {
       this.shown = !this.shown
     }

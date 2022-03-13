@@ -2,6 +2,86 @@ const axios = require('axios')
 const Moralis = require('moralis/node')
 const { COLLECTIONS, METADATA_URL, IMAGE_URL } = require('./constants')
 
+const getTraits = NFTs => {
+  const traits = {}
+
+  for (const NFT of NFTs) {
+    for (const attribute of NFT.attributes) {
+      const { trait_type, value } = attribute
+
+      if (!traits[trait_type]) {
+        traits[trait_type] = {}
+      }
+
+      if (!traits[trait_type][value]) {
+        traits[trait_type][value] = { quantity: 0 }
+      }
+
+      traits[trait_type][value].quantity++
+    }
+  }
+
+  return traits
+}
+
+const getRarity = NFTs => {
+  const traits = getTraits(NFTs)
+
+  const rarity = {}
+
+  for (const traitType of Object.keys(traits)) {
+    rarity[traitType] = {}
+
+    for (const traitValue of Object.keys(traits[traitType])) {
+      if (!rarity[traitType][traitValue]) {
+        const traitQuantity = traits[traitType][traitValue].quantity
+        const collectionQuantity = NFTs.length
+        const rarityPercentage = traitQuantity / collectionQuantity
+
+        rarity[traitType][traitValue] = {
+          quantity: traitQuantity,
+          rarity: rarityPercentage,
+          score: 1 / rarityPercentage
+        }
+      }
+    }
+  }
+
+  return rarity
+}
+
+const addRarity = NFTs => {
+  const rarity = getRarity(NFTs)
+
+  NFTs.forEach(NFT => {
+    let NFTScore = 0
+
+    for (const attribute of NFT.attributes) {
+      const { trait_type, value } = attribute
+
+      const traitScore = rarity[trait_type][value].score
+
+      attribute.quantity = rarity[trait_type][value].quantity
+      attribute.rarity = rarity[trait_type][value].rarity
+      attribute.score = traitScore
+
+      NFTScore += traitScore
+    }
+
+    NFT.score = NFTScore
+  })
+
+  const scores = NFTs.map(NFT => NFT.score)
+    .sort((a, b) => a - b)
+    .reverse()
+
+  NFTs.forEach(
+    NFT => (NFT.rank = scores.findIndex(score => score === NFT.score) + 1)
+  )
+
+  return NFTs
+}
+
 const getNFTs = async collectionId => {
   const NFTs = []
 
@@ -18,6 +98,8 @@ const getNFTs = async collectionId => {
       attributes: attributes
     })
   })
+
+  addRarity(NFTs)
 
   return NFTs
 }
