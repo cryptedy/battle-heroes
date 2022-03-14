@@ -6,6 +6,7 @@ export const PLAYER_STATE = constants.PLAYER_STATE
 
 export const BACKEND_URL = process.env.VUE_APP_BACKEND_URL
 export const API_URL = `${BACKEND_URL}/api`
+export const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 
 export default Object.freeze({
   ...constants,

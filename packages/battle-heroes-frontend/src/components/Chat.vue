@@ -7,7 +7,7 @@
       -
       {{ message.text }}
       -
-      {{ message.posted_at }}
+      {{ $filters.datetime(message.posted_at) }}
       <hr />
     </li>
   </ul>

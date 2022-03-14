@@ -4,11 +4,6 @@ const store = require('./store')
 const { getNFTsForAddress } = require('./NFT')
 const { COLLECTIONS, OPENSEA_API_URL, PLAYER_STATE } = require('./constants')
 
-setInterval(() => {
-  const { players } = store.getState()
-  console.log(players)
-}, 5000)
-
 const LOGIN = 'LOGIN'
 
 const PROCESS = {
