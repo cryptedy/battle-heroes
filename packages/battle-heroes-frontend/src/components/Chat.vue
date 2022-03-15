@@ -1,21 +1,21 @@
 <template>
   <ul>
-    <li v-for="(message, index) in messages" :key="index">
-      <BasePlayerAvatar :player="message.player" />
+    <li v-for="(chatMessage, index) in chatMessages" :key="index">
+      <BasePlayerAvatar :player="chatMessage.player" />
 
-      {{ message.player.name }}
+      {{ chatMessage.player.name }}
       -
-      {{ message.text }}
+      {{ chatMessage.text }}
       -
-      {{ $filters.datetime(message.posted_at) }}
+      {{ $filters.datetime(chatMessage.posted_at) }}
       <hr />
     </li>
   </ul>
 
-  <form @submit.prevent="sendMessage">
+  <form @submit.prevent="sendChatMessage">
     <input
       ref="input"
-      v-model="newMessage"
+      v-model="newChatMessage"
       v-focus
       placeholder="Send message"
       type="text"
@@ -27,24 +27,23 @@
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Messages',
+  name: 'Chat',
 
   data() {
     return {
-      newMessage: ''
+      newChatMessage: ''
     }
   },
 
   computed: {
     ...mapGetters({
-      messages: 'chat/messages'
+      chatMessages: 'chat/messages'
     })
   },
 
   watch: {
-    messages: {
-      // eslint-disable-next-line no-unused-vars
-      handler(value, oldValue) {
+    chatMessages: {
+      handler() {
         this.$nextTick(() => this.scrollToBottom())
       },
       deep: true
@@ -57,13 +56,16 @@ export default {
   },
 
   methods: {
-    sendMessage() {
-      if (this.newMessage.length === 0 || this.newMessage.match('^( |　)+$'))
+    sendChatMessage() {
+      if (
+        this.newChatMessage.length === 0 ||
+        this.newChatMessage.match('^( |　)+$')
+      )
         return
 
-      this.$socket.emit('chat:newMessage', this.newMessage)
+      this.$socket.emit('chat:newMessage', this.newChatMessage)
 
-      this.newMessage = ''
+      this.newChatMessage = ''
     },
 
     scrollToBottom() {

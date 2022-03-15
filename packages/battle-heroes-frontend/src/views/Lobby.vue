@@ -54,8 +54,8 @@
       </a>
       -
       <a href="#" @click="changeTab(2)">
-        <strong v-if="activeTab === 2"> CHAT </strong>
-        <span v-else> CHAT </span>
+        <strong v-if="activeTab === 2"> CHAT({{ unreadChatMessages }}) </strong>
+        <span v-else> CHAT({{ unreadChatMessages }}) </span>
       </a>
     </p>
 
@@ -89,6 +89,7 @@ export default {
       isMetaMaskEnabled: window.ethereum !== undefined,
       loading: false,
       activeTab: 1,
+      unreadChatMessages: 0,
       PLAYER_STATE: PLAYER_STATE
     }
   },
@@ -97,8 +98,27 @@ export default {
     ...mapGetters({
       isGameLogin: 'game/isLogin',
       player: 'player/userPlayer',
-      playerCount: 'player/count'
+      playerCount: 'player/count',
+      chatMessages: 'chat/messages'
     })
+  },
+
+  watch: {
+    chatMessages: {
+      handler(value, oldValue) {
+        if (this.activeTab !== 2) {
+          const unread = value.length - oldValue.length
+
+          this.unreadChatMessages += unread
+        }
+      }
+    },
+
+    activeTab(value) {
+      if (value === 2) {
+        this.unreadChatMessages = 0
+      }
+    }
   },
 
   async created() {
