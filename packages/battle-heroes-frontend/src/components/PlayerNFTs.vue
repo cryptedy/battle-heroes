@@ -29,10 +29,16 @@ import { COLLECTION_ID } from '@/utils/constants'
 export default {
   name: 'PlayerNFTs',
 
+  props: {
+    player: {
+      type: Object,
+      required: true
+    }
+  },
+
   computed: {
     ...mapGetters({
-      byPlayer: 'NFT/byPlayer',
-      player: 'player/userPlayer'
+      byPlayer: 'NFT/byPlayer'
     }),
 
     pixelHeroes() {

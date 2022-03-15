@@ -15,8 +15,22 @@
       - Lv.
       {{ player.level }}
       -
-      {{ player.token_ids[1].length + player.token_ids[2].length }} heros -
       {{ $filters.playerState(player.state) }}
+
+      <base-accordion :open="false">
+        <template #trigger="scopeProps">
+          <a style="color: blue; cursor: pointer">
+            <span v-if="scopeProps.show">▼</span>
+            <span v-else>▶</span>
+            Heroes (
+            {{ player.token_ids[1].length + player.token_ids[2].length }}
+            )
+          </a>
+        </template>
+        <template #contents>
+          <PlayerNFTs :player="player" />
+        </template>
+      </base-accordion>
       <hr />
     </li>
   </ul>
@@ -24,9 +38,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import PlayerNFTs from '@/components/PlayerNFTs'
 
 export default {
   name: 'Players',
+
+  components: {
+    PlayerNFTs
+  },
 
   computed: {
     ...mapGetters({

@@ -1,61 +1,66 @@
 <template>
-  <LayoutMain>
-    <p v-if="!isGameLogin">
-      <BaseSpinner />
-      Connecting to gmae server...
+  <SplashScreen v-if="!isGameLogin" message="Connecting to game server..." />
+  <LayoutMain v-else>
+    <p>
+      <strong>{{ player.name }}</strong>
+      -
+      <router-link :to="{ name: 'logout' }"> Logout </router-link>
     </p>
 
-    <template v-else>
-      <p>
-        <strong>{{ player.name }}</strong> -
-        <router-link :to="{ name: 'logout' }"> Logout </router-link>
-      </p>
+    <BasePlayerAvatar :player="player" />
 
-      <BasePlayerAvatar :player="player" />
+    <p>Level: {{ player.level }}</p>
+    <p>Player ID: {{ player.id }}</p>
+    <p>Address: {{ player.address }}</p>
+    <p>Login from {{ player.socket_ids.length }} devices</p>
+    <p>state: {{ $filters.playerState(player.state) }}</p>
 
-      <p>Level: {{ player.level }}</p>
-      <p>Player ID: {{ player.id }}</p>
-      <p>Address: {{ player.address }}</p>
-      <p>state: {{ $filters.playerState(player.state) }}</p>
-
-      <hr />
-
-      <button
-        v-if="player.state === PLAYER_STATE.IDLE"
-        @click="changeState(PLAYER_STATE.STANDBY)"
-      >
-        STAND-BY
-      </button>
-      <button
-        v-if="player.state === PLAYER_STATE.STANDBY"
-        @click="changeState(PLAYER_STATE.IDLE)"
-      >
-        IDLE
-      </button>
-
-      <hr />
-
-      <p>
-        <a href="#" @click="changeTab(1)">
-          <strong v-if="activeTab === 1"> PLAYERS({{ playerCount }}) </strong>
-          <span v-else> PLAYERS({{ playerCount }}) </span>
+    <base-accordion :open="false">
+      <template #trigger="scopeProps">
+        <a style="color: blue; cursor: pointer">
+          <span v-if="scopeProps.show">▼</span>
+          <span v-else>▶</span>
+          Your Heroes (
+          {{ player.token_ids[1].length + player.token_ids[2].length }}
+          )
         </a>
-        -
-        <a href="#" @click="changeTab(2)">
-          <strong v-if="activeTab === 2"> CHAT </strong>
-          <span v-else> CHAT </span>
-        </a>
-        -
-        <a href="#" @click="changeTab(3)">
-          <strong v-if="activeTab === 3"> HEROES </strong>
-          <span v-else> HEROES </span>
-        </a>
-      </p>
+      </template>
+      <template #contents>
+        <PlayerNFTs :player="player" />
+      </template>
+    </base-accordion>
 
-      <Players v-if="activeTab === 1" />
-      <Chat v-else-if="activeTab === 2" />
-      <PlayerNFTs v-if="activeTab === 3" />
-    </template>
+    <hr />
+
+    <button
+      v-if="player.state === PLAYER_STATE.IDLE"
+      @click="changePlayerState(PLAYER_STATE.STANDBY)"
+    >
+      STAND-BY
+    </button>
+    <button
+      v-if="player.state === PLAYER_STATE.STANDBY"
+      @click="changePlayerState(PLAYER_STATE.IDLE)"
+    >
+      IDLE
+    </button>
+
+    <hr />
+
+    <p>
+      <a href="#" @click="changeTab(1)">
+        <strong v-if="activeTab === 1"> PLAYERS({{ playerCount }}) </strong>
+        <span v-else> PLAYERS({{ playerCount }}) </span>
+      </a>
+      -
+      <a href="#" @click="changeTab(2)">
+        <strong v-if="activeTab === 2"> CHAT </strong>
+        <span v-else> CHAT </span>
+      </a>
+    </p>
+
+    <Players v-if="activeTab === 1" />
+    <Chat v-else-if="activeTab === 2" />
   </LayoutMain>
 </template>
 
@@ -66,6 +71,7 @@ import { mapGetters, mapActions } from 'vuex'
 import LayoutMain from '@/components/LayoutMain'
 import PlayerNFTs from '@/components/PlayerNFTs'
 import { PLAYER_STATE } from '@/utils/constants'
+import SplashScreen from '@/components/SplashScreen'
 
 export default {
   name: 'Lobby',
@@ -74,7 +80,8 @@ export default {
     Chat,
     Players,
     LayoutMain,
-    PlayerNFTs
+    PlayerNFTs,
+    SplashScreen
   },
 
   data() {
@@ -153,7 +160,7 @@ export default {
       this.activeTab = tab
     },
 
-    changeState(STATE) {
+    changePlayerState(STATE) {
       if (STATE === PLAYER_STATE.STANDBY) {
         this.$socket.emit('player:standBy')
       }
