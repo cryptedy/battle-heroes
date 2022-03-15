@@ -3,11 +3,12 @@ const cors = require('cors')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
 const Moralis = require('moralis/node')
-const routes = require('./routes')
-const game = require('./game')
+const api = require('./api')
 const store = require('./store')
 const { getNFTs } = require('./NFT')
-const { COLLECTIONS, FRONTEND_URL, PORT } = require('./constants')
+const NFTActions = require('./NFT/actions')
+const { gameManager } = require('./game')
+const { FRONTEND_URL, PORT } = require('./utils/constants')
 
 Moralis.start({
   serverUrl: process.env.MORALIS_SERVER_URL,
@@ -18,42 +19,36 @@ const corsOptions = {
   origin: new URL(FRONTEND_URL).origin
 }
 
+setInterval(() => {
+  const state = store.getState()
+  console.log(state.player.players.length)
+}, 5000)
+
 const main = async () => {
-  const NFTs = {}
+  const NFTs = await getNFTs()
 
-  for (const collection of COLLECTIONS) {
-    try {
-      NFTs[collection.id] = await getNFTs(collection.id)
-    } catch (error) {
-      throw new Error(error)
-    }
-  }
-
-  store.dispatch({
-    type: 'SET_NFTs',
-    payload: NFTs
-  })
+  NFTActions.set(NFTs)
 
   const app = express()
 
-  app.use(cors(corsOptions)).use('/', routes)
+  app.use(cors(corsOptions)).use(api)
 
-  const httpServer = createServer(app)
+  const server = createServer(app)
 
-  const io = new Server(httpServer, {
+  const io = new Server(server, {
     cors: corsOptions
   })
 
   const onConnection = socket => {
     console.log('onConnection', socket.id)
 
-    game(io, socket)
+    gameManager(io, socket)
   }
 
   io.on('connection', onConnection)
 
-  httpServer.listen(PORT, () => {
-    console.log(`Listening on ${httpServer.address().port}`)
+  server.listen(PORT, () => {
+    console.log(`Listening on ${server.address().port}`)
   })
 }
 

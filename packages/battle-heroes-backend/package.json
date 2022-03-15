@@ -16,6 +16,7 @@
     "lint": "eslint --ext .js index.js src/ --fix"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.8.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.0",

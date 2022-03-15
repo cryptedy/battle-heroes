@@ -37,14 +37,14 @@ export const mutations = {
 }
 
 export const actions = {
-  async setPlayers({ commit }, players) {
-    console.log('player/setPlayers', players)
+  async set({ commit }, players) {
+    console.log('player/set', players)
 
     commit(SET_PLAYERS, { players })
   },
 
-  async deletePlayers({ commit }) {
-    console.log('player/deletePlayers')
+  async delete({ commit }) {
+    console.log('player/delete')
 
     commit(DELETE_PLAYERS)
   }

@@ -1,8 +1,49 @@
 const axios = require('axios')
 const Moralis = require('moralis/node')
-const { COLLECTIONS, METADATA_URL, IMAGE_URL } = require('./constants')
+const { createSlice } = require('@reduxjs/toolkit')
+const { COLLECTIONS, METADATA_URL, IMAGE_URL } = require('../utils/constants')
 
-const getNFTs = async collectionId => {
+const initialState = () => {
+  const NFTs = {}
+
+  for (const collection of COLLECTIONS) {
+    NFTs[collection.id] = []
+  }
+
+  return {
+    NFTs
+  }
+}
+
+const NFTSlice = createSlice({
+  name: 'NFT',
+  initialState: initialState(),
+  reducers: {
+    set: (state, action) => {
+      console.log('NFT/add')
+
+      Object.keys(action.payload).forEach(collectionId => {
+        state.NFTs[collectionId] = action.payload[collectionId]
+      })
+    }
+  }
+})
+
+const NFTSelectors = {
+  selectNFTs: state => state.NFTs
+}
+
+const getNFTs = async () => {
+  const NFTs = {}
+
+  for (const collection of COLLECTIONS) {
+    NFTs[collection.id] = await getNFTsForCollection(collection.id)
+  }
+
+  return NFTs
+}
+
+const getNFTsForCollection = async collectionId => {
   const NFTs = []
 
   const { data: metadata } = await getMetadata(collectionId)
@@ -23,6 +64,12 @@ const getNFTs = async collectionId => {
   addRank(NFTs)
 
   return NFTs
+}
+
+const getTokenIdsForAddress = async (collectionId, address) => {
+  const NFTs = await getNFTsForAddress(collectionId, address)
+
+  return NFTs.map(NFT => NFT.token_id).sort((a, b) => a - b)
 }
 
 const getNFTsForAddress = async (collectionId, address) => {
@@ -191,6 +238,8 @@ const getContractAddress = collectionId => {
 }
 
 module.exports = {
+  NFTSlice,
+  NFTSelectors,
   getNFTs,
-  getNFTsForAddress
+  getTokenIdsForAddress
 }

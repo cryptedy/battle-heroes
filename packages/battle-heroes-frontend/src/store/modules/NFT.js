@@ -57,13 +57,13 @@ export const mutations = {
 }
 
 export const actions = {
-  async getNFTs({ commit }) {
-    console.log('NFT/getNFTs')
+  async get({ commit }) {
+    console.log('NFT/get')
 
     for (const collection of COLLECTIONS) {
       const collectionId = collection.id
 
-      console.log('NFT/getNFTs', collectionId)
+      console.log('NFT/get', collectionId)
 
       try {
         const { data: NFTs } = await axios.get(

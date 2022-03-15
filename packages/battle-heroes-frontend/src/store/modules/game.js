@@ -22,7 +22,7 @@ export const actions = {
             return reject(status)
           }
 
-          await dispatch('player/setPlayers', players, { root: true })
+          await dispatch('player/set', players, { root: true })
           await dispatch('chat/setMessages', messages, { root: true })
 
           resolve(status)
@@ -34,16 +34,13 @@ export const actions = {
   async logout({ dispatch }) {
     console.log('game/logout')
 
-    await dispatch('player/deletePlayers', null, { root: true })
+    await dispatch('player/delete', null, { root: true })
     await dispatch('chat/deleteMessages', null, { root: true })
 
-    return new Promise((resolve, reject) => {
-      this.$socket.emit('game:logout', async ({ status }) => {
-        if (!status) {
-          return reject(status)
-        }
-
-        resolve(status)
+    return new Promise(resolve => {
+      this.$socket.emit('game:logout', async () => {
+        // ignore errors for logout
+        resolve(true)
       })
     })
   }

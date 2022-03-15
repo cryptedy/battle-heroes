@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import SplashScreen from '@/components/SplashScreen'
 
 export default {
@@ -11,6 +11,12 @@ export default {
 
   components: {
     SplashScreen
+  },
+
+  computed: {
+    ...mapGetters({
+      isLoginGame: 'game/isLogin'
+    })
   },
 
   async created() {

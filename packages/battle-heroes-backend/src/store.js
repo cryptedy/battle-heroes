@@ -1,48 +1,12 @@
-const { createStore } = require('redux')
-const { COLLECTIONS } = require('./constants')
+const { NFTSlice } = require('./NFT')
+const { chatSlice } = require('./chat')
+const { playerSlice } = require('./player')
+const { createStore, combineReducers } = require('redux')
 
-const NFTs = {}
+const reducer = combineReducers({
+  NFT: NFTSlice.reducer,
+  chat: chatSlice.reducer,
+  player: playerSlice.reducer
+})
 
-for (const collection of COLLECTIONS) {
-  NFTs[collection.id] = []
-}
-
-const initialState = {
-  NFTs,
-  players: [],
-  messages: []
-}
-
-function reducer(state, action) {
-  const { payload, type } = action
-
-  switch (type) {
-    case 'SET_NFTs':
-      return {
-        ...state,
-        NFTs: payload
-      }
-    case 'ADD_PLAYER':
-      console.log(payload)
-      return {
-        ...state,
-        players: [...state.players, payload.player]
-      }
-    case 'UPDATE_PLAYER':
-      return {
-        ...state,
-        players: state.players.map(player =>
-          player.id === payload.id ? { ...player, payload } : player
-        )
-      }
-    case 'SET_MESSAGE':
-      return {
-        ...state,
-        messages: [...state.messages, payload.message]
-      }
-    default:
-      return state
-  }
-}
-
-module.exports = createStore(reducer, initialState)
+module.exports = createStore(reducer)

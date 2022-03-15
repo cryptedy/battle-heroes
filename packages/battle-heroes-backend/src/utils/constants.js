@@ -1,4 +1,4 @@
-const constants = require('../../battle-heroes-utils/constants')
+const constants = require('../../../battle-heroes-utils/constants')
 
 const PORT = process.env.PORT || 3000
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080'

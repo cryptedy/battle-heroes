@@ -30,7 +30,7 @@ async function beforeEach(to, from, next) {
   }
 
   if (!store.getters['NFT/isLoaded']) {
-    await store.dispatch('NFT/getNFTs')
+    await store.dispatch('NFT/get')
   }
 
   const middleware = getMiddleware(to)

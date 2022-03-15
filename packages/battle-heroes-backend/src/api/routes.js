@@ -1,12 +1,11 @@
 const { Router } = require('express')
-const store = require('./store')
-
 const router = Router()
+const NFTSelectors = require('../NFT/selectors')
 
-router.get('/api/collections/:id/nfts', async (req, res) => {
+router.get('/collections/:id/nfts', async (req, res) => {
+  const NFTs = NFTSelectors.all()
+
   try {
-    const { NFTs } = store.getState()
-
     res.json(NFTs[req.params.id])
   } catch (error) {
     res.json({})

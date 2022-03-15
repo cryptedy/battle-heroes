@@ -127,11 +127,11 @@ export default {
   methods: {
     ...mapActions({
       loginGame: 'game/login',
+      setPlayers: 'player/set',
       logoutGame: 'game/logout',
       addMessage: 'chat/addMessage',
-      setPlayers: 'player/setPlayers',
+      deletePlayers: 'player/delete',
       setMessages: 'chat/setMessages',
-      deletePlayers: 'player/deletePlayers',
       deleteMessages: 'chat/deleteMessages'
     }),
 
