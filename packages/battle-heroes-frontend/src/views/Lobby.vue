@@ -20,9 +20,9 @@
         <a style="color: blue; cursor: pointer">
           <span v-if="scopeProps.show">▼</span>
           <span v-else>▶</span>
-          Your Heroes (
-          {{ player.token_ids[1].length + player.token_ids[2].length }}
-          )
+          Your Heroes ({{
+            player.token_ids[1].length + player.token_ids[2].length
+          }})
         </a>
       </template>
       <template #contents>
@@ -39,7 +39,10 @@
       STAND-BY
     </button>
     <button
-      v-if="player.state === PLAYER_STATE.STANDBY"
+      v-if="
+        player.state === PLAYER_STATE.STANDBY ||
+        player.state === PLAYER_STATE.BATTLE
+      "
       @click="changePlayerState(PLAYER_STATE.IDLE)"
     >
       IDLE
@@ -193,6 +196,13 @@ export default {
     onMatched(game) {
       console.log('onMatched')
       console.log(game)
+
+      this.$router.push({
+        name: 'games.show',
+        params: {
+          gameId: game.id
+        }
+      })
     }
   }
 }

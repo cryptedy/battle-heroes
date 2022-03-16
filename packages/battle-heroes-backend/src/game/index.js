@@ -1,9 +1,10 @@
 const { createPlayer } = require('../player')
+const { addGame } = require('../game/actions')
 const { createMessage } = require('../message')
 const { addMessage } = require('../message/actions')
 const { PLAYER_STATE } = require('../utils/constants')
 const { selectMessages } = require('../message/selectors')
-const { createSlice, nanoid } = require('@reduxjs/toolkit')
+const { nanoid } = require('@reduxjs/toolkit')
 const {
   addPlayer,
   updatePlayerState,
@@ -15,22 +16,6 @@ const {
   selectPlayerByUser,
   selectPlayerBySocket
 } = require('../player/selectors')
-
-const initialState = {
-  games: []
-}
-
-const gameSlice = createSlice({
-  name: 'game',
-  initialState,
-  reducers: {
-    addGame: (state, action) => {
-      console.log('game/addGame')
-
-      state.games.push(action.payload)
-    }
-  }
-})
 
 const createGame = (player, opponentPlayer) => {
   return {
@@ -104,6 +89,8 @@ const gameManager = (io, socket) => {
 
       if (opponentPlayer) {
         const mewGame = createGame(player, opponentPlayer)
+
+        addGame(mewGame)
 
         updatePlayerState({ player, state: PLAYER_STATE.BATTLE })
         updatePlayerState({
@@ -191,6 +178,5 @@ const gameManager = (io, socket) => {
 }
 
 module.exports = {
-  gameSlice,
   gameManager
 }

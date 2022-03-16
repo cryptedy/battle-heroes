@@ -1,14 +1,14 @@
 const store = require('../store')
-const { playerSlice } = require('./')
+const playerActions = require('./slice').actions
 
 const actions = {}
 
-Object.keys(playerSlice.actions).forEach(key => {
-  if (typeof playerSlice.actions[key] !== 'function') {
+Object.keys(playerActions).forEach(key => {
+  if (typeof playerActions[key] !== 'function') {
     throw new Error(`The action '${key}' must be a function`)
   }
 
-  actions[key] = (...arg) => store.dispatch(playerSlice.actions[key](...arg))
+  actions[key] = (...arg) => store.dispatch(playerActions[key](...arg))
 })
 
 module.exports = actions

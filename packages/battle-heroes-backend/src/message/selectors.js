@@ -1,10 +1,11 @@
 const store = require('../store')
-const { messageSelectors } = require('./')
+
+const selectors = {
+  selectMessages: state => state.messages
+}
 
 const getState = () => store.getState().message
 
-const selectors = {
-  selectMessages: () => messageSelectors.selectMessages(getState())
+module.exports = {
+  selectMessages: () => selectors.selectMessages(getState())
 }
-
-module.exports = selectors

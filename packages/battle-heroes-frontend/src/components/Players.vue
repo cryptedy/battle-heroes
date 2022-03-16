@@ -22,9 +22,9 @@
           <a style="color: blue; cursor: pointer">
             <span v-if="scopeProps.show">▼</span>
             <span v-else>▶</span>
-            Heroes (
-            {{ player.token_ids[1].length + player.token_ids[2].length }}
-            )
+            Heroes ({{
+              player.token_ids[1].length + player.token_ids[2].length
+            }})
           </a>
         </template>
         <template #contents>

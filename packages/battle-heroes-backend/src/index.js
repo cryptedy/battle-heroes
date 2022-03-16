@@ -4,7 +4,6 @@ const { createServer } = require('http')
 const { Server } = require('socket.io')
 const Moralis = require('moralis/node')
 const api = require('./api')
-const store = require('./store')
 const { getNFTs } = require('./NFT')
 const { setNFTs } = require('./NFT/actions')
 const { gameManager } = require('./game')
@@ -19,10 +18,13 @@ const corsOptions = {
   origin: new URL(FRONTEND_URL).origin
 }
 
-setInterval(() => {
-  const state = store.getState()
-  console.log(state.player.players.length)
-}, 5000)
+// DEBUG
+// const store = require('./store')
+// setInterval(() => {
+//   const state = store.getState()
+//   console.log(`Players ${state.player.players.length}`)
+//   console.log(`Games ${state.game.games.length}`)
+// }, 5000)
 
 const main = async () => {
   const NFTs = await getNFTs()

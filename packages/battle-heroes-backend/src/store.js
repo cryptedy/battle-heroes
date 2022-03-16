@@ -1,12 +1,14 @@
-const { NFTSlice } = require('./NFT')
-const { playerSlice } = require('./player')
-const { messageSlice } = require('./message')
+const NFTRecucer = require('./NFT/slice').reducer
+const playerReducer = require('./player/slice').reducer
+const messageReducer = require('./message/slice').reducer
+const gameReducer = require('./game/slice').reducer
 const { createStore, combineReducers } = require('redux')
 
 const reducer = combineReducers({
-  NFT: NFTSlice.reducer,
-  player: playerSlice.reducer,
-  message: messageSlice.reducer
+  NFT: NFTRecucer,
+  player: playerReducer,
+  message: messageReducer,
+  game: gameReducer
 })
 
 module.exports = createStore(reducer)

@@ -1,10 +1,10 @@
 const store = require('../store')
-const { messageSlice } = require('./')
+const messageActions = require('./slice').actions
 
 const actions = {}
 
-Object.keys(messageSlice.actions).forEach(key => {
-  actions[key] = (...arg) => store.dispatch(messageSlice.actions[key](...arg))
+Object.keys(messageActions).forEach(key => {
+  actions[key] = (...arg) => store.dispatch(messageActions[key](...arg))
 })
 
 module.exports = actions

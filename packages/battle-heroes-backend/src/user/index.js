@@ -3,7 +3,7 @@ const { OPENSEA_API_URL } = require('../utils/constants')
 
 const getUserProfile = async user => {
   const profile = {
-    name: 'NO NAME',
+    name: 'Unnamed',
     avatar_url: ''
   }
 
@@ -14,7 +14,7 @@ const getUserProfile = async user => {
 
     const { account } = openSeaUser
 
-    profile.name = openSeaUser.username
+    profile.name = openSeaUser.username || 'Unnamed'
     profile.avatar_url = account.profile_img_url
 
     return profile

@@ -20,12 +20,24 @@ export default [
     path: '/login',
     name: 'login',
     meta: { middleware: ['guest'] },
-    component: view('Login')
+    component: view('auth/Login')
   },
   {
     path: '/logout',
     name: 'logout',
     meta: { middleware: ['auth'] },
-    component: view('Logout')
+    component: view('auth/Logout')
+  },
+  {
+    path: '/games',
+    name: 'games',
+    meta: { middleware: ['auth'] },
+    component: view('games/Index')
+  },
+  {
+    path: '/games/:gameId',
+    name: 'games.show',
+    meta: { middleware: ['auth'] },
+    component: view('games/Show')
   }
 ]

@@ -1,37 +1,6 @@
 const axios = require('axios')
 const Moralis = require('moralis/node')
-const { createSlice } = require('@reduxjs/toolkit')
 const { COLLECTIONS, METADATA_URL, IMAGE_URL } = require('../utils/constants')
-
-const initialState = () => {
-  const NFTs = {}
-
-  for (const collection of COLLECTIONS) {
-    NFTs[collection.id] = []
-  }
-
-  return {
-    NFTs
-  }
-}
-
-const NFTSlice = createSlice({
-  name: 'NFT',
-  initialState: initialState(),
-  reducers: {
-    setNFTs: (state, action) => {
-      console.log('NFT/add')
-
-      Object.keys(action.payload).forEach(collectionId => {
-        state.NFTs[collectionId] = action.payload[collectionId]
-      })
-    }
-  }
-})
-
-const NFTSelectors = {
-  selectNFTs: state => state.NFTs
-}
 
 const getNFTs = async () => {
   const NFTs = {}
@@ -253,8 +222,6 @@ const getContractAddress = collectionId => {
 }
 
 module.exports = {
-  NFTSlice,
-  NFTSelectors,
   getNFTs,
   getTokenIdsForAddress
 }

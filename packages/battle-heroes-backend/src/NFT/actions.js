@@ -1,10 +1,10 @@
 const store = require('../store')
-const { NFTSlice } = require('./')
+const NFTActions = require('./slice').actions
 
 const actions = {}
 
-Object.keys(NFTSlice.actions).forEach(key => {
-  actions[key] = (...arg) => store.dispatch(NFTSlice.actions[key](...arg))
+Object.keys(NFTActions).forEach(key => {
+  actions[key] = (...arg) => store.dispatch(NFTActions[key](...arg))
 })
 
 module.exports = actions
