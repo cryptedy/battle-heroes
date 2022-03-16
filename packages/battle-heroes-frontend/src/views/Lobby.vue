@@ -137,6 +137,7 @@ export default {
     this.$socket.on('disconnect', () => this.onDisconnect())
     this.$socket.on('player:players', players => this.setPlayers(players))
     this.$socket.on('message:messages', messages => this.setMessages(messages))
+    this.$socket.on('game:matched', game => this.onMatched(game))
     this.$socket.io.on('reconnect', attempt => this.onReconnect(attempt))
   },
 
@@ -146,6 +147,7 @@ export default {
     this.$socket.off('disconnect')
     this.$socket.off('player:players')
     this.$socket.off('message:messages')
+    this.$socket.off('game:matched')
     this.$socket.io.off('reconnect')
   },
 
@@ -186,6 +188,11 @@ export default {
       if (STATE === PLAYER_STATE.IDLE) {
         this.$socket.emit('player:idle')
       }
+    },
+
+    onMatched(game) {
+      console.log('onMatched')
+      console.log(game)
     }
   }
 }

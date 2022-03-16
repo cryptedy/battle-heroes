@@ -66,13 +66,28 @@ const getNFTsForCollection = async collectionId => {
   return NFTs
 }
 
-const getTokenIdsForAddress = async (collectionId, address) => {
-  const NFTs = await getNFTsForAddress(collectionId, address)
+const getTokenIdsForAddress = async address => {
+  const tokenIds = {}
+
+  for (const collection of COLLECTIONS) {
+    tokenIds[collection.id] = []
+
+    tokenIds[collection.id] = await getTokenIdsForCollectionAndAddress(
+      collection.id,
+      address
+    )
+  }
+
+  return tokenIds
+}
+
+const getTokenIdsForCollectionAndAddress = async (collectionId, address) => {
+  const NFTs = await getNFTsForCollectionAndAddress(collectionId, address)
 
   return NFTs.map(NFT => NFT.token_id).sort((a, b) => a - b)
 }
 
-const getNFTsForAddress = async (collectionId, address) => {
+const getNFTsForCollectionAndAddress = async (collectionId, address) => {
   const currentPage = 1
   const offset = currentPage - 1
   const perPage = 500
@@ -84,7 +99,7 @@ const getNFTsForAddress = async (collectionId, address) => {
     perPage
   )
 
-  const paginatedNFTs = await getPaginatedNFTsForAddress(
+  const paginatedNFTs = await getPaginatedNFTsForCollectionAndAddress(
     collectionId,
     address,
     currentPage,
@@ -99,7 +114,7 @@ const getNFTsForAddress = async (collectionId, address) => {
   return NFTs
 }
 
-const getPaginatedNFTsForAddress = async (
+const getPaginatedNFTsForCollectionAndAddress = async (
   collectionId,
   address,
   currentPage,

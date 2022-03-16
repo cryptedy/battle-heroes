@@ -3,6 +3,7 @@ const { createMessage } = require('../message')
 const { addMessage } = require('../message/actions')
 const { PLAYER_STATE } = require('../utils/constants')
 const { selectMessages } = require('../message/selectors')
+const { createSlice, nanoid } = require('@reduxjs/toolkit')
 const {
   addPlayer,
   updatePlayerState,
@@ -15,26 +16,49 @@ const {
   selectPlayerBySocket
 } = require('../player/selectors')
 
-const PROCESS_LOGIN = 'PROCESS_LOGIN'
-
-const PROCESS = {
-  [PROCESS_LOGIN]: false
+const initialState = {
+  games: []
 }
 
-const waitProcess = name => {
-  return new Promise(resolve => {
-    let interval = setInterval(() => {
-      if (!PROCESS[name]) {
-        clearInterval(interval)
-        resolve(true)
-      }
-    }, 5000)
-  })
+const gameSlice = createSlice({
+  name: 'game',
+  initialState,
+  reducers: {
+    addGame: (state, action) => {
+      console.log('game/addGame')
+
+      state.games.push(action.payload)
+    }
+  }
+})
+
+const createGame = (player, opponentPlayer) => {
+  return {
+    id: nanoid(),
+    player_ids: [player.id, opponentPlayer.id]
+  }
 }
 
 const gameManager = (io, socket) => {
+  const PROCESS_LOGIN = 'PROCESS_LOGIN'
+
+  const PROCESS = {
+    [PROCESS_LOGIN]: false
+  }
+
+  const waitProcess = name => {
+    return new Promise(resolve => {
+      let interval = setInterval(() => {
+        if (!PROCESS[name]) {
+          clearInterval(interval)
+          resolve(true)
+        }
+      }, 5000)
+    })
+  }
+
   const onLogin = async (user, callback) => {
-    console.log('onLogin', socket.id, user.name)
+    console.log('onLogin', socket.id, user)
 
     await waitProcess(PROCESS_LOGIN)
 
@@ -71,11 +95,37 @@ const gameManager = (io, socket) => {
 
     const player = selectPlayerBySocket(socket)
 
-    updatePlayerState({ player, state: PLAYER_STATE.STANDBY })
+    if (player) {
+      const players = selectPlayers()
 
-    const players = selectPlayers()
+      const opponentPlayer = players.find(
+        otherPlayer => otherPlayer.state === PLAYER_STATE.STANDBY
+      )
 
-    io.emit('player:players', players)
+      if (opponentPlayer) {
+        const mewGame = createGame(player, opponentPlayer)
+
+        updatePlayerState({ player, state: PLAYER_STATE.BATTLE })
+        updatePlayerState({
+          player: opponentPlayer,
+          state: PLAYER_STATE.BATTLE
+        })
+
+        // to player
+        player.socket_ids.forEach(socketId =>
+          io.to(socketId).emit('game:matched', mewGame)
+        )
+
+        // to opponent player
+        opponentPlayer.socket_ids.forEach(socketId =>
+          io.to(socketId).emit('game:matched', mewGame)
+        )
+      } else {
+        updatePlayerState({ player, state: PLAYER_STATE.STANDBY })
+      }
+
+      io.emit('player:players', selectPlayers())
+    }
   }
 
   const onPlayerIdle = () => {
@@ -83,11 +133,11 @@ const gameManager = (io, socket) => {
 
     const player = selectPlayerBySocket(socket)
 
-    updatePlayerState({ player, state: PLAYER_STATE.IDLE })
+    if (player) {
+      updatePlayerState({ player, state: PLAYER_STATE.IDLE })
 
-    const players = selectPlayers()
-
-    io.emit('player:players', players)
+      io.emit('player:players', selectPlayers())
+    }
   }
 
   const onNewMessage = text => {
@@ -95,13 +145,13 @@ const gameManager = (io, socket) => {
 
     const player = selectPlayerBySocket(socket)
 
-    const message = createMessage(text, player)
+    if (player) {
+      const message = createMessage(text, player)
 
-    addMessage(message)
+      addMessage(message)
 
-    const messages = selectMessages()
-
-    io.emit('message:messages', messages)
+      io.emit('message:messages', selectMessages())
+    }
   }
 
   const onLogout = callback => {
@@ -112,9 +162,7 @@ const gameManager = (io, socket) => {
     if (player) {
       removePlayerSocket(socket)
 
-      const players = selectPlayers()
-
-      io.emit('player:players', players)
+      io.emit('player:players', selectPlayers())
 
       callback({ status: true })
     } else {
@@ -130,9 +178,7 @@ const gameManager = (io, socket) => {
     if (player) {
       removePlayerSocket(socket)
 
-      const players = selectPlayers()
-
-      io.emit('player:players', players)
+      io.emit('player:players', selectPlayers())
     }
   }
 
@@ -145,5 +191,6 @@ const gameManager = (io, socket) => {
 }
 
 module.exports = {
+  gameSlice,
   gameManager
 }

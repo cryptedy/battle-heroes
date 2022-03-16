@@ -1,5 +1,6 @@
+const { getUserProfile } = require('../user')
+const { getTokenIdsForAddress } = require('../NFT')
 const { PLAYER_STATE } = require('../utils/constants')
-const { getUserProfile, getUserTokenIds } = require('../user')
 const { createSlice, createSelector } = require('@reduxjs/toolkit')
 
 const initialState = {
@@ -70,7 +71,7 @@ const playerSelectors = {
 
 const createPlayer = async (user, socket) => {
   const profile = await getUserProfile(user)
-  const tokenIds = await getUserTokenIds(user)
+  const tokenIds = await getTokenIdsForAddress(user.address)
 
   return {
     id: user.id,

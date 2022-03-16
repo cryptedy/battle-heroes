@@ -27,10 +27,12 @@ export const getters = {
     state.tokenIds[collectionId].map(
       tokenId => state.NFTs[collectionId][tokenId]
     ),
-  byPlayer: state => (collectionId, player) => {
-    return player.token_ids[collectionId].map(
-      tokenId => state.NFTs[collectionId][tokenId]
-    )
+  byPlayer: (state, getters) => (collectionId, player) => {
+    return getters.isLoaded
+      ? player.token_ids[collectionId].map(
+          tokenId => state.NFTs[collectionId][tokenId]
+        )
+      : []
   }
 }
 

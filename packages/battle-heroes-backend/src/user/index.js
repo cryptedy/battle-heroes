@@ -1,6 +1,5 @@
 const axios = require('axios')
-const { getTokenIdsForAddress } = require('../NFT')
-const { COLLECTIONS, OPENSEA_API_URL } = require('../utils/constants')
+const { OPENSEA_API_URL } = require('../utils/constants')
 
 const getUserProfile = async user => {
   const profile = {
@@ -24,26 +23,6 @@ const getUserProfile = async user => {
   }
 }
 
-const getUserTokenIds = async user => {
-  const tokenIds = {}
-
-  for (const collection of COLLECTIONS) {
-    tokenIds[collection.id] = []
-
-    try {
-      tokenIds[collection.id] = await getTokenIdsForAddress(
-        collection.id,
-        user.address
-      )
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  return tokenIds
-}
-
 module.exports = {
-  getUserProfile,
-  getUserTokenIds
+  getUserProfile
 }
