@@ -21,7 +21,7 @@ export const SET_CONNECTED = 'SET_CONNECTED'
 export const SET_PLAYERS = 'SET_PLAYERS'
 export const DELETE_PLAYERS = 'DELETE_PLAYERS'
 
-// chat
+// message
 export const SET_MESSAGES = 'SET_MESSAGES'
 export const DELETE_MESSAGES = 'DELETE_MESSAGES'
 export const ADD_MESSAGE = 'ADD_MESSAGE'

@@ -1,9 +1,10 @@
 const { Router } = require('express')
+const { selectNFTs } = require('../NFT/selectors')
+
 const router = Router()
-const NFTSelectors = require('../NFT/selectors')
 
 router.get('/collections/:id/nfts', async (req, res) => {
-  const NFTs = NFTSelectors.all()
+  const NFTs = selectNFTs()
 
   try {
     res.json(NFTs[req.params.id])

@@ -1,32 +1,29 @@
 const moment = require('moment')
-const { createSlice } = require('@reduxjs/toolkit')
+const { createSlice, nanoid } = require('@reduxjs/toolkit')
 
 const initialState = {
   messages: []
 }
 
-const chatSlice = createSlice({
-  name: 'chat',
+const messageSlice = createSlice({
+  name: 'message',
   initialState,
   reducers: {
     addMessage: (state, action) => {
-      console.log('chat/addMessage')
+      console.log('message/addMessage')
 
-      const { payload } = action
-
-      const message = createMessage(payload.text, payload.player)
-
-      state.messages.push(message)
+      state.messages.push(action.payload)
     }
   }
 })
 
-const chatSelectors = {
+const messageSelectors = {
   selectMessages: state => state.messages
 }
 
 const createMessage = (text, player) => {
   return {
+    id: nanoid(),
     player,
     text,
     posted_at: moment().unix()
@@ -34,7 +31,7 @@ const createMessage = (text, player) => {
 }
 
 module.exports = {
-  chatSlice,
-  chatSelectors,
+  messageSlice,
+  messageSelectors,
   createMessage
 }

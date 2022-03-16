@@ -19,7 +19,7 @@ const NFTSlice = createSlice({
   name: 'NFT',
   initialState: initialState(),
   reducers: {
-    set: (state, action) => {
+    setNFTs: (state, action) => {
       console.log('NFT/add')
 
       Object.keys(action.payload).forEach(collectionId => {

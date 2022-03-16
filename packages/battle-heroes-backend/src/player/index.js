@@ -10,13 +10,13 @@ const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    add: (state, action) => {
-      console.log('player/add', action)
+    addPlayer: (state, action) => {
+      console.log('player/addPlayer', action)
 
       state.players.push(action.payload)
     },
-    updateState: (state, action) => {
-      console.log('player/updateState', action)
+    updatePlayerState: (state, action) => {
+      console.log('player/updatePlayerState', action)
 
       const player = state.players.find(
         player => player.id === action.payload.player.id
@@ -26,8 +26,8 @@ const playerSlice = createSlice({
         player.state = action.payload.state
       }
     },
-    addSocket: (state, action) => {
-      console.log('player/addSocket', action)
+    addPlayerSocket: (state, action) => {
+      console.log('player/addPlayerSocket', action)
 
       const player = state.players.find(
         player => player.id === action.payload.player.id
@@ -37,8 +37,8 @@ const playerSlice = createSlice({
         player.socket_ids.push(action.payload.socket.id)
       }
     },
-    removeSocket: (state, action) => {
-      console.log('player/removeSocket', action)
+    removePlayerSocket: (state, action) => {
+      console.log('player/removePlayerSocket', action)
 
       const player = state.players.find(player =>
         player.socket_ids.includes(action.payload.id)

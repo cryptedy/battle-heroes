@@ -6,7 +6,7 @@ const Moralis = require('moralis/node')
 const api = require('./api')
 const store = require('./store')
 const { getNFTs } = require('./NFT')
-const NFTActions = require('./NFT/actions')
+const { setNFTs } = require('./NFT/actions')
 const { gameManager } = require('./game')
 const { FRONTEND_URL, PORT } = require('./utils/constants')
 
@@ -27,7 +27,7 @@ setInterval(() => {
 const main = async () => {
   const NFTs = await getNFTs()
 
-  NFTActions.set(NFTs)
+  setNFTs(NFTs)
 
   const app = express()
 

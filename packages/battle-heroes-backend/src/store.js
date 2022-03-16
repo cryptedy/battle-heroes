@@ -1,12 +1,12 @@
 const { NFTSlice } = require('./NFT')
-const { chatSlice } = require('./chat')
 const { playerSlice } = require('./player')
+const { messageSlice } = require('./message')
 const { createStore, combineReducers } = require('redux')
 
 const reducer = combineReducers({
   NFT: NFTSlice.reducer,
-  chat: chatSlice.reducer,
-  player: playerSlice.reducer
+  player: playerSlice.reducer,
+  message: messageSlice.reducer
 })
 
 module.exports = createStore(reducer)

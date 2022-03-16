@@ -7,7 +7,7 @@ const initialState = () => ({
 export const state = initialState()
 
 export const getters = {
-  messages: state => state.messages
+  all: state => state.messages
 }
 
 export const mutations = {
@@ -22,27 +22,25 @@ export const mutations = {
   },
 
   [ADD_MESSAGE](state, { message }) {
-    const { player, text, posted_at } = message
-
-    state.messages.push({ player, text, posted_at })
+    state.messages.push(message)
   }
 }
 
 export const actions = {
-  setMessages({ commit }, messages) {
-    console.log('chat/setMessages', messages)
+  set({ commit }, messages) {
+    console.log('message/set', messages)
 
     commit(SET_MESSAGES, { messages })
   },
 
-  async deleteMessages({ commit }) {
-    console.log('chat/deleteMessages')
+  delete({ commit }) {
+    console.log('message/delete')
 
     commit(DELETE_MESSAGES)
   },
 
-  addMessage({ commit }, message) {
-    console.log('chat/addMessage', message)
+  add({ commit }, message) {
+    console.log('message/add', message)
 
     commit(ADD_MESSAGE, { message })
   }

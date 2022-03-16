@@ -23,7 +23,7 @@ export const actions = {
           }
 
           await dispatch('player/set', players, { root: true })
-          await dispatch('chat/setMessages', messages, { root: true })
+          await dispatch('message/set', messages, { root: true })
 
           resolve(status)
         }
@@ -35,7 +35,7 @@ export const actions = {
     console.log('game/logout')
 
     await dispatch('player/delete', null, { root: true })
-    await dispatch('chat/deleteMessages', null, { root: true })
+    await dispatch('message/delete', null, { root: true })
 
     return new Promise(resolve => {
       this.$socket.emit('game:logout', async () => {

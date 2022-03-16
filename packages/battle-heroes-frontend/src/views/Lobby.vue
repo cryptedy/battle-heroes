@@ -54,18 +54,20 @@
       </a>
       -
       <a href="#" @click="changeTab(2)">
-        <strong v-if="activeTab === 2"> CHAT({{ unreadChatMessages }}) </strong>
-        <span v-else> CHAT({{ unreadChatMessages }}) </span>
+        <strong v-if="activeTab === 2">
+          MESAGES({{ unreadMessageCount }})
+        </strong>
+        <span v-else> MESAGES({{ unreadMessageCount }}) </span>
       </a>
     </p>
 
     <Players v-if="activeTab === 1" />
-    <Chat v-else-if="activeTab === 2" />
+    <Message v-else-if="activeTab === 2" />
   </LayoutMain>
 </template>
 
 <script>
-import Chat from '@/components/Chat'
+import Message from '@/components/Message'
 import Players from '@/components/Players'
 import { mapGetters, mapActions } from 'vuex'
 import LayoutMain from '@/components/LayoutMain'
@@ -77,7 +79,7 @@ export default {
   name: 'Lobby',
 
   components: {
-    Chat,
+    Message,
     Players,
     LayoutMain,
     PlayerNFTs,
@@ -89,34 +91,32 @@ export default {
       isMetaMaskEnabled: window.ethereum !== undefined,
       loading: false,
       activeTab: 1,
-      unreadChatMessages: 0,
+      unreadMessageCount: 0,
       PLAYER_STATE: PLAYER_STATE
     }
   },
 
   computed: {
     ...mapGetters({
+      messages: 'message/all',
       isGameLogin: 'game/isLogin',
       player: 'player/userPlayer',
-      playerCount: 'player/count',
-      chatMessages: 'chat/messages'
+      playerCount: 'player/count'
     })
   },
 
   watch: {
-    chatMessages: {
+    messages: {
       handler(value, oldValue) {
         if (this.activeTab !== 2) {
-          const unread = value.length - oldValue.length
-
-          this.unreadChatMessages += unread
+          this.unreadMessageCount += value.length - oldValue.length
         }
       }
     },
 
     activeTab(value) {
       if (value === 2) {
-        this.unreadChatMessages = 0
+        this.unreadMessageCount = 0
       }
     }
   },
@@ -136,8 +136,7 @@ export default {
 
     this.$socket.on('disconnect', () => this.onDisconnect())
     this.$socket.on('player:players', players => this.setPlayers(players))
-    this.$socket.on('chat:messages', messages => this.setMessages(messages))
-    this.$socket.on('chat:message', message => this.addMessage(message))
+    this.$socket.on('message:messages', messages => this.setMessages(messages))
     this.$socket.io.on('reconnect', attempt => this.onReconnect(attempt))
   },
 
@@ -146,8 +145,7 @@ export default {
 
     this.$socket.off('disconnect')
     this.$socket.off('player:players')
-    this.$socket.off('chat:messages')
-    this.$socket.off('chat:message')
+    this.$socket.off('message:messages')
     this.$socket.io.off('reconnect')
   },
 
@@ -156,10 +154,10 @@ export default {
       loginGame: 'game/login',
       setPlayers: 'player/set',
       logoutGame: 'game/logout',
-      addMessage: 'chat/addMessage',
+      addMessage: 'message/add',
+      setMessages: 'message/set',
       deletePlayers: 'player/delete',
-      setMessages: 'chat/setMessages',
-      deleteMessages: 'chat/deleteMessages'
+      deleteMessages: 'message/delete'
     }),
 
     onDisconnect() {

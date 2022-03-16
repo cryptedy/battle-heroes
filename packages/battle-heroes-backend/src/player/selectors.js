@@ -4,9 +4,10 @@ const { playerSelectors } = require('./')
 const getState = () => store.getState().player
 
 const selectors = {
-  all: () => playerSelectors.selectPlayers(getState()),
-  findByUser: user => playerSelectors.selectPlayerByUser(getState())(user),
-  findBySocket: socket =>
+  selectPlayers: () => playerSelectors.selectPlayers(getState()),
+  selectPlayerByUser: user =>
+    playerSelectors.selectPlayerByUser(getState())(user),
+  selectPlayerBySocket: socket =>
     playerSelectors.selectPlayerBySocket(getState())(socket)
 }
 

@@ -1,9 +1,19 @@
-const chatActions = require('../chat/actions')
-const chatSelectors = require('../chat/selectors')
-const playerActions = require('../player/actions')
-const playerSelectors = require('../player/selectors')
 const { createPlayer } = require('../player')
+const { createMessage } = require('../message')
+const { addMessage } = require('../message/actions')
 const { PLAYER_STATE } = require('../utils/constants')
+const { selectMessages } = require('../message/selectors')
+const {
+  addPlayer,
+  updatePlayerState,
+  addPlayerSocket,
+  removePlayerSocket
+} = require('../player/actions')
+const {
+  selectPlayers,
+  selectPlayerByUser,
+  selectPlayerBySocket
+} = require('../player/selectors')
 
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
 
@@ -24,24 +34,24 @@ const waitProcess = name => {
 
 const gameManager = (io, socket) => {
   const onLogin = async (user, callback) => {
-    console.log('onLogin')
+    console.log('onLogin', socket.id, user.name)
 
     await waitProcess(PROCESS_LOGIN)
 
     PROCESS.LOGIN = true
 
-    const player = playerSelectors.findByUser(user)
+    const player = selectPlayerByUser(user)
 
     if (player) {
-      playerActions.addSocket({ player, socket })
+      addPlayerSocket({ player, socket })
     } else {
       const newPlayer = await createPlayer(user, socket)
 
-      playerActions.add(newPlayer)
+      addPlayer(newPlayer)
     }
 
-    const players = playerSelectors.all()
-    const messages = chatSelectors.allMessages()
+    const players = selectPlayers()
+    const messages = selectMessages()
 
     // to login user
     callback({
@@ -59,11 +69,11 @@ const gameManager = (io, socket) => {
   const onPlayerStandBy = () => {
     console.log('onPlayerStandBy', socket.id)
 
-    const player = playerSelectors.findBySocket(socket)
+    const player = selectPlayerBySocket(socket)
 
-    playerActions.updateState({ player, state: PLAYER_STATE.STANDBY })
+    updatePlayerState({ player, state: PLAYER_STATE.STANDBY })
 
-    const players = playerSelectors.all()
+    const players = selectPlayers()
 
     io.emit('player:players', players)
   }
@@ -71,11 +81,11 @@ const gameManager = (io, socket) => {
   const onPlayerIdle = () => {
     console.log('onPlayerIdle', socket.id)
 
-    const player = playerSelectors.findBySocket(socket)
+    const player = selectPlayerBySocket(socket)
 
-    playerActions.updateState({ player, state: PLAYER_STATE.IDLE })
+    updatePlayerState({ player, state: PLAYER_STATE.IDLE })
 
-    const players = playerSelectors.all()
+    const players = selectPlayers()
 
     io.emit('player:players', players)
   }
@@ -83,24 +93,26 @@ const gameManager = (io, socket) => {
   const onNewMessage = text => {
     console.log('onNewMessage', socket.id)
 
-    const player = playerSelectors.findBySocket(socket)
+    const player = selectPlayerBySocket(socket)
 
-    chatActions.addMessage({ text, player })
+    const message = createMessage(text, player)
 
-    const messages = chatSelectors.allMessages()
+    addMessage(message)
 
-    io.emit('chat:messages', messages)
+    const messages = selectMessages()
+
+    io.emit('message:messages', messages)
   }
 
   const onLogout = callback => {
     console.log('onLogout', socket.id)
 
-    const player = playerSelectors.findBySocket(socket)
+    const player = selectPlayerBySocket(socket)
 
     if (player) {
-      playerActions.removeSocket(socket)
+      removePlayerSocket(socket)
 
-      const players = playerSelectors.all()
+      const players = selectPlayers()
 
       io.emit('player:players', players)
 
@@ -113,12 +125,12 @@ const gameManager = (io, socket) => {
   const onDisconnect = () => {
     console.log('onDisconnect', socket.id)
 
-    const player = playerSelectors.findBySocket(socket)
+    const player = selectPlayerBySocket(socket)
 
     if (player) {
-      playerActions.removeSocket(socket)
+      removePlayerSocket(socket)
 
-      const players = playerSelectors.all()
+      const players = selectPlayers()
 
       io.emit('player:players', players)
     }
@@ -128,7 +140,7 @@ const gameManager = (io, socket) => {
   socket.on('game:logout', onLogout)
   socket.on('player:standBy', onPlayerStandBy)
   socket.on('player:idle', onPlayerIdle)
-  socket.on('chat:newMessage', onNewMessage)
+  socket.on('message:new', onNewMessage)
   socket.on('disconnect', onDisconnect)
 }
 
