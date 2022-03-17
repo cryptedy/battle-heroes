@@ -1,6 +1,6 @@
 // app
-export const SET_LOADING = 'SET_LOADING'
-export const SET_LOADED = 'SET_LOADED'
+export const SET_APP_LOADING = 'SET_APP_LOADING'
+export const SET_APP_LOADED = 'SET_APP_LOADED'
 
 // NFT
 export const SET_NFTS = 'SET_NFTS'
@@ -15,7 +15,10 @@ export const SET_COLLECTIONS = 'SET_COLLECTIONS'
 export const DELETE_COLLECTIONS = 'DELETE_COLLECTIONS'
 
 // socket
-export const SET_CONNECTED = 'SET_CONNECTED'
+export const SET_SOCKET_CONNECTED = 'SET_SOCKET_CONNECTED'
+
+// network
+export const SET_NETWORK_CONNECTED = 'SET_NETWORK_CONNECTED'
 
 // player
 export const SET_PLAYERS = 'SET_PLAYERS'

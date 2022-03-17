@@ -1,5 +1,5 @@
-import socket from '@/utils/socket'
-import { SET_CONNECTED } from '../mutation-types'
+import { socket } from '@/plugins'
+import { SET_SOCKET_CONNECTED } from '../mutation-types'
 
 const initialState = () => ({
   connected: false
@@ -8,11 +8,11 @@ const initialState = () => ({
 export const state = initialState()
 
 export const getters = {
-  connected: state => state.connected
+  isConnected: state => state.connected
 }
 
 export const mutations = {
-  [SET_CONNECTED](state, { connected }) {
+  [SET_SOCKET_CONNECTED](state, { connected }) {
     state.connected = connected
   }
 }
@@ -21,13 +21,13 @@ export const actions = {
   async onConnect({ commit }) {
     console.log('onConnect')
 
-    commit(SET_CONNECTED, { connected: socket.connected })
+    commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
   },
 
   async onDisconnect({ commit }) {
     console.log('onDisconnect')
 
-    commit(SET_CONNECTED, { connected: socket.connected })
+    commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
   },
 
   async onConnectError(context, error) {

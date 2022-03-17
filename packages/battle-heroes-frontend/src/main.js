@@ -8,14 +8,7 @@ import components from './components'
 import directives from './directives'
 import './assets/styles/sass/app.scss'
 
-const app = createApp(App)
-
-app.config.errorHandler = (error, instance, info) => {
-  console.log('errorHandler')
-  console.log(error, instance, info)
-}
-
-app
+createApp(App)
   .use(store)
   .use(router)
   .use(filters)

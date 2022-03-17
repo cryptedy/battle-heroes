@@ -109,11 +109,9 @@ export default {
   },
 
   watch: {
-    messages: {
-      handler(value, oldValue) {
-        if (this.activeTab !== 2) {
-          this.unreadMessageCount += value.length - oldValue.length
-        }
+    messages(value, oldValue) {
+      if (this.activeTab !== 2) {
+        this.unreadMessageCount += value.length - oldValue.length
       }
     },
 
@@ -137,21 +135,21 @@ export default {
   mounted() {
     console.log('Lobby mounted')
 
+    this.$socket.on('connect', () => this.onConnect())
     this.$socket.on('disconnect', () => this.onDisconnect())
     this.$socket.on('player:players', players => this.setPlayers(players))
     this.$socket.on('message:messages', messages => this.setMessages(messages))
     this.$socket.on('game:matched', game => this.onMatched(game))
-    this.$socket.io.on('reconnect', attempt => this.onReconnect(attempt))
   },
 
   beforeUnmount() {
     console.log('Lobby beforeUnmount')
 
+    this.$socket.off('connect')
     this.$socket.off('disconnect')
     this.$socket.off('player:players')
     this.$socket.off('message:messages')
     this.$socket.off('game:matched')
-    this.$socket.io.off('reconnect')
   },
 
   methods: {
@@ -165,18 +163,17 @@ export default {
       deleteMessages: 'message/delete'
     }),
 
-    onDisconnect() {
-      this.deletePlayers()
-      this.deleteMessages()
-    },
-
-    // eslint-disable-next-line no-unused-vars
-    onReconnect(attempt) {
+    onConnect() {
       try {
         this.loginGame()
       } catch (error) {
         console.log(error)
       }
+    },
+
+    onDisconnect() {
+      this.deletePlayers()
+      this.deleteMessages()
     },
 
     changeTab(tab) {

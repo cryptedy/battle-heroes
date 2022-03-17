@@ -1,7 +1,7 @@
-import focus from './focus'
+import focusDirective from './focus'
 
 export default {
   install(app) {
-    app.use(focus)
+    app.use(focusDirective)
   }
 }

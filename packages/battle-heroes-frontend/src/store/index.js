@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import socket from '@/utils/socket'
+import { socket } from '@/plugins'
 import createWebSocketPlugin from './plugins/socket'
 
 const requireContext = require.context('./modules', false, /.*\.js$/)
