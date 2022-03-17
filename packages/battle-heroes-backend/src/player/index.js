@@ -1,8 +1,23 @@
+const { getUsers } = require('../user')
 const { getUserProfile } = require('../user')
 const { getTokenIdsForAddress } = require('../NFT')
 const { PLAYER_STATE } = require('../utils/constants')
 
-const createPlayer = async (user, socket) => {
+const getPlayers = async () => {
+  const players = []
+
+  const users = await getUsers()
+
+  for (const user of users) {
+    const player = await createPlayer(user)
+
+    players.push(player)
+  }
+
+  return players
+}
+
+const createPlayer = async user => {
   const profile = await getUserProfile(user)
   const tokenIds = await getTokenIdsForAddress(user.address)
 
@@ -12,7 +27,7 @@ const createPlayer = async (user, socket) => {
     name: profile.name,
     avatar_url: profile.avatar_url,
     address: user.address,
-    socket_ids: [socket.id],
+    socket_ids: [],
     token_ids: tokenIds,
     level: 1,
     state: PLAYER_STATE.IDLE
@@ -20,5 +35,6 @@ const createPlayer = async (user, socket) => {
 }
 
 module.exports = {
+  getPlayers,
   createPlayer
 }

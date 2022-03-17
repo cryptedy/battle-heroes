@@ -1,33 +1,41 @@
 <template>
-  <ul>
-    <li v-for="message in messages" :key="message.id">
-      <BasePlayerAvatar :player="message.player" />
+  <LayoutMain>
+    <p v-if="!messages.length > 0">No messages.</p>
+    <ul v-else>
+      <li v-for="message in messages" :key="message.id">
+        <BasePlayerAvatar :player="message.player" />
 
-      {{ message.player.name }}
-      -
-      {{ message.text }}
-      -
-      {{ $filters.datetime(message.posted_at) }}
-      <hr />
-    </li>
-  </ul>
+        {{ message.player.name }}
+        -
+        {{ message.text }}
+        -
+        {{ $filters.datetime(message.posted_at) }}
+        <hr />
+      </li>
+    </ul>
 
-  <form @submit.prevent="sendMessage">
-    <input
-      ref="input"
-      v-model="newMessage"
-      v-focus
-      placeholder="Send message"
-      type="text"
-    />
-  </form>
+    <form @submit.prevent="sendMessage">
+      <input
+        ref="input"
+        v-model="newMessage"
+        v-focus
+        placeholder="Send message"
+        type="text"
+      />
+    </form>
+  </LayoutMain>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import LayoutMain from '@/components/LayoutMain'
 
 export default {
   name: 'Message',
+
+  components: {
+    LayoutMain
+  },
 
   data() {
     return {
@@ -48,11 +56,6 @@ export default {
       },
       deep: true
     }
-  },
-
-  mounted() {
-    // TODO: no effect
-    this.$nextTick(() => this.scrollToBottom())
   },
 
   methods: {

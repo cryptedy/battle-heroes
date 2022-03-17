@@ -11,12 +11,6 @@ export default [
     component: view('Home')
   },
   {
-    path: '/lobby',
-    name: 'lobby',
-    meta: { middleware: ['auth'] },
-    component: view('Lobby')
-  },
-  {
     path: '/login',
     name: 'login',
     meta: { middleware: ['guest'] },
@@ -27,6 +21,18 @@ export default [
     name: 'logout',
     meta: { middleware: ['auth'] },
     component: view('auth/Logout')
+  },
+  {
+    path: '/players',
+    name: 'players',
+    meta: { middleware: ['auth'] },
+    component: view('players/Index')
+  },
+  {
+    path: '/messages',
+    name: 'messages',
+    meta: { middleware: ['auth'] },
+    component: view('messages/Index')
   },
   {
     path: '/games',

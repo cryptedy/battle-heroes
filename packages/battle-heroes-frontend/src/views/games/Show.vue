@@ -1,7 +1,19 @@
-<template>GAMES</template>
+<template>
+  <LayoutMain> GamesShow </LayoutMain>
+</template>
 
 <script>
+import LayoutMain from '@/components/LayoutMain'
+
 export default {
-  name: 'GamesShow'
+  name: 'GamesShow',
+
+  components: {
+    LayoutMain
+  },
+
+  created() {
+    this.$socket.emit('game:join')
+  }
 }
 </script>

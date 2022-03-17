@@ -8,6 +8,19 @@ module.exports = createSlice({
   name: 'player',
   initialState,
   reducers: {
+    setPlayers: (state, action) => {
+      console.log('player/setPlayer', action)
+
+      console.log(action.payload)
+
+      const availableUsers = action.payload.filter(
+        user => user.address !== undefined
+      )
+
+      console.log(availableUsers)
+
+      state.players = availableUsers
+    },
     addPlayer: (state, action) => {
       console.log('player/addPlayer', action)
 
@@ -32,7 +45,10 @@ module.exports = createSlice({
       )
 
       if (player) {
+        console.log('FOUND!')
         player.socket_ids.push(action.payload.socket.id)
+      } else {
+        console.log('NOT FOUND!')
       }
     },
     removePlayerSocket: (state, action) => {

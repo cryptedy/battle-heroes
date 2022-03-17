@@ -6,6 +6,8 @@ const Moralis = require('moralis/node')
 const api = require('./api')
 const { getNFTs } = require('./NFT')
 const { setNFTs } = require('./NFT/actions')
+const { getPlayers } = require('./player')
+const { setPlayers } = require('./player/actions')
 const { gameManager } = require('./game')
 const { FRONTEND_URL, PORT } = require('./utils/constants')
 
@@ -19,17 +21,21 @@ const corsOptions = {
 }
 
 // DEBUG
-// const store = require('./store')
-// setInterval(() => {
-//   const state = store.getState()
-//   console.log(`Players ${state.player.players.length}`)
-//   console.log(`Games ${state.game.games.length}`)
-// }, 5000)
+const store = require('./store')
+setInterval(() => {
+  const state = store.getState()
+  console.log(`Players ${state.player.players.length}`)
+  console.log(`Games ${state.game.games.length}`)
+}, 5000)
 
 const main = async () => {
-  const NFTs = await getNFTs()
+  // const NFTs = await getNFTs()
 
-  setNFTs(NFTs)
+  // setNFTs(NFTs)
+
+  // const players = await getPlayers()
+
+  // setPlayers(players)
 
   const app = express()
 

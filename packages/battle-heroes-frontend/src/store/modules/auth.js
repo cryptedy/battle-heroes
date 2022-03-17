@@ -3,10 +3,10 @@ import { SET_USER, DELETE_USER } from '../mutation-types'
 
 const SIGNING_MESSAGE = `Login to ${process.env.VUE_APP_TITLE}`
 
-const createUser = MoralisUser => {
+const createUser = moralisUser => {
   return {
-    id: MoralisUser.id,
-    address: MoralisUser.get('ethAddress')
+    id: moralisUser.id,
+    address: moralisUser.get('ethAddress')
   }
 }
 
@@ -37,12 +37,12 @@ export const actions = {
     console.log('auth/login')
 
     try {
-      const MoralisUser = await Moralis.authenticate({
+      const moralisUser = await Moralis.authenticate({
         signingMessage: SIGNING_MESSAGE
       })
 
-      if (MoralisUser) {
-        const user = createUser(MoralisUser)
+      if (moralisUser) {
+        const user = createUser(moralisUser)
 
         commit(SET_USER, { user })
       }
@@ -57,10 +57,10 @@ export const actions = {
     console.log('auth/loginWithToken')
 
     try {
-      const MoralisUser = Moralis.User.current()
+      const moralisUser = Moralis.User.current()
 
-      if (MoralisUser) {
-        const user = createUser(MoralisUser)
+      if (moralisUser) {
+        const user = createUser(moralisUser)
 
         commit(SET_USER, { user })
       }

@@ -36,7 +36,7 @@ export default {
 
         this.$router.push(
           {
-            name: 'lobby'
+            name: 'players'
           },
           () => {}
         )

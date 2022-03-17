@@ -1,10 +1,11 @@
 const { createPlayer } = require('../player')
 const { addGame } = require('../game/actions')
+const { nanoid } = require('@reduxjs/toolkit')
 const { createMessage } = require('../message')
 const { addMessage } = require('../message/actions')
 const { PLAYER_STATE } = require('../utils/constants')
 const { selectMessages } = require('../message/selectors')
-const { nanoid } = require('@reduxjs/toolkit')
+const { selectGames, selectPlayerGame } = require('../game/selectors')
 const {
   addPlayer,
   updatePlayerState,
@@ -13,8 +14,8 @@ const {
 } = require('../player/actions')
 const {
   selectPlayers,
-  selectPlayerByUser,
-  selectPlayerBySocket
+  selectUserPlayer,
+  selectSocketPlayer
 } = require('../player/selectors')
 
 const createGame = (player, opponentPlayer) => {
@@ -42,6 +43,24 @@ const gameManager = (io, socket) => {
     })
   }
 
+  const onJoinGame = () => {
+    console.log('onJoinGame', socket.id)
+
+    const player = selectSocketPlayer(socket)
+
+    if (player) {
+      const game = selectPlayerGame(player)
+
+      console.log(game)
+
+      if (game) {
+        console.log('player!')
+      } else {
+        console.log('guest!')
+      }
+    }
+  }
+
   const onLogin = async (user, callback) => {
     console.log('onLogin', socket.id, user)
 
@@ -49,27 +68,29 @@ const gameManager = (io, socket) => {
 
     PROCESS.LOGIN = true
 
-    const player = selectPlayerByUser(user)
+    const player = selectUserPlayer(user)
 
     if (player) {
       addPlayerSocket({ player, socket })
     } else {
-      const newPlayer = await createPlayer(user, socket)
+      const newPlayer = await createPlayer(user)
 
       addPlayer(newPlayer)
+      addPlayerSocket({ player: newPlayer, socket })
     }
 
     const players = selectPlayers()
     const messages = selectMessages()
+    const games = selectGames()
 
-    // to login user
     callback({
       status: true,
       players,
-      messages
+      messages,
+      games
     })
 
-    // to other users
+    // to others
     socket.broadcast.emit('player:players', players)
 
     PROCESS.LOGIN = false
@@ -78,7 +99,7 @@ const gameManager = (io, socket) => {
   const onPlayerStandBy = () => {
     console.log('onPlayerStandBy', socket.id)
 
-    const player = selectPlayerBySocket(socket)
+    const player = selectSocketPlayer(socket)
 
     if (player) {
       const players = selectPlayers()
@@ -88,9 +109,11 @@ const gameManager = (io, socket) => {
       )
 
       if (opponentPlayer) {
-        const mewGame = createGame(player, opponentPlayer)
+        const newGame = createGame(player, opponentPlayer)
 
-        addGame(mewGame)
+        console.log(newGame)
+
+        addGame(newGame)
 
         updatePlayerState({ player, state: PLAYER_STATE.BATTLE })
         updatePlayerState({
@@ -100,13 +123,16 @@ const gameManager = (io, socket) => {
 
         // to player
         player.socket_ids.forEach(socketId =>
-          io.to(socketId).emit('game:matched', mewGame)
+          io.to(socketId).emit('game:matched', newGame)
         )
 
         // to opponent player
         opponentPlayer.socket_ids.forEach(socketId =>
-          io.to(socketId).emit('game:matched', mewGame)
+          io.to(socketId).emit('game:matched', newGame)
         )
+
+        // to all
+        io.emit('game:games', selectGames())
       } else {
         updatePlayerState({ player, state: PLAYER_STATE.STANDBY })
       }
@@ -118,7 +144,7 @@ const gameManager = (io, socket) => {
   const onPlayerIdle = () => {
     console.log('onPlayerIdle', socket.id)
 
-    const player = selectPlayerBySocket(socket)
+    const player = selectSocketPlayer(socket)
 
     if (player) {
       updatePlayerState({ player, state: PLAYER_STATE.IDLE })
@@ -130,7 +156,7 @@ const gameManager = (io, socket) => {
   const onNewMessage = text => {
     console.log('onNewMessage', socket.id)
 
-    const player = selectPlayerBySocket(socket)
+    const player = selectSocketPlayer(socket)
 
     if (player) {
       const message = createMessage(text, player)
@@ -144,7 +170,7 @@ const gameManager = (io, socket) => {
   const onLogout = callback => {
     console.log('onLogout', socket.id)
 
-    const player = selectPlayerBySocket(socket)
+    const player = selectSocketPlayer(socket)
 
     if (player) {
       removePlayerSocket(socket)
@@ -160,7 +186,7 @@ const gameManager = (io, socket) => {
   const onDisconnect = () => {
     console.log('onDisconnect', socket.id)
 
-    const player = selectPlayerBySocket(socket)
+    const player = selectSocketPlayer(socket)
 
     if (player) {
       removePlayerSocket(socket)
@@ -171,6 +197,7 @@ const gameManager = (io, socket) => {
 
   socket.on('game:login', onLogin)
   socket.on('game:logout', onLogout)
+  socket.on('game:join', onJoinGame)
   socket.on('player:standBy', onPlayerStandBy)
   socket.on('player:idle', onPlayerIdle)
   socket.on('message:new', onNewMessage)

@@ -28,3 +28,7 @@ export const DELETE_PLAYERS = 'DELETE_PLAYERS'
 export const SET_MESSAGES = 'SET_MESSAGES'
 export const DELETE_MESSAGES = 'DELETE_MESSAGES'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
+
+// game
+export const SET_GAMES = 'SET_GAMES'
+export const DELETE_GAMES = 'DELETE_GAMES'
