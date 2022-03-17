@@ -29,3 +29,7 @@
     @return $letter-spacing + em;
   }
 }
+
+@function z-index($element) {
+  @return map-get($z-indexes, $element);
+}

@@ -2,7 +2,9 @@
   <LayoutMain>
     <p v-if="!players.length > 0">No players.</p>
     <ul v-else>
-      <li v-for="player in players" :key="player.id" style="margin-right: 8px">
+      <li v-for="player in players" :key="player.id">
+        <hr />
+
         <BasePlayerAvatar :player="player" />
 
         {{ player.name }}
@@ -19,21 +21,31 @@
         -
         {{ $filters.playerState(player.state) }}
 
-        <base-accordion :open="false">
-          <template #trigger="scopeProps">
-            <a style="color: blue; cursor: pointer">
-              <span v-if="scopeProps.show">▼</span>
-              <span v-else>▶</span>
+        <BaseDialog>
+          <template #trigger>
+            <span style="color: blue; cursor: pointer">
               Heroes ({{
                 player.token_ids[1].length + player.token_ids[2].length
               }})
-            </a>
+            </span>
           </template>
-          <template #contents>
-            <PlayerNFTs :player="player" />
-          </template>
-        </base-accordion>
-        <hr />
+
+          <BaseGrid>
+            <BaseGridRow>
+              <BaseGridColumn>
+                <BasePlayerAvatar :player="player" />
+
+                <p>
+                  <strong>{{ player.name }} heroes</strong>
+                </p>
+
+                <hr />
+
+                <PlayerNFTs :player="player" />
+              </BaseGridColumn>
+            </BaseGridRow>
+          </BaseGrid>
+        </BaseDialog>
       </li>
     </ul>
   </LayoutMain>
@@ -50,6 +62,13 @@ export default {
   components: {
     PlayerNFTs,
     LayoutMain
+  },
+
+  data() {
+    return {
+      drawerShown: false,
+      dialogShown: false
+    }
   },
 
   computed: {

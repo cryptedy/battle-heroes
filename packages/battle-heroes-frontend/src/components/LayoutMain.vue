@@ -2,98 +2,131 @@
   <SplashScreen v-if="!isGameLogin" message="Connecting to game server..." />
 
   <BaseGrid v-else>
+    <template v-if="!isGameShowPage">
+      <header style="overflow: hidden">
+        <BaseGridRow>
+          <BaseGridColumn>
+            <BaseDrawer>
+              <template #trigger>
+                <button>Your heroes</button>
+              </template>
+
+              <BaseGrid>
+                <BaseGridRow>
+                  <BaseGridColumn>
+                    <BasePlayerAvatar :player="player" />
+
+                    <p>
+                      <strong>{{ player.name }} heroes</strong>
+                    </p>
+
+                    <hr />
+
+                    <PlayerNFTs :player="player" />
+                  </BaseGridColumn>
+                </BaseGridRow>
+              </BaseGrid>
+            </BaseDrawer>
+
+            <BaseMenu>
+              <template #trigger>
+                <BasePlayerAvatar
+                  :player="player"
+                  style="float: right; overflow: hidden"
+                />
+              </template>
+
+              <BaseGrid>
+                <BaseGridRow>
+                  <BaseGridColumn>
+                    <p>
+                      <strong>{{ player.name }}</strong>
+                      -
+                      <router-link :to="{ name: 'logout' }">
+                        Logout
+                      </router-link>
+                    </p>
+
+                    <p>Level: {{ player.level }}</p>
+                    <p>Player ID: {{ player.id }}</p>
+                    <p>Address: {{ player.address }}</p>
+                    <p>Login from {{ player.socket_ids.length }} devices</p>
+                    <p>state: {{ $filters.playerState(player.state) }}</p>
+                  </BaseGridColumn>
+                </BaseGridRow>
+              </BaseGrid>
+            </BaseMenu>
+          </BaseGridColumn>
+        </BaseGridRow>
+      </header>
+
+      <hr />
+
+      <nav>
+        <BaseGridRow>
+          <BaseGridColumn>
+            Chnage your state to:
+            <button
+              v-if="player.state === PLAYER_STATE.IDLE"
+              @click="changePlayerState(PLAYER_STATE.STANDBY)"
+            >
+              STAND-BY
+            </button>
+            <button
+              v-if="
+                player.state === PLAYER_STATE.STANDBY ||
+                player.state === PLAYER_STATE.BATTLE
+              "
+              @click="changePlayerState(PLAYER_STATE.IDLE)"
+            >
+              IDLE
+            </button>
+          </BaseGridColumn>
+
+          <BaseGridColumn>
+            <router-link
+              v-slot="{ href, route, navigate }"
+              custom
+              :to="{ name: 'players' }"
+            >
+              <a :href="href" @click="navigate">
+                <strong v-if="$route.path.startsWith(route.path)">
+                  PLAYERS({{ playerCount }})
+                </strong>
+                <span v-else> PLAYERS({{ playerCount }}) </span>
+              </a>
+            </router-link>
+            <router-link
+              v-slot="{ href, route, navigate }"
+              custom
+              :to="{ name: 'messages' }"
+            >
+              <a :href="href" @click="navigate">
+                <strong v-if="$route.path.startsWith(route.path)">
+                  MESSAGES({{ unreadMessageCount }})
+                </strong>
+                <span v-else> MESSAGES({{ unreadMessageCount }}) </span>
+              </a>
+            </router-link>
+            <router-link
+              v-slot="{ href, route, navigate }"
+              custom
+              :to="{ name: 'games' }"
+            >
+              <a :href="href" @click="navigate">
+                <strong v-if="$route.path.startsWith(route.path)">
+                  GAMES({{ gameCount }})
+                </strong>
+                <span v-else> GAMES({{ gameCount }}) </span>
+              </a>
+            </router-link>
+          </BaseGridColumn>
+        </BaseGridRow>
+      </nav>
+    </template>
+
     <BaseGridRow>
       <BaseGridColumn>
-        <template v-if="!isGameShowPage">
-          <p>
-            <strong>{{ player.name }}</strong>
-            -
-            <router-link :to="{ name: 'logout' }"> Logout </router-link>
-          </p>
-
-          <BasePlayerAvatar :player="player" />
-
-          <p>Level: {{ player.level }}</p>
-          <p>Player ID: {{ player.id }}</p>
-          <p>Address: {{ player.address }}</p>
-          <p>Login from {{ player.socket_ids.length }} devices</p>
-          <p>state: {{ $filters.playerState(player.state) }}</p>
-
-          <base-accordion :open="false">
-            <template #trigger="scopeProps">
-              <a style="color: blue; cursor: pointer">
-                <span v-if="scopeProps.show">▼</span>
-                <span v-else>▶</span>
-                Your Heroes ({{
-                  player.token_ids[1].length + player.token_ids[2].length
-                }})
-              </a>
-            </template>
-            <template #contents>
-              <PlayerNFTs :player="player" />
-            </template>
-          </base-accordion>
-
-          <hr />
-
-          <button
-            v-if="player.state === PLAYER_STATE.IDLE"
-            @click="changePlayerState(PLAYER_STATE.STANDBY)"
-          >
-            STAND-BY
-          </button>
-          <button
-            v-if="
-              player.state === PLAYER_STATE.STANDBY ||
-              player.state === PLAYER_STATE.BATTLE
-            "
-            @click="changePlayerState(PLAYER_STATE.IDLE)"
-          >
-            IDLE
-          </button>
-
-          <hr />
-
-          <router-link
-            v-slot="{ href, route, navigate }"
-            custom
-            :to="{ name: 'players' }"
-          >
-            <a :href="href" @click="navigate">
-              <strong v-if="$route.path.startsWith(route.path)">
-                PLAYERS({{ playerCount }})
-              </strong>
-              <span v-else> PLAYERS({{ playerCount }}) </span>
-            </a>
-          </router-link>
-          <router-link
-            v-slot="{ href, route, navigate }"
-            custom
-            :to="{ name: 'messages' }"
-          >
-            <a :href="href" @click="navigate">
-              <strong v-if="$route.path.startsWith(route.path)">
-                MESSAGES({{ unreadMessageCount }})
-              </strong>
-              <span v-else> MESSAGES({{ unreadMessageCount }}) </span>
-            </a>
-          </router-link>
-          <router-link
-            v-slot="{ href, route, navigate }"
-            custom
-            :to="{ name: 'games' }"
-          >
-            <a :href="href" @click="navigate">
-              <strong v-if="$route.path.startsWith(route.path)">
-                GAMES({{ gameCount }})
-              </strong>
-              <span v-else> GAMES({{ gameCount }}) </span>
-            </a>
-          </router-link>
-
-          <hr />
-        </template>
-
         <slot />
       </BaseGridColumn>
     </BaseGridRow>

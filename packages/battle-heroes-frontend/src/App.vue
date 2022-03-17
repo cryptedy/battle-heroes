@@ -2,6 +2,8 @@
   <SplashScreen v-if="isAppLoading" />
 
   <router-view v-else />
+
+  <div id="teleport"></div>
 </template>
 
 <script>

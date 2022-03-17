@@ -1,0 +1,31 @@
+.menu {
+  background-color: palette(grey, 0);
+  border: 1px solid palette(grey, 400);
+  border-radius: 2px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  white-space: normal;
+  z-index: z-index(menu);
+
+  max-width: 80%;
+  @include mediaQuery(sm) {
+    max-width: 450px;
+  }
+
+  &-trigger {
+    user-select: none;
+  }
+
+  &-enter-active {
+    transition: all 0.2s;
+  }
+  &-leave-active {
+    transition: all 0.1s;
+  }
+  &-enter-from {
+    transform: translateY(-6px);
+  }
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+  }
+}

@@ -45,10 +45,7 @@ module.exports = createSlice({
       )
 
       if (player) {
-        console.log('FOUND!')
         player.socket_ids.push(action.payload.socket.id)
-      } else {
-        console.log('NOT FOUND!')
       }
     },
     removePlayerSocket: (state, action) => {
