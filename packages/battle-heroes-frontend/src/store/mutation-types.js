@@ -2,6 +2,15 @@
 export const SET_APP_LOADING = 'SET_APP_LOADING'
 export const SET_APP_LOADED = 'SET_APP_LOADED'
 
+// window
+export const RESET_WINDOW_STATE = 'RESET_WINDOW_STATE'
+export const UPDATE_WINDOW_SIZE = 'UPDATE_WINDOW_SIZE'
+export const UPDATE_WINDOW_OFFSET = 'UPDATE_WINDOW_OFFSET'
+
+// scrollbar
+export const UPDATE_SCROLLBAR = 'UPDATE_SCROLLBAR'
+export const SET_SCROLLBAR_WIDTH = 'SET_SCROLLBAR_WIDTH'
+
 // NFT
 export const SET_NFTS = 'SET_NFTS'
 export const DELETE_NFTS = 'DELETE_NFTS'

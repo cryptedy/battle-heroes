@@ -1,9 +1,11 @@
 <template>
-  <p v-if="!isMetaMaskEnabled">Please install MetaMask</p>
+  <button v-if="!isMetaMaskEnabled" class="button is-diabled" disabled>
+    Please install MetaMask
+  </button>
 
-  <button v-else :disabled="loading" @click="loginWithMetaMask">
+  <button v-else class="button" :disabled="loading" @click="loginWithMetaMask">
     <BaseSpinner v-if="loading" />
-    {{ $t('message.login') }}
+    LOGIN
   </button>
 </template>
 
@@ -49,3 +51,20 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.button {
+  height: 48px;
+  margin: 16px 0;
+  padding: 0 24px;
+  border-radius: 3px;
+  background-color: palette(blue, 500);
+  color: palette(grey, 0);
+  cursor: pointer;
+
+  &.is-diabled {
+    background-color: palette(grey, 500);
+    color: palette(grey, 300);
+  }
+}
+</style>

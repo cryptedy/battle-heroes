@@ -1,15 +1,12 @@
 <template>
   <div class="splash-screen">
-    <BaseGrid>
-      <BaseGridRow>
-        <BaseGridColumn>
-          <p>
-            <BaseSpinner />
-            {{ message }}
-          </p>
-        </BaseGridColumn>
-      </BaseGridRow>
-    </BaseGrid>
+    <div class="splash-screen-image">
+      <img src="@/assets/images/brand-logo.png" alt="Battle Heroes" />
+    </div>
+    <p class="splash-screen-message">
+      <BaseSpinner />
+      {{ message }}
+    </p>
   </div>
 </template>
 
@@ -25,3 +22,22 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.splash-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  &-image {
+    width: 230px;
+  }
+
+  &-message {
+    margin-top: 32px;
+    font-size: 24px;
+  }
+}
+</style>

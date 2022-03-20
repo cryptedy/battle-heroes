@@ -9,7 +9,13 @@ $breakpoints: (
 ) !default;
 
 $z-indexes: (
-  'dialog': 3,
-  'menu': 2,
-  'drawer': 1,
+  'progress-bar': 9,
+  'dialog': 8,
+  'loading-splash': 7,
+  'drawer': 6,
+  'menu': 5,
+  'overlay': 4,
+  'global-navigation': 3,
+  'global-header': 2,
+  'global-content': 1,
 ) !default;

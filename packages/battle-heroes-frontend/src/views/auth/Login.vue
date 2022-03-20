@@ -1,6 +1,12 @@
 <template>
   <LayoutHome>
-    <LoginButton />
+    <BaseGrid>
+      <BaseGridRow>
+        <BaseGridColumn>
+          <LoginButton />
+        </BaseGridColumn>
+      </BaseGridRow>
+    </BaseGrid>
   </LayoutHome>
 </template>
 

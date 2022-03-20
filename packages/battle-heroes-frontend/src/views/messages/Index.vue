@@ -3,7 +3,7 @@
     <p v-if="!messages.length > 0">No messages.</p>
     <ul v-else>
       <li v-for="message in messages" :key="message.id">
-        <BasePlayerAvatar :player="message.player" />
+        <PlayerAvatar :player="message.player" />
 
         {{ message.player.name }}
         -
@@ -29,12 +29,14 @@
 <script>
 import { mapGetters } from 'vuex'
 import LayoutMain from '@/components/LayoutMain'
+import PlayerAvatar from '@/components/PlayerAvatar'
 
 export default {
   name: 'Message',
 
   components: {
-    LayoutMain
+    LayoutMain,
+    PlayerAvatar
   },
 
   data() {
@@ -77,3 +79,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+input {
+  color: color(primary);
+}
+</style>
