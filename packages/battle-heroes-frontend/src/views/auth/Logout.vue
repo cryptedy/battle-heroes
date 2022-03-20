@@ -15,7 +15,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      isLoginGame: 'game/isLogin'
+      isLoginGame: 'auth/isGameLogin'
     })
   },
 

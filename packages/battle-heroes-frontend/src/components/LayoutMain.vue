@@ -155,11 +155,11 @@ export default {
 
   computed: {
     ...mapGetters({
+      player: 'auth/player',
       gameCount: 'game/count',
       messages: 'message/all',
-      isGameLogin: 'game/isLogin',
-      player: 'player/userPlayer',
-      playerCount: 'player/count'
+      playerCount: 'player/count',
+      isGameLogin: 'auth/isGameLogin'
     }),
 
     PLAYER_STATE() {

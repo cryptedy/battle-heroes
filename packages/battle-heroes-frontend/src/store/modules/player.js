@@ -11,12 +11,7 @@ export const getters = {
   all: state => state.playerIds.map(playerId => state.players[playerId]),
   find: (state, getters) => playerId =>
     getters.all.find(player => player.id === playerId),
-  count: (state, getters) => getters.all.length,
-  userPlayer: (state, getters, rootState, rootGetters) => {
-    if (!rootGetters['auth/isLogin']) return null
-
-    return getters.find(rootGetters['auth/user'].id) || null
-  }
+  count: (state, getters) => getters.all.length
 }
 
 export const mutations = {

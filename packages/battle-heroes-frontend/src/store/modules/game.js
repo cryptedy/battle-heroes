@@ -8,9 +8,7 @@ export const state = initialState()
 
 export const getters = {
   all: state => state.games,
-  count: state => state.games.length,
-  isLogin: (state, getters, rootState, rootGetters) =>
-    rootGetters['player/userPlayer'] !== null
+  count: state => state.games.length
 }
 
 export const mutations = {
@@ -24,6 +22,7 @@ export const mutations = {
     state.games = games
   }
 }
+
 export const actions = {
   set({ commit }, games) {
     console.log('game/set', games)
