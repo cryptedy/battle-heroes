@@ -33,9 +33,9 @@ const main = async () => {
 
   setNFTs(NFTs)
 
-  // const players = await getPlayers()
+  const players = await getPlayers()
 
-  // setPlayers(players)
+  setPlayers(players)
 
   const app = express()
 

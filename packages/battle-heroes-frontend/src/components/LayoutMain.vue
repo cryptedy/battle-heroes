@@ -155,9 +155,11 @@ export default {
 
   computed: {
     ...mapGetters({
+      game: 'auth/game',
       player: 'auth/player',
       gameCount: 'game/count',
       messages: 'message/all',
+      playerNFTs: 'NFT/byPlayer',
       playerCount: 'player/count',
       isGameLogin: 'auth/isGameLogin'
     }),
@@ -193,6 +195,15 @@ export default {
         console.log(error)
       }
     }
+
+    if (this.game) {
+      this.$router.push({
+        name: 'games.show',
+        params: {
+          gameId: this.game.id
+        }
+      })
+    }
   },
 
   mounted() {
@@ -226,11 +237,20 @@ export default {
       setMessages: 'message/set'
     }),
 
-    onConnect() {
+    async onConnect() {
       try {
-        this.loginGame()
+        await this.loginGame()
       } catch (error) {
         console.log(error)
+      }
+
+      if (this.game) {
+        this.$router.push({
+          name: 'games.show',
+          params: {
+            gameId: this.game.id
+          }
+        })
       }
     },
 

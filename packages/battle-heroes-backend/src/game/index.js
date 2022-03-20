@@ -58,6 +58,8 @@ const gameManager = (io, socket) => {
       } else {
         console.log('guest!')
       }
+    } else {
+      console.log('guest!')
     }
   }
 
