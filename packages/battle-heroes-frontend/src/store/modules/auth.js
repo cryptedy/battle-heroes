@@ -18,22 +18,7 @@ export const state = initialState()
 
 export const getters = {
   user: state => state.user,
-  isLogin: (state, getters) => getters.user !== null,
-  player: (state, getters, rootState, rootGetters) => {
-    if (!getters.isLogin) return null
-
-    return rootGetters['player/find'](getters.user.id) || null
-  },
-  isGameLogin: (state, getters) => getters.player !== null,
-  game: (state, getters, rootState, rootGetters) => {
-    if (!getters.isGameLogin) return null
-
-    return (
-      rootGetters['game/all'].find(game =>
-        game.player_ids.includes(getters.player.id)
-      ) || null
-    )
-  }
+  isLogin: (state, getters) => getters.user !== null
 }
 
 export const mutations = {

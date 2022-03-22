@@ -6,44 +6,64 @@ const view = path => () =>
 export default [
   {
     path: '/',
-    name: 'home',
+    name: 'index',
     meta: { middleware: ['guest'] },
-    component: view('Home')
+    component: view('Index')
   },
   {
     path: '/login',
     name: 'login',
     meta: { middleware: ['guest'] },
-    component: view('auth/Login')
+    component: view('Login')
   },
   {
     path: '/logout',
     name: 'logout',
     meta: { middleware: ['auth'] },
-    component: view('auth/Logout')
+    component: view('Logout')
+  },
+  {
+    path: '/home',
+    name: 'home',
+    meta: { middleware: ['auth', 'game'] },
+    component: view('Home')
   },
   {
     path: '/players',
     name: 'players',
-    meta: { middleware: ['auth'] },
-    component: view('players/Index')
+    meta: { middleware: ['auth', 'game'] },
+    component: view('Players')
   },
   {
     path: '/messages',
     name: 'messages',
-    meta: { middleware: ['auth'] },
-    component: view('messages/Index')
+    meta: { middleware: ['auth', 'game'] },
+    component: view('Messages')
   },
   {
-    path: '/games',
-    name: 'games',
-    meta: { middleware: ['auth'] },
-    component: view('games/Index')
+    path: '/battles',
+    name: 'battles',
+    meta: { middleware: ['auth', 'game'] },
+    component: view('Battles')
   },
   {
-    path: '/games/:gameId',
-    name: 'games.show',
-    meta: { middleware: ['auth'] },
-    component: view('games/Show')
+    path: '/battles/:battleId',
+    name: 'battle',
+    meta: { middleware: ['auth', 'game'] },
+    component: view('Battle')
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { middleware: ['auth', 'game'] },
+    redirect: { name: 'settings.account' },
+    component: view('settings/Index'),
+    children: [
+      {
+        path: 'account',
+        name: 'settings.account',
+        component: view('settings/Account')
+      }
+    ]
   }
 ]

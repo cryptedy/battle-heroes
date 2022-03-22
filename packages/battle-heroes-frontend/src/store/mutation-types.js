@@ -3,12 +3,11 @@ export const SET_APP_LOADING = 'SET_APP_LOADING'
 export const SET_APP_LOADED = 'SET_APP_LOADED'
 
 // window
-export const RESET_WINDOW_STATE = 'RESET_WINDOW_STATE'
-export const UPDATE_WINDOW_SIZE = 'UPDATE_WINDOW_SIZE'
-export const UPDATE_WINDOW_OFFSET = 'UPDATE_WINDOW_OFFSET'
+export const SET_WINDOW_SIZE = 'SET_WINDOW_SIZE'
+export const SET_WINDOW_OFFSET = 'SET_WINDOW_OFFSET'
 
 // scrollbar
-export const UPDATE_SCROLLBAR = 'UPDATE_SCROLLBAR'
+export const SET_SCROLLBAR = 'SET_SCROLLBAR'
 export const SET_SCROLLBAR_WIDTH = 'SET_SCROLLBAR_WIDTH'
 
 // NFT
@@ -32,12 +31,15 @@ export const SET_NETWORK_CONNECTED = 'SET_NETWORK_CONNECTED'
 // player
 export const SET_PLAYERS = 'SET_PLAYERS'
 export const DELETE_PLAYERS = 'DELETE_PLAYERS'
+export const ADD_PLAYER = 'ADD_PLAYER'
+export const UPDATE_PLAYER = 'UPDATE_PLAYER'
 
 // message
 export const SET_MESSAGES = 'SET_MESSAGES'
 export const DELETE_MESSAGES = 'DELETE_MESSAGES'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 
-// game
-export const SET_GAMES = 'SET_GAMES'
-export const DELETE_GAMES = 'DELETE_GAMES'
+// battle
+export const SET_BATTLES = 'SET_BATTLES'
+export const DELETE_BATTLES = 'DELETE_BATTLES'
+export const ADD_BATTLE = 'ADD_BATTLE'

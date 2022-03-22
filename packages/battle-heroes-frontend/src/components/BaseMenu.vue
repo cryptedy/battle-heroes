@@ -69,6 +69,8 @@ export default {
       menuShown: false,
       menuContentShown: false,
       overlayShown: false,
+      attemptingToOpen: false,
+      attemptingToClose: false,
       triggerDimensions: null,
       isParentPositionFixed: false
     }
@@ -79,6 +81,10 @@ export default {
       scrollbarWidth: 'scrollbar/width',
       windowDimensions: 'window/dimensions'
     }),
+
+    attempting() {
+      return this.attemptingToOpen || this.attemptingToClose
+    },
 
     styleObject() {
       let top = 'auto'
@@ -130,27 +136,25 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     shown(value, oldValue) {
-      this.processing = true
-
       if (value) {
-        document.body.classList.add('has-menu')
+        this.attemptingToOpen = true
 
         this.menuShown = true
         this.overlayShown = true
 
         setTimeout(() => {
           this.menuContentShown = true
-          this.processing = false
+          this.attemptingToOpen = false
         }, 200 / 2)
       } else {
-        document.body.classList.remove('has-menu')
+        this.attemptingToClose = true
 
         this.menuContentShown = false
 
         setTimeout(() => {
           this.overlayShown = false
           this.menuShown = false
-          this.processing = false
+          this.attemptingToClose = false
         }, 225)
       }
     },
@@ -167,10 +171,8 @@ export default {
   mounted() {
     this.shown = this.open
 
-    setImmediate(() => {
-      this.triggerDimensions = this.$refs.trigger.getBoundingClientRect()
-      this.isParentPositionFixed = isParentPositionFixed(this.$refs.trigger)
-    })
+    this.triggerDimensions = this.$refs.trigger.getBoundingClientRect()
+    this.isParentPositionFixed = isParentPositionFixed(this.$refs.trigger)
   },
 
   methods: {
@@ -179,14 +181,15 @@ export default {
     },
 
     openMenu() {
-      if (this.processing) return
+      if (this.attempting) return
+
       this.shown = true
 
       this.$emit('open')
     },
 
     closeMenu() {
-      if (this.processing) return
+      if (this.attempting) return
 
       this.shown = false
 
@@ -195,43 +198,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  outline: none;
-  color: color(primary);
-  z-index: z-index(menu);
-
-  &-content {
-    background-color: palette(grey, 0);
-    border: 1px solid palette(grey, 400);
-    border-radius: 2px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-    white-space: normal;
-
-    &-trigger {
-      display: inline-block;
-      user-select: none;
-    }
-
-    &-enter-active {
-      transition: all 200ms;
-    }
-    &-leave-active {
-      transition: all 100ms;
-    }
-    &-enter-from,
-    &-leave-to {
-      opacity: 0;
-    }
-    &-enter-from {
-      transform: translateY(-6px);
-    }
-  }
-}
-</style>

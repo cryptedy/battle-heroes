@@ -25,6 +25,8 @@ async function onError(error) {
 }
 
 async function beforeEach(to, from, next) {
+  document.body.classList.remove('has-dialog', 'has-drawer')
+
   if (!store.getters['app/isLoaded']) {
     await store.dispatch('app/setLoading', true)
   }

@@ -1,4 +1,4 @@
-import * as types from '../mutation-types'
+import { SET_SCROLLBAR, SET_SCROLLBAR_WIDTH } from '../mutation-types'
 
 function getScrollbarWidth() {
   const outer = document.createElement('div')
@@ -32,21 +32,21 @@ export const getters = {
 }
 
 export const mutations = {
-  [types.UPDATE_SCROLLBAR](state, { vertical, horizontal }) {
+  [SET_SCROLLBAR](state, { vertical, horizontal }) {
     state.vertical = vertical
     state.horizontal = horizontal
   },
 
-  [types.SET_SCROLLBAR_WIDTH](state, { width }) {
+  [SET_SCROLLBAR_WIDTH](state, { width }) {
     state.width = width
   }
 }
 
 export const actions = {
-  update({ commit }, payload) {
-    commit(types.UPDATE_SCROLLBAR, payload)
+  set({ commit }, payload) {
+    commit(SET_SCROLLBAR, payload)
 
-    commit(types.SET_SCROLLBAR_WIDTH, {
+    commit(SET_SCROLLBAR_WIDTH, {
       width: payload.vertical ? getScrollbarWidth() : 0
     })
   }

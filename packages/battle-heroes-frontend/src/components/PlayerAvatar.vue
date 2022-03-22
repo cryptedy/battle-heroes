@@ -32,16 +32,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.player-avatar {
-  display: inline-block;
-  width: 42px;
-  height: 42px;
-
-  > img {
-    object-fit: cover;
-    border-radius: 50%;
-  }
-}
-</style>

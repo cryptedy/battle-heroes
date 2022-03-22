@@ -38,8 +38,7 @@ export const actions = {
     console.log('onError', error)
   },
 
-  // eslint-disable-next-line no-unused-vars
-  async onReconnect({ commit, dispatch, rootGetters }, attempt) {
+  async onReconnect(context, attempt) {
     console.log('onReconnect', attempt)
   },
 

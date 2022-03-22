@@ -1,0 +1,27 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1065px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 32px;
+
+  .brand-text {
+    font-size: 20px;
+    color: color(primary, light);
+
+    > a {
+      color: inherit;
+    }
+  }
+
+  .login-text {
+    color: color(primary, light);
+
+    > a {
+      color: inherit;
+    }
+  }
+}

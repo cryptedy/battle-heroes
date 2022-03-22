@@ -17,8 +17,8 @@ module.exports = createSlice({
   name: 'NFT',
   initialState: initialState(),
   reducers: {
-    setNFTs: (state, action) => {
-      console.log('NFT/add')
+    set: (state, action) => {
+      console.log('NFT/set')
 
       Object.keys(action.payload).forEach(collectionId => {
         state.NFTs[collectionId] = action.payload[collectionId]

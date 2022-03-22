@@ -1,5 +1,5 @@
 <template>
-  <SplashScreen v-if="isAppLoading" />
+  <SplashScreen v-if="isAppLoading || !isSocketConnected" />
 
   <router-view v-else />
 
@@ -27,7 +27,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      isAppLoading: 'app/isLoading'
+      isAppLoading: 'app/isLoading',
+      isSocketConnected: 'socket/isConnected'
     })
   },
 
@@ -51,36 +52,36 @@ export default {
 
   methods: {
     ...mapActions({
-      updateWindowSize: 'window/updateSize',
-      updateWindowOffset: 'window/updateOffset',
-      updateScrollbar: 'scrollbar/update'
+      setWindowSize: 'window/setSize',
+      setWindowOffset: 'window/setOffset',
+      setScrollbar: 'scrollbar/set'
     }),
 
     onWindowLoad() {
-      this.updateScrollbar(this.getScrollbar())
+      this.setScrollbar(this.getScrollbar())
 
-      this.updateWindowSize({
+      this.setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight
       })
 
-      this.updateWindowOffset({
+      this.setWindowOffset({
         offsetX: window.pageXOffset,
         offsetY: window.pageYOffset
       })
     },
 
     onWindowResize() {
-      this.updateScrollbar(this.getScrollbar())
+      this.setScrollbar(this.getScrollbar())
 
-      this.updateWindowSize({
+      this.setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight
       })
     },
 
     onWindowScroll() {
-      this.updateWindowOffset({
+      this.setWindowOffset({
         offsetX: window.pageXOffset,
         offsetY: window.pageYOffset
       })

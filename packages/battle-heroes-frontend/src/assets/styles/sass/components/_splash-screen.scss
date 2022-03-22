@@ -1,0 +1,18 @@
+.splash-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  &-image {
+    > img {
+      width: 100%;
+    }
+  }
+
+  &-message {
+    margin-top: 32px;
+    font-size: 24px;
+  }
+}

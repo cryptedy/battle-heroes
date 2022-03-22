@@ -1,5 +1,7 @@
 <template>
-  <LayoutMain>
+  <TheLayout>
+    <h1>PLAYERS</h1>
+
     <p v-if="!players.length > 0">No players.</p>
 
     <BaseList v-else>
@@ -7,20 +9,20 @@
         <Player :player="player" />
       </BaseListItem>
     </BaseList>
-  </LayoutMain>
+  </TheLayout>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Player from '@/components/Player'
-import LayoutMain from '@/components/LayoutMain'
+import TheLayout from '@/components/TheLayout'
 
 export default {
   name: 'Players',
 
   components: {
     Player,
-    LayoutMain
+    TheLayout
   },
 
   data() {

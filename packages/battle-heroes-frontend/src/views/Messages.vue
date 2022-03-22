@@ -1,8 +1,11 @@
 <template>
-  <LayoutMain>
+  <TheLayout>
+    <h1>MESSAGES</h1>
+
     <p v-if="!messages.length > 0">No messages.</p>
-    <ul v-else>
-      <li v-for="message in messages" :key="message.id">
+
+    <BaseList v-else>
+      <BaseListItem v-for="message in messages" :key="message.id">
         <PlayerAvatar :player="message.player" />
 
         {{ message.player.name }}
@@ -11,31 +14,30 @@
         -
         {{ $filters.datetime(message.posted_at) }}
         <hr />
-      </li>
-    </ul>
+      </BaseListItem>
+    </BaseList>
 
     <form @submit.prevent="sendMessage">
       <input
         ref="input"
         v-model="newMessage"
-        v-focus
         placeholder="Send message"
         type="text"
       />
     </form>
-  </LayoutMain>
+  </TheLayout>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import LayoutMain from '@/components/LayoutMain'
+import TheLayout from '@/components/TheLayout'
 import PlayerAvatar from '@/components/PlayerAvatar'
 
 export default {
   name: 'Message',
 
   components: {
-    LayoutMain,
+    TheLayout,
     PlayerAvatar
   },
 
@@ -79,9 +81,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-input {
-  color: color(primary);
-}
-</style>

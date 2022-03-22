@@ -8,8 +8,8 @@ module.exports = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    setPlayers: (state, action) => {
-      console.log('player/setPlayer', action)
+    set: (state, action) => {
+      console.log('player/set', action)
 
       console.log(action.payload)
 
@@ -21,13 +21,13 @@ module.exports = createSlice({
 
       state.players = availableUsers
     },
-    addPlayer: (state, action) => {
-      console.log('player/addPlayer', action)
+    add: (state, action) => {
+      console.log('player/add', action)
 
       state.players.push(action.payload)
     },
-    updatePlayerState: (state, action) => {
-      console.log('player/updatePlayerState', action)
+    updateState: (state, action) => {
+      console.log('player/updateState', action)
 
       const player = state.players.find(
         player => player.id === action.payload.player.id
@@ -37,8 +37,8 @@ module.exports = createSlice({
         player.state = action.payload.state
       }
     },
-    addPlayerSocket: (state, action) => {
-      console.log('player/addPlayerSocket', action)
+    addSocket: (state, action) => {
+      console.log('player/addSocket', action)
 
       const player = state.players.find(
         player => player.id === action.payload.player.id
@@ -48,8 +48,8 @@ module.exports = createSlice({
         player.socket_ids.push(action.payload.socket.id)
       }
     },
-    removePlayerSocket: (state, action) => {
-      console.log('player/removePlayerSocket', action)
+    removeSocket: (state, action) => {
+      console.log('player/removeSocket', action)
 
       const player = state.players.find(player =>
         player.socket_ids.includes(action.payload.id)

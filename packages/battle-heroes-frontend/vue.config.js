@@ -1,4 +1,3 @@
-const path = require('path')
 const { defineConfig } = require('@vue/cli-service')
 
 const url = new URL(process.env.VUE_APP_URL || 'http://localhost:8080')
@@ -13,12 +12,6 @@ module.exports = defineConfig({
       args[0].title = process.env.VUE_APP_TITLE
       return args
     })
-
-    const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
-
-    types.forEach(type =>
-      addStyleResource(config.module.rule('scss').oneOf(type))
-    )
   },
 
   css: {
@@ -32,12 +25,3 @@ module.exports = defineConfig({
     compress: true
   }
 })
-
-function addStyleResource(rule) {
-  rule
-    .use('style-resource')
-    .loader('style-resources-loader')
-    .options({
-      patterns: [path.resolve(__dirname, './src/assets/styles/sass/app.scss')]
-    })
-}

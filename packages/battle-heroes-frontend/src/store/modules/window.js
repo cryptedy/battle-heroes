@@ -1,4 +1,4 @@
-import * as types from '../mutation-types'
+import { SET_WINDOW_SIZE, SET_WINDOW_OFFSET } from '../mutation-types'
 
 const initialState = () => ({
   dimensions: {
@@ -20,35 +20,27 @@ export const getters = {
 }
 
 export const mutations = {
-  [types.RESET_WINDOW_STATE](state) {
-    Object.assign(state, initialState())
-  },
-
-  [types.UPDATE_WINDOW_SIZE](state, { width, height }) {
+  [SET_WINDOW_SIZE](state, { width, height }) {
     state.dimensions.width = width
     state.dimensions.height = height
   },
 
-  [types.UPDATE_WINDOW_OFFSET](state, { offsetX, offsetY }) {
+  [SET_WINDOW_OFFSET](state, { offsetX, offsetY }) {
     state.dimensions.offsetX = offsetX
     state.dimensions.offsetY = offsetY
   }
 }
 
 export const actions = {
-  reset({ commit }) {
-    commit(types.RESET_WINDOW_STATE)
-  },
-
-  updateSize({ commit }, payload) {
-    commit(types.UPDATE_WINDOW_SIZE, {
+  setSize({ commit }, payload) {
+    commit(SET_WINDOW_SIZE, {
       width: payload.width,
       height: payload.height
     })
   },
 
-  updateOffset({ commit }, payload) {
-    commit(types.UPDATE_WINDOW_OFFSET, {
+  setOffset({ commit }, payload) {
+    commit(SET_WINDOW_OFFSET, {
       offsetX: payload.offsetX,
       offsetY: payload.offsetY
     })

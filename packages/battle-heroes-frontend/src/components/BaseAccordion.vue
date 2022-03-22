@@ -1,8 +1,11 @@
 <template>
-  <span @click="toggle">
-    <slot name="trigger" :show="shown" />
-  </span>
-  <slot v-if="shown" name="contents" />
+  <div class="accordion">
+    <div class="accordion-trigger" @click="toggleAccordion">
+      <slot name="trigger" :open="shown" />
+    </div>
+
+    <slot v-if="shown" />
+  </div>
 </template>
 
 <script>
@@ -23,7 +26,7 @@ export default {
   },
 
   methods: {
-    toggle() {
+    toggleAccordion() {
       this.shown = !this.shown
     }
   }

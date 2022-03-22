@@ -1,9 +1,11 @@
 <template>
-  <div class="player">
+  <div class="player" :class="{ 'is-online': player.socket_ids.length > 0 }">
     <PlayerAvatar :player="player" />
 
     <div class="player-info">
-      <h2>{{ player.name }}</h2>
+      <h2 class="player-name">
+        {{ player.name }} - {{ player.socket_ids.length }} devices
+      </h2>
       <ul class="player-info-list">
         <li class="player-info-list-item">
           <FontAwesomeIcon icon="star" size="1x" />
@@ -26,18 +28,14 @@
     </div>
 
     <div class="player-actions">
-      <span v-if="player.socket_ids.length > 0"> ONLINE </span>
-      <span v-else> OFFLINE </span>
-
-      <span class="player-status is-standby">
-        {{ $filters.playerState(player.state) }}
-      </span>
+      <PlayerState :player="player" />
     </div>
   </div>
 </template>
 
 <script>
 import PlayerNFTs from '@/components/PlayerNFTs'
+import PlayerState from '@/components/PlayerState'
 import PlayerAvatar from '@/components/PlayerAvatar'
 
 export default {
@@ -45,6 +43,7 @@ export default {
 
   components: {
     PlayerNFTs,
+    PlayerState,
     PlayerAvatar
   },
 
@@ -56,42 +55,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.player {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px 24px;
-
-  &-avatar {
-    width: 42px;
-    height: 42px;
-    margin-right: 16px;
-  }
-
-  &-info {
-    width: 100%;
-
-    &-list {
-      display: flex;
-      width: 100%;
-      height: 100%;
-
-      &-item {
-        .svg-inline--fa {
-          margin-right: 6px;
-        }
-
-        &-text {
-          margin-right: 12px;
-        }
-      }
-    }
-  }
-
-  &-actions {
-    display: flex;
-    align-items: center;
-  }
-}
-</style>

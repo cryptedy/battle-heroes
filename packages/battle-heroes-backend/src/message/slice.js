@@ -8,8 +8,8 @@ module.exports = createSlice({
   name: 'message',
   initialState,
   reducers: {
-    addMessage: (state, action) => {
-      console.log('message/addMessage')
+    add: (state, action) => {
+      console.log('message/add')
 
       state.messages.push(action.payload)
     }

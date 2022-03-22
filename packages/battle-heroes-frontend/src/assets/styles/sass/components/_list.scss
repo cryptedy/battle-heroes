@@ -1,0 +1,12 @@
+.list {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid color(divider, light);
+
+  &-item {
+    border-bottom: 1px solid color(divider, light);
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

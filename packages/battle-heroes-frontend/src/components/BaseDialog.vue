@@ -17,13 +17,20 @@
 
       <transition name="dialog-content">
         <div v-if="dialogContentShown" class="dialog-content">
-          {{ overlayShown }} - {{ dialogContentShown }} - {{ dialogShown }}
-
           <span v-if="$slots.trigger || programmatic">
-            <button @click="closeDialog">CLOSE</button>
+            <BaseButton @click="closeDialog">CLOSE</BaseButton>
           </span>
 
-          <template v-if="programmatic"> DATA </template>
+          <template v-if="programmatic">
+            DATA
+
+            <BaseButton @click="cancelDialog"> CANCEL </BaseButton>
+
+            <BaseButton :disabled="confirmLoading" @click="confirmDialog">
+              <BaseSpinner v-if="confirmLoading" />
+              OK
+            </BaseButton>
+          </template>
 
           <slot v-else />
         </div>
@@ -47,6 +54,30 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+
+    timeout: {
+      type: Number,
+      required: false,
+      default: 0
+    },
+
+    onConfirm: {
+      type: Function,
+      required: false,
+      default: () => {}
+    },
+
+    onCancel: {
+      type: Function,
+      required: false,
+      default: () => {}
+    },
+
+    onTimeout: {
+      type: Function,
+      required: false,
+      default: () => {}
     }
   },
 
@@ -54,11 +85,20 @@ export default {
 
   data() {
     return {
-      processing: false,
       shown: false,
       dialogShown: false,
       dialogContentShown: false,
-      overlayShown: false
+      overlayShown: false,
+      attemptingToOpen: false,
+      attemptingToClose: false,
+      confirmLoading: false,
+      timeoutId: null
+    }
+  },
+
+  computed: {
+    attempting() {
+      return this.attemptingToOpen || this.attemptingToClose
     }
   },
 
@@ -70,27 +110,37 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     shown(value, oldValue) {
-      this.processing = true
-
       if (value) {
+        this.attemptingToOpen = true
+
         document.body.classList.add('has-dialog')
+
+        if (this.timeout > 0) {
+          this.setCloseTimeout()
+        }
 
         this.dialogShown = true
         this.overlayShown = true
 
         setTimeout(() => {
           this.dialogContentShown = true
-          this.processing = false
+          this.attemptingToOpen = false
         }, 225 / 2)
       } else {
+        this.attemptingToClose = true
+
         document.body.classList.remove('has-dialog')
+
+        if (this.timeout > 0) {
+          this.clearCloseTimeout()
+        }
 
         this.dialogContentShown = false
 
         setTimeout(() => {
           this.overlayShown = false
           this.dialogShown = false
-          this.processing = false
+          this.attemptingToClose = false
         }, 225)
       }
     }
@@ -102,7 +152,7 @@ export default {
 
   methods: {
     openDialog() {
-      if (this.processing) return
+      if (this.attempting) return
 
       this.shown = true
 
@@ -110,51 +160,40 @@ export default {
     },
 
     closeDialog() {
-      if (this.processing) return
+      if (this.attempting) return
 
       this.shown = false
 
       this.$emit('close')
+    },
+
+    cancelDialog() {
+      this.onCancel.apply(null, arguments)
+
+      this.closeDialog()
+    },
+
+    async confirmDialog() {
+      const confirmFunction = this.onConfirm.bind(null, arguments)
+
+      await confirmFunction(this)
+
+      this.closeDialog()
+    },
+
+    setCloseTimeout() {
+      this.timeoutId = setTimeout(() => {
+        this.onTimeout.apply(null, arguments)
+
+        this.closeDialog()
+      }, this.timeout)
+    },
+
+    clearCloseTimeout() {
+      clearTimeout(this.timeoutId)
+
+      this.timeoutId = null
     }
   }
 }
 </script>
-
-<style lang="scss">
-.dialog {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  outline: none;
-  color: color(primary);
-  z-index: z-index(dialog);
-
-  &-trigger {
-    display: inline-block;
-    user-select: none;
-  }
-
-  &-content {
-    overflow-y: auto;
-    position: relative;
-    background-color: palette(grey, 0);
-    width: 80%;
-    max-height: 90%;
-
-    &-enter-active,
-    &-leave-active {
-      transition: all 225ms;
-    }
-    &-enter-from,
-    &-leave-to {
-      opacity: 0;
-      transform: translateY(-12px);
-    }
-  }
-}
-</style>

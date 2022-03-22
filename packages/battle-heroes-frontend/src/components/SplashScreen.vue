@@ -22,22 +22,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.splash-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-
-  &-image {
-    width: 230px;
-  }
-
-  &-message {
-    margin-top: 32px;
-    font-size: 24px;
-  }
-}
-</style>

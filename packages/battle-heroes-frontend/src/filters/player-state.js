@@ -4,7 +4,7 @@ export function playerState(value) {
   if (value === PLAYER_STATE.IDLE) {
     return 'Idle'
   } else if (value === PLAYER_STATE.STANDBY) {
-    return 'Stand-By'
+    return 'Standby'
   } else if (value === PLAYER_STATE.BATTLE) {
     return 'Battle'
   }

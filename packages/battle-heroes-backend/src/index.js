@@ -25,20 +25,17 @@ const corsOptions = {
 // setInterval(() => {
 //   const state = store.getState()
 //   console.log(`Players ${state.player.players.length}`)
-//   console.log(`Games ${state.game.games.length}`)
+//   console.log(`Battles ${state.battle.battles.length}`)
 // }, 5000)
 
 const main = async () => {
   const NFTs = await getNFTs()
-
   setNFTs(NFTs)
 
   const players = await getPlayers()
-
   setPlayers(players)
 
   const app = express()
-
   app.use(cors(corsOptions)).use(api)
 
   const server = createServer(app)

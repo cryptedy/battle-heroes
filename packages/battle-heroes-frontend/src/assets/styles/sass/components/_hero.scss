@@ -1,0 +1,44 @@
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 12px auto;
+  padding: 24px 12px;
+  text-align: center;
+
+  &-image {
+    max-width: 360px;
+    max-height: 182px;
+    margin: 32px;
+
+    > img {
+      width: 100%;
+    }
+  }
+
+  &-text {
+    word-break: break-all;
+
+    &-primary {
+      margin-bottom: 8px;
+      font-size: 32px;
+      line-height: line-height(32px, 24px);
+      color: color(primary, light);
+    }
+
+    &-secondary {
+      color: color(secondary, light);
+    }
+  }
+
+  .online-players-text {
+    color: color(secondary, light);
+
+    &-count {
+      font-weight: bold;
+      color: palette(green, 500);
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import store from '@/store'
 import { createApp } from 'vue'
+import components from '@/components'
 import BaseDialog from '@/components/BaseDialog'
-import BaseOverlay from '@/components/BaseOverlay'
 
 export default {
   install(app) {
@@ -18,7 +18,7 @@ export default {
 
         dialog.use(this)
         dialog.use(store)
-        dialog.component(BaseOverlay.name, BaseOverlay)
+        dialog.use(components)
 
         const div = document.createElement('div')
         dialog.mount(div)

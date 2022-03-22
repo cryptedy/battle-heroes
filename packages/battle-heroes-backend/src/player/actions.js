@@ -1,14 +1,11 @@
 const store = require('../store')
-const playerActions = require('./slice').actions
+const { set, add, updateState, addSocket, removeSocket } =
+  require('./slice').actions
 
-const actions = {}
-
-Object.keys(playerActions).forEach(key => {
-  if (typeof playerActions[key] !== 'function') {
-    throw new Error(`The action '${key}' must be a function`)
-  }
-
-  actions[key] = (...arg) => store.dispatch(playerActions[key](...arg))
-})
-
-module.exports = actions
+module.exports = {
+  setPlayers: payload => store.dispatch(set(payload)),
+  addPlayer: payload => store.dispatch(add(payload)),
+  updatePlayerState: payload => store.dispatch(updateState(payload)),
+  addPlayerSocket: payload => store.dispatch(addSocket(payload)),
+  removePlayerSocket: payload => store.dispatch(removeSocket(payload))
+}

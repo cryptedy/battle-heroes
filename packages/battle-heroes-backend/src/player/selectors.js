@@ -5,14 +5,18 @@ const selectPlayers = state => state.players
 
 const selectors = {
   selectPlayers,
+  selectPlayer: createSelector(
+    selectPlayers,
+    players => playerId => players.find(player => player.id == playerId)
+  ),
   selectUserPlayer: createSelector(
     selectPlayers,
-    players => user => players.find(player => player.user_id == user.id)
+    players => userId => players.find(player => player.user_id == userId)
   ),
   selectSocketPlayer: createSelector(
     selectPlayers,
-    players => socket =>
-      players.find(player => player.socket_ids.includes(socket.id))
+    players => socketId =>
+      players.find(player => player.socket_ids.includes(socketId))
   )
 }
 
@@ -20,6 +24,8 @@ const getState = () => store.getState().player
 
 module.exports = {
   selectPlayers: () => selectors.selectPlayers(getState()),
-  selectUserPlayer: user => selectors.selectUserPlayer(getState())(user),
-  selectSocketPlayer: socket => selectors.selectSocketPlayer(getState())(socket)
+  selectPlayer: playerId => selectors.selectPlayer(getState())(playerId),
+  selectUserPlayer: userId => selectors.selectUserPlayer(getState())(userId),
+  selectSocketPlayer: socketId =>
+    selectors.selectSocketPlayer(getState())(socketId)
 }
