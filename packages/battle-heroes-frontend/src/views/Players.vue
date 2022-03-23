@@ -1,5 +1,5 @@
 <template>
-  <TheLayout>
+  <TheLayoutGame>
     <h1>PLAYERS</h1>
 
     <p v-if="!players.length > 0">No players.</p>
@@ -9,20 +9,20 @@
         <Player :player="player" />
       </BaseListItem>
     </BaseList>
-  </TheLayout>
+  </TheLayoutGame>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Player from '@/components/Player'
-import TheLayout from '@/components/TheLayout'
+import TheLayoutGame from '@/components/TheLayoutGame'
 
 export default {
   name: 'Players',
 
   components: {
     Player,
-    TheLayout
+    TheLayoutGame
   },
 
   data() {

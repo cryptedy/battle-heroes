@@ -1,5 +1,5 @@
 <template>
-  <TheLayout>
+  <TheLayoutGame>
     <h1>MESSAGES</h1>
 
     <p v-if="!messages.length > 0">No messages.</p>
@@ -25,19 +25,19 @@
         type="text"
       />
     </form>
-  </TheLayout>
+  </TheLayoutGame>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import TheLayout from '@/components/TheLayout'
+import TheLayoutGame from '@/components/TheLayoutGame'
 import PlayerAvatar from '@/components/PlayerAvatar'
 
 export default {
   name: 'Message',
 
   components: {
-    TheLayout,
+    TheLayoutGame,
     PlayerAvatar
   },
 

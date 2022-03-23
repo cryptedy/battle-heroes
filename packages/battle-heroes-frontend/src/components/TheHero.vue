@@ -1,24 +1,31 @@
 <template>
   <div class="hero">
     <p class="hero-image">
-      <img src="@/assets/images/brand-logo.png" alt="Battle Heroes" />
+      <img
+        src="@/assets/images/brand-logo.png"
+        alt="Battle Heroes"
+        width="360"
+        height="182"
+      />
     </p>
 
-    <h2 class="hero-text-primary">A Pixel Heroes Game</h2>
+    <div class="hero-info">
+      <h2 class="hero-text-primary">A Pixel Heroes Game</h2>
 
-    <p class="hero-text-secondary">Prototype version 0.01</p>
+      <p class="hero-text-secondary">Prototype version 0.01</p>
 
-    <LoginButton />
+      <LoginButton />
 
-    <p class="online-players-text">
-      <span class="online-players-text-count">
-        {{ onlinePlayers.length }}
-      </span>
-      /
-      {{ players.length }}
+      <p class="online-players-text">
+        <span class="online-players-text-count">
+          {{ onlinePlayers.length }}
+        </span>
+        /
+        {{ players.length }}
 
-      players are now online.
-    </p>
+        players are now online.
+      </p>
+    </div>
   </div>
 </template>
 

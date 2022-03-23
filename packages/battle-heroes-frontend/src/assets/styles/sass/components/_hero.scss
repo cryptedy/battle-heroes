@@ -4,17 +4,17 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin: 12px auto;
-  padding: 24px 12px;
+  margin: 16px auto;
+  padding: 24px 16px;
   text-align: center;
 
   &-image {
     max-width: 360px;
-    max-height: 182px;
     margin: 32px;
 
     > img {
       width: 100%;
+      height: auto;
     }
   }
 

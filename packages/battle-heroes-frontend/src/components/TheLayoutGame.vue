@@ -1,49 +1,42 @@
 <template>
   <SplashScreen v-if="!isGameLogin" message="Connecting to game server..." />
 
-  <template v-else>
-    <div id="app-bar">
+  <div v-else class="game">
+    <header class="game-header" role="banner">
       <TheAppBar />
-    </div>
+    </header>
 
-    <div id="main">
-      <TheMain>
+    <main class="game-main" role="main">
+      <section class="section">
         <TheBattleNav :player="player" />
+      </section>
 
+      <section class="section">
         <slot />
-      </TheMain>
-    </div>
+      </section>
+    </main>
 
-    <div id="bottom-nav">
+    <footer class="game-footer">
       <TheBottomNav />
-    </div>
-  </template>
+    </footer>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import TheMain from '@/components/TheMain'
 import TheAppBar from '@/components/TheAppBar'
 import SplashScreen from '@/components/SplashScreen'
 import TheBattleNav from '@/components/TheBattleNav'
 import TheBottomNav from '@/components/TheBottomNav'
 
 export default {
-  name: 'TheLayout',
+  name: 'TheLayoutGame',
 
   components: {
-    TheMain,
     TheAppBar,
     SplashScreen,
     TheBattleNav,
     TheBottomNav
-  },
-
-  data() {
-    return {
-      unreadMessageCount: 0,
-      selectNFTsDialogShown: false
-    }
   },
 
   computed: {

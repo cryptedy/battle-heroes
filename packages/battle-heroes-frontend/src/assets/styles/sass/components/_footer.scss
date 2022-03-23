@@ -1,0 +1,10 @@
+.footer {
+  .copyright-text {
+    font-size: 14px;
+    color: color(primary, light);
+
+    > a {
+      color: inherit;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <TheLayout>
+  <TheLayoutGame>
     <h1>BATTLES</h1>
 
     <p v-if="!battles.length > 0">No battles.</p>
@@ -20,18 +20,18 @@
         <hr />
       </BaseListItem>
     </BaseList>
-  </TheLayout>
+  </TheLayoutGame>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import TheLayout from '@/components/TheLayout'
+import TheLayoutGame from '@/components/TheLayoutGame'
 
 export default {
   name: 'Battles',
 
   components: {
-    TheLayout
+    TheLayoutGame
   },
 
   computed: {

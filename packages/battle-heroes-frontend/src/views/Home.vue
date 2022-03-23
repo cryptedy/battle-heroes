@@ -1,5 +1,5 @@
 <template>
-  <TheLayout>
+  <TheLayoutGame>
     <h1>HOME</h1>
 
     <ul>
@@ -8,17 +8,17 @@
       <li>TODO: PLAYERS LIST</li>
       <li>TODO: CURRENT BATTLES</li>
     </ul>
-  </TheLayout>
+  </TheLayoutGame>
 </template>
 
 <script>
-import TheLayout from '@/components/TheLayout'
+import TheLayoutGame from '@/components/TheLayoutGame'
 
 export default {
   name: 'Home',
 
   components: {
-    TheLayout
+    TheLayoutGame
   }
 }
 </script>
