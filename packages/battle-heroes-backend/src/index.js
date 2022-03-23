@@ -32,8 +32,8 @@ const main = async () => {
   const NFTs = await getNFTs()
   setNFTs(NFTs)
 
-  // const players = await getPlayers()
-  // setPlayers(players)
+  const players = await getPlayers()
+  setPlayers(players)
 
   const app = express()
   app.use(cors(corsOptions)).use(api)
