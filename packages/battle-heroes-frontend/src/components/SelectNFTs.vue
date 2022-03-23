@@ -2,21 +2,20 @@
   <h1>SELECT A HERO</h1>
   <div style="padding: 16px; text-align: center">
     <img
-      v-for="NFT in NFTs"
-      :key="NFT.token_id"
+      v-for="playerNFT in playerNFTs"
+      :key="playerNFT.id"
       style="cursor: pointer"
-      :src="NFT.image_url"
-      :alt="NFT.name"
+      :src="playerNFT.image_url"
+      :alt="playerNFT.name"
       width="128"
       height="128"
-      @click="select(NFT)"
+      @click="select(playerNFT)"
     />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { COLLECTION_ID } from '@/utils/constants'
 
 export default {
   name: 'SelectNFTs',
@@ -32,19 +31,11 @@ export default {
 
   computed: {
     ...mapGetters({
-      byPlayer: 'NFT/byPlayer'
+      NFTsByPlayer: 'NFT/byPlayer'
     }),
 
-    pixelHeroes() {
-      return this.byPlayer(COLLECTION_ID.PIXEL_HEROES, this.player)
-    },
-
-    pixelHeroesX() {
-      return this.byPlayer(COLLECTION_ID.PIXEL_HEROES_X, this.player)
-    },
-
-    NFTs() {
-      return this.pixelHeroes.concat(this.pixelHeroesX)
+    playerNFTs() {
+      return this.NFTsByPlayer(this.player)
     }
   },
 

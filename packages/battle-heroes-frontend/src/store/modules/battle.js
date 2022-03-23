@@ -1,29 +1,35 @@
 import { SET_BATTLES, DELETE_BATTLES, ADD_BATTLE } from '../mutation-types'
 
 const initialState = () => ({
-  battles: []
+  entities: {},
+  ids: []
 })
 
 export const state = initialState()
 
 export const getters = {
-  all: state => state.battles,
-  count: state => state.battles.length
+  all: state => state.ids.map(id => state.entities[id]),
+  count: state => state.ids.length
 }
 
 export const mutations = {
   [SET_BATTLES](state, { battles }) {
-    state.battles = battles
+    battles.forEach(battle => {
+      state.entities = { ...state.entities, [battle.id]: battle }
+    })
+    state.ids = battles.map(battle => battle.id)
   },
 
   [DELETE_BATTLES](state) {
-    const { battles } = initialState()
+    const { entities, ids } = initialState()
 
-    state.battles = battles
+    state.entities = entities
+    state.ids = ids
   },
 
   [ADD_BATTLE](state, { battle }) {
-    state.battles.push(battle)
+    state.entities = { ...state.entities, [battle.id]: battle }
+    state.ids.push(battle.id)
   }
 }
 

@@ -31,8 +31,8 @@ async function beforeEach(to, from, next) {
     await store.dispatch('app/setLoading', true)
   }
 
-  if (!store.getters['NFT/isLoaded']) {
-    await store.dispatch('NFT/get')
+  if (!store.getters['NFT/count'] > 0) {
+    await store.dispatch('NFT/fetch')
   }
 
   const middleware = getMiddleware(to)

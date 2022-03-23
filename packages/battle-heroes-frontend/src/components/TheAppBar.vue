@@ -88,7 +88,7 @@
         <li class="app-bar-info-list-item is-heroes-count">
           <FontAwesomeIcon icon="layer-group" size="1x" />
           <span class="app-bar-info-list-item-text">
-            {{ player.token_ids[1].length + player.token_ids[2].length }}
+            {{ player.nft_ids.length }}
           </span>
         </li>
         <li class="app-bar-info-list-item is-won">

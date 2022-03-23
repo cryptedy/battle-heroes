@@ -24,8 +24,8 @@ const corsOptions = {
 // const store = require('./store')
 // setInterval(() => {
 //   const state = store.getState()
-//   console.log(`Players ${state.player.players.length}`)
-//   console.log(`Battles ${state.battle.battles.length}`)
+//   console.log(`Players ${state.player.ids.length}`)
+//   console.log(`Battles ${state.battle.ids.length}`)
 // }, 5000)
 
 const main = async () => {

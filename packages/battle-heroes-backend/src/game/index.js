@@ -81,7 +81,7 @@ const gameManager = (io, socket) => {
     const player = selectSocketPlayer(socket.id)
 
     if (player) {
-      removePlayerSocket(socket)
+      removePlayerSocket({ player, socket })
 
       io.emit('player:update', selectPlayer(player.id))
 
@@ -165,7 +165,7 @@ const gameManager = (io, socket) => {
     const player = selectSocketPlayer(socket.id)
 
     if (player) {
-      removePlayerSocket(socket)
+      removePlayerSocket({ player, socket })
 
       io.emit('player:update', selectPlayer(player.id))
     }

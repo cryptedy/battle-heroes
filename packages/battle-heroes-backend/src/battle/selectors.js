@@ -1,7 +1,7 @@
 const store = require('../store')
 const { createSelector } = require('@reduxjs/toolkit')
 
-const selectBattles = state => state.battles
+const selectBattles = state => state.ids.map(id => state.entities[id])
 
 const selectors = {
   selectBattles,

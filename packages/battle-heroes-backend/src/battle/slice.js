@@ -1,7 +1,8 @@
 const { createSlice } = require('@reduxjs/toolkit')
 
 const initialState = {
-  battles: []
+  entities: {},
+  ids: []
 }
 
 module.exports = createSlice({
@@ -11,17 +12,18 @@ module.exports = createSlice({
     add: (state, action) => {
       console.log('battle/add')
 
-      state.battles.push(action.payload)
+      state.entities[action.payload.id] = action.payload
+      state.ids.push(action.payload.id)
     },
     remove: (state, action) => {
       console.log('battle/remove')
 
-      const index = state.battles.findIndex(
-        battle => battle.id === action.payload.id
-      )
+      delete state.entities[action.payload.id]
+
+      const index = state.ids.findIndex(id => id === action.payload.id)
 
       if (index != -1) {
-        state.battles.splice(index, 1)
+        state.ids.splice(index, 1)
       }
     }
   }

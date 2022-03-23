@@ -1,28 +1,34 @@
 import { SET_MESSAGES, DELETE_MESSAGES, ADD_MESSAGE } from '../mutation-types'
 
 const initialState = () => ({
-  messages: []
+  entities: {},
+  ids: []
 })
 
 export const state = initialState()
 
 export const getters = {
-  all: state => state.messages
+  all: state => state.ids.map(id => state.entities[id])
 }
 
 export const mutations = {
   [SET_MESSAGES](state, { messages }) {
-    state.messages = messages
+    messages.forEach(message => {
+      state.entities = { ...state.entities, [message.id]: message }
+    })
+    state.ids = messages.map(message => message.id)
   },
 
   [DELETE_MESSAGES](state) {
-    const { messages } = initialState()
+    const { entities, ids } = initialState()
 
-    state.messages = messages
+    state.entities = entities
+    state.ids = ids
   },
 
   [ADD_MESSAGE](state, { message }) {
-    state.messages.push(message)
+    state.entities = { ...state.entities, [message.id]: message }
+    state.ids.push(message.id)
   }
 }
 

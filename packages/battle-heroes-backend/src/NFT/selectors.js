@@ -1,7 +1,7 @@
 const store = require('../store')
 
 const selectors = {
-  selectNFTs: state => state.NFTs
+  selectNFTs: state => state.ids.map(id => state.entities[id])
 }
 
 const getState = () => store.getState().NFT

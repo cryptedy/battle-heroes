@@ -4,11 +4,9 @@ const { selectPlayers } = require('../player/selectors')
 
 const router = Router()
 
-router.get('/collections/:id/nfts', async (req, res) => {
-  const NFTs = selectNFTs()
-
+router.get('/nfts', async (req, res) => {
   try {
-    res.json(NFTs[req.params.id])
+    res.json(selectNFTs())
   } catch (error) {
     res.json({})
   }

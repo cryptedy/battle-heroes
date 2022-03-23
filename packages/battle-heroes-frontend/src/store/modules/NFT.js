@@ -1,83 +1,57 @@
 import axios from 'axios'
-import { COLLECTIONS, API_URL } from '@/utils/constants'
+import { API_URL } from '@/utils/constants'
 import { SET_NFTS, DELETE_NFTS } from '../mutation-types'
 
 const initialState = () => {
-  const NFTs = {}
-  const tokenIds = {}
-
-  for (const collection of COLLECTIONS) {
-    NFTs[collection.id] = {}
-    tokenIds[collection.id] = []
-  }
-
   return {
-    NFTs,
-    tokenIds
+    entities: {},
+    ids: []
   }
 }
 
 export const state = initialState()
 
 export const getters = {
-  isLoaded: state =>
-    COLLECTIONS.filter(collection => state.tokenIds[collection.id].length > 0)
-      .length === COLLECTIONS.length,
-  all: state => collectionId =>
-    state.tokenIds[collectionId].map(
-      tokenId => state.NFTs[collectionId][tokenId]
-    ),
-  byPlayer: (state, getters) => (collectionId, player) => {
-    return getters.isLoaded
-      ? player.token_ids[collectionId].map(
-          tokenId => state.NFTs[collectionId][tokenId]
-        )
-      : []
-  }
+  all: state => state.ids.map(id => state.entities[id]),
+  count: state => state.ids.length,
+  find: state => id => state.entities[id],
+  byPlayer: (state, getters) => player =>
+    player.nft_ids.map(NFTId => getters.find(NFTId))
 }
 
 export const mutations = {
-  [SET_NFTS](state, { collectionId, NFTs }) {
-    const NFTsObject = {}
-    const tokenIds = []
+  [SET_NFTS](state, { NFTs }) {
+    const entities = {}
 
-    NFTs.forEach(NFT => {
-      NFTsObject[NFT.token_id] = NFT
-      tokenIds.push(NFT.token_id)
-    })
+    for (const NFT of NFTs) {
+      entities[NFT.id] = NFT
+    }
 
-    state.NFTs[collectionId] = NFTsObject
-    state.tokenIds[collectionId] = tokenIds.sort((a, b) => a - b)
+    // bulk assignment for better performance
+    state.entities = entities
+    state.ids = NFTs.map(NFT => NFT.id).sort((a, b) => a - b)
   },
 
-  [DELETE_NFTS](state, { collectionId }) {
-    const { NFTs, tokenIds } = initialState()
+  [DELETE_NFTS](state) {
+    const { entities, ids } = initialState()
 
-    state.NFTs[collectionId] = NFTs[collectionId]
-    state.tokenIds[collectionId] = tokenIds[collectionId]
+    state.entities = entities
+    state.ids = ids
   }
 }
 
 export const actions = {
-  async get({ commit }) {
-    console.log('NFT/get')
+  async fetch({ commit }) {
+    console.log('NFT/fetch')
 
-    for (const collection of COLLECTIONS) {
-      const collectionId = collection.id
+    try {
+      const { data: NFTs } = await axios.get(`${API_URL}/nfts/`)
 
-      console.log('NFT/get', collectionId)
+      commit(SET_NFTS, { NFTs })
+    } catch (error) {
+      commit(DELETE_NFTS)
 
-      try {
-        const { data: NFTs } = await axios.get(
-          `${API_URL}/collections/${collectionId}/nfts`
-        )
-
-        commit(SET_NFTS, { collectionId, NFTs })
-      } catch (error) {
-        commit(DELETE_NFTS, { collectionId })
-
-        throw new Error(error)
-      }
+      throw new Error(error)
     }
   }
 }

@@ -1,6 +1,6 @@
 const { getUsers } = require('../user')
 const { getUserProfile } = require('../user')
-const { getTokenIdsForAddress } = require('../NFT')
+const { getNFTIdsForAddress } = require('../NFT')
 const { PLAYER_STATE } = require('../utils/constants')
 
 const getPlayers = async () => {
@@ -19,7 +19,7 @@ const getPlayers = async () => {
 
 const createPlayer = async user => {
   const profile = await getUserProfile(user)
-  const tokenIds = await getTokenIdsForAddress(user.address)
+  const NFTIds = await getNFTIdsForAddress(user.address)
 
   return {
     id: user.id,
@@ -28,7 +28,7 @@ const createPlayer = async user => {
     avatar_url: profile.avatar_url,
     address: user.address,
     socket_ids: [],
-    token_ids: tokenIds,
+    nft_ids: NFTIds,
     level: 1,
     state: PLAYER_STATE.IDLE
   }

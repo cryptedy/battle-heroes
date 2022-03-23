@@ -1,12 +1,22 @@
 const axios = require('axios')
 const Moralis = require('moralis/node')
-const { COLLECTIONS, METADATA_URL, IMAGE_URL } = require('../utils/constants')
+const { selectNFTs } = require('./selectors')
+const { selectCollections } = require('../collection/selectors')
+const { METADATA_URL, IMAGE_URL } = require('../utils/constants')
 
 const getNFTs = async () => {
-  const NFTs = {}
+  const NFTs = []
 
-  for (const collection of COLLECTIONS) {
-    NFTs[collection.id] = await getNFTsForCollection(collection.id)
+  const collections = selectCollections()
+
+  for (const collection of collections) {
+    const NFTsForCollection = await getNFTsForCollection(collection.id)
+
+    NFTsForCollection.forEach(NFTForCollection => {
+      NFTForCollection.id = NFTs.length + 1
+
+      NFTs.push(NFTForCollection)
+    })
   }
 
   return NFTs
@@ -23,6 +33,7 @@ const getNFTsForCollection = async collectionId => {
 
     NFTs.push({
       token_id: tokenId,
+      collection_id: collectionId,
       name,
       image_url: `${IMAGE_URL}/${collectionId}/${tokenId}.png`,
       attributes
@@ -35,10 +46,33 @@ const getNFTsForCollection = async collectionId => {
   return NFTs
 }
 
+const getNFTIdsForAddress = async address => {
+  const NFTIds = []
+
+  const collections = selectCollections()
+
+  const NFTs = selectNFTs()
+  const tokenIds = await getTokenIdsForAddress(address)
+
+  for (const collection of collections) {
+    tokenIds[collection.id].forEach(tokenId => {
+      const NFT = NFTs.find(
+        NFT => NFT.collection_id === collection.id && NFT.token_id === tokenId
+      )
+
+      NFTIds.push(NFT.id)
+    })
+  }
+
+  return NFTIds
+}
+
 const getTokenIdsForAddress = async address => {
   const tokenIds = {}
 
-  for (const collection of COLLECTIONS) {
+  const collections = selectCollections()
+
+  for (const collection of collections) {
     tokenIds[collection.id] = []
 
     tokenIds[collection.id] = await getTokenIdsForCollectionAndAddress(
@@ -217,11 +251,13 @@ const getMetadata = async collectionId => {
 }
 
 const getContractAddress = collectionId => {
-  return COLLECTIONS.find(collection => collection.id === collectionId)
+  const collections = selectCollections()
+
+  return collections.find(collection => collection.id === collectionId)
     .contract_address
 }
 
 module.exports = {
   getNFTs,
-  getTokenIdsForAddress
+  getNFTIdsForAddress
 }

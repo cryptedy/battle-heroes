@@ -6,43 +6,40 @@ import {
 } from '../mutation-types'
 
 const initialState = () => ({
-  players: {},
-  playerIds: []
+  entities: {},
+  ids: []
 })
 
 export const state = initialState()
 
 export const getters = {
-  all: state => state.playerIds.map(playerId => state.players[playerId]),
-  find: (state, getters) => playerId =>
-    getters.all.find(player => player.id === playerId),
-  count: (state, getters) => getters.all.length
+  all: state => state.ids.map(id => state.entities[id]),
+  find: state => id => state.entities[id],
+  count: state => state.ids.length
 }
 
 export const mutations = {
   [SET_PLAYERS](state, { players }) {
     players.forEach(player => {
-      state.players = { ...state.players, [player.id]: player }
+      state.entities = { ...state.entities, [player.id]: player }
     })
-
-    state.playerIds = players.map(player => player.id)
+    state.ids = players.map(player => player.id)
   },
 
   [DELETE_PLAYERS](state) {
-    const { players, playerIds } = initialState()
+    const { entities, ids } = initialState()
 
-    state.players = players
-    state.playerIds = playerIds
+    state.entities = entities
+    state.ids = ids
   },
 
   [ADD_PLAYER](state, { player }) {
-    state.players = { ...state.players, [player.id]: player }
-
-    state.playerIds.push(player.id)
+    state.entities = { ...state.entities, [player.id]: player }
+    state.ids.push(player.id)
   },
 
   [UPDATE_PLAYER](state, { player }) {
-    state.players[player.id] = player
+    state.entities[player.id] = player
   }
 }
 

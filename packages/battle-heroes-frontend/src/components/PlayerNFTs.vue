@@ -1,30 +1,16 @@
 <template>
-  <h2>
-    <strong>Pixel Heroes</strong>
-  </h2>
-  <p v-if="!pixelHeroes.length > 0">No data</p>
-  <ul v-else>
-    <li v-for="pixelHero in pixelHeroes" :key="pixelHero.token_id">
-      <hr />
-      <BaseNFT :nft="pixelHero" />
-    </li>
-  </ul>
+  <p v-if="!playerNFTs.length > 0">No data</p>
 
-  <h2>
-    <strong>Pixel Heroes X</strong>
-  </h2>
-  <p v-if="!pixelHeroesX.length > 0">No data</p>
   <ul v-else>
-    <li v-for="pixelHeroX in pixelHeroesX" :key="pixelHeroX.token_id">
+    <li v-for="playerNFT in playerNFTs" :key="playerNFT.id">
       <hr />
-      <BaseNFT :nft="pixelHeroX" />
+      <BaseNFT :nft="playerNFT" />
     </li>
   </ul>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { COLLECTION_ID } from '@/utils/constants'
 
 export default {
   name: 'PlayerNFTs',
@@ -38,15 +24,11 @@ export default {
 
   computed: {
     ...mapGetters({
-      byPlayer: 'NFT/byPlayer'
+      NFTsByPlayer: 'NFT/byPlayer'
     }),
 
-    pixelHeroes() {
-      return this.byPlayer(COLLECTION_ID.PIXEL_HEROES, this.player)
-    },
-
-    pixelHeroesX() {
-      return this.byPlayer(COLLECTION_ID.PIXEL_HEROES_X, this.player)
+    playerNFTs() {
+      return this.NFTsByPlayer(this.player)
     }
   }
 }

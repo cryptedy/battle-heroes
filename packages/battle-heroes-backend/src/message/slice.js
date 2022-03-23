@@ -1,7 +1,8 @@
 const { createSlice } = require('@reduxjs/toolkit')
 
 const initialState = {
-  messages: []
+  entities: {},
+  ids: []
 }
 
 module.exports = createSlice({
@@ -11,7 +12,8 @@ module.exports = createSlice({
     add: (state, action) => {
       console.log('message/add')
 
-      state.messages.push(action.payload)
+      state.entities[action.payload.id] = action.payload
+      state.ids.push(action.payload.id)
     }
   }
 })

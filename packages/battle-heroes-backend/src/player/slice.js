@@ -1,7 +1,8 @@
 const { createSlice } = require('@reduxjs/toolkit')
 
 const initialState = {
-  players: []
+  entities: {},
+  ids: []
 }
 
 module.exports = createSlice({
@@ -11,55 +12,45 @@ module.exports = createSlice({
     set: (state, action) => {
       console.log('player/set', action)
 
-      console.log(action.payload)
+      const entities = {}
 
       const availableUsers = action.payload.filter(
         user => user.address !== undefined
       )
 
-      console.log(availableUsers)
+      for (const availableUser of availableUsers) {
+        entities[availableUser.id] = availableUser
+      }
 
-      state.players = availableUsers
+      state.entities = entities
+      state.ids = action.payload.map(player => player.id)
     },
     add: (state, action) => {
       console.log('player/add', action)
 
-      state.players.push(action.payload)
+      state.entities[action.payload.id] = action.payload
+      state.ids.push(action.payload.id)
     },
     updateState: (state, action) => {
       console.log('player/updateState', action)
 
-      const player = state.players.find(
-        player => player.id === action.payload.player.id
-      )
-
-      if (player) {
-        player.state = action.payload.state
-      }
+      state.entities[action.payload.player.id].state = action.payload.state
     },
     addSocket: (state, action) => {
       console.log('player/addSocket', action)
 
-      const player = state.players.find(
-        player => player.id === action.payload.player.id
-      )
+      const { player, socket } = action.payload
 
-      if (player) {
-        player.socket_ids.push(action.payload.socket.id)
-      }
+      state.entities[player.id].socket_ids.push(socket.id)
     },
     removeSocket: (state, action) => {
       console.log('player/removeSocket', action)
 
-      const player = state.players.find(player =>
-        player.socket_ids.includes(action.payload.id)
-      )
+      const { player, socket } = action.payload
 
-      if (player) {
-        player.socket_ids = player.socket_ids.filter(
-          socketId => socketId !== action.payload.id
-        )
-      }
+      state.entities[player.id].socket_ids = state.entities[
+        player.id
+      ].socket_ids.filter(socketId => socketId !== socket.id)
     }
   }
 })

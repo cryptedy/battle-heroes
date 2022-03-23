@@ -18,7 +18,7 @@
           <span class="player-info-list-item-text">
             <BaseDialog>
               <template #trigger>
-                {{ player.token_ids[1].length + player.token_ids[2].length }}
+                {{ player.nft_ids.length }}
               </template>
               <PlayerNFTs :player="player" />
             </BaseDialog>
