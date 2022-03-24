@@ -9,23 +9,21 @@
       />
     </p>
 
-    <div class="hero-info">
-      <h2 class="hero-text-primary">A Pixel Heroes Game</h2>
+    <h2 class="hero-text-primary">A Pixel Heroes Game</h2>
 
-      <p class="hero-text-secondary">Prototype version 0.01</p>
+    <p class="hero-text-secondary">Prototype version 0.01</p>
 
-      <LoginButton />
+    <LoginButton />
 
-      <p class="online-players-text">
-        <span class="online-players-text-count">
-          {{ onlinePlayers.length }}
-        </span>
-        /
-        {{ players.length }}
+    <p class="online-players-text">
+      <span class="online-players-text-count">
+        {{ onlinePlayers.length }}
+      </span>
+      /
+      {{ players.length }}
 
-        players are now online.
-      </p>
-    </div>
+      players are now online.
+    </p>
   </div>
 </template>
 
