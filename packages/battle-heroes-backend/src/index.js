@@ -21,19 +21,19 @@ const corsOptions = {
 }
 
 // DEBUG
-// const store = require('./store')
-// setInterval(() => {
-//   const state = store.getState()
-//   console.log(`Players ${state.player.ids.length}`)
-//   console.log(`Battles ${state.battle.ids.length}`)
-// }, 5000)
+const store = require('./store')
+setInterval(() => {
+  const state = store.getState()
+  console.log(`Players ${state.player.ids.length}`)
+  console.log(`Battles ${state.battle.ids.length}`)
+}, 5000)
 
 const main = async () => {
   const NFTs = await getNFTs()
   setNFTs(NFTs)
 
-  const players = await getPlayers()
-  setPlayers(players)
+  // const players = await getPlayers()
+  // setPlayers(players)
 
   const app = express()
   app.use(cors(corsOptions)).use(api)
