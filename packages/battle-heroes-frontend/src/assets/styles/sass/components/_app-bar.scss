@@ -47,10 +47,7 @@
           height: 100%;
 
           .svg-inline--fa {
-            font-size: 32px;
-            @include mediaQuery(lg) {
-              font-size: 28px;
-            }
+            font-size: 28px;
             color: color(inactive-icon, light);
           }
 
