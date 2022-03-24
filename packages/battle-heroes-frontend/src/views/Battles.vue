@@ -1,6 +1,6 @@
 <template>
   <TheLayoutGame>
-    <p v-if="!battles.length > 0">No battles.</p>
+    <BaseEmpty v-if="!battles.length > 0" />
 
     <BaseList v-else>
       <BaseListItem v-for="battle in battles" :key="battle.id">

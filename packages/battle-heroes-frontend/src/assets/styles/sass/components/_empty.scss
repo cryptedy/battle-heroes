@@ -1,0 +1,12 @@
+.empty {
+  padding-top: 4px;
+  padding-bottom: 4px;
+
+  &-content {
+    padding: 16px 0;
+  }
+
+  &-message {
+    color: color(disabled, light);
+  }
+}

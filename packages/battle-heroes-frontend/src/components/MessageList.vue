@@ -1,5 +1,5 @@
 <template>
-  <p v-if="!messages.length > 0">No messages.</p>
+  <BaseEmpty v-if="!messages.length > 0" />
 
   <BaseList v-else>
     <BaseListItem v-for="message in messages" :key="message.id">

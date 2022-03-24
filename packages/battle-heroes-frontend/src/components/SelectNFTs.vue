@@ -1,6 +1,7 @@
 <template>
-  <h1>SELECT A HERO</h1>
-  <div style="padding: 16px; text-align: center">
+  <BaseEmpty v-if="!playerNFTs.length > 0" />
+
+  <div v-else style="padding: 16px; text-align: center">
     <img
       v-for="playerNFT in playerNFTs"
       :key="playerNFT.id"

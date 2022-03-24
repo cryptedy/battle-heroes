@@ -1,5 +1,5 @@
 <template>
-  <p v-if="!players.length > 0">No players.</p>
+  <BaseEmpty v-if="!players.length > 0" />
 
   <BaseList v-else>
     <BaseListItem v-for="player in players" :key="player.id">

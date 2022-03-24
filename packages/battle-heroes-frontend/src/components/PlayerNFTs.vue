@@ -1,5 +1,5 @@
 <template>
-  <p v-if="!playerNFTs.length > 0">No data</p>
+  <BaseEmpty v-if="!playerNFTs.length > 0" />
 
   <ul v-else>
     <li v-for="playerNFT in playerNFTs" :key="playerNFT.id">

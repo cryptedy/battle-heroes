@@ -1,6 +1,7 @@
 import BaseNFT from './BaseNFT'
 import BaseList from './BaseList'
 import BaseMenu from './BaseMenu'
+import BaseEmpty from './BaseEmpty'
 import BaseButton from './BaseButton'
 import BaseDialog from './BaseDialog'
 import BaseDrawer from './BaseDrawer'
@@ -13,6 +14,7 @@ const components = [
   BaseNFT,
   BaseList,
   BaseMenu,
+  BaseEmpty,
   BaseButton,
   BaseDialog,
   BaseDrawer,
