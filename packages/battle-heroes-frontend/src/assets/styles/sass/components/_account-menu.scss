@@ -1,0 +1,20 @@
+.account-menu {
+  &-list {
+    display: flex;
+    flex-direction: column;
+
+    &-item {
+
+      &-link {
+        display: inline-block;
+        width: 100%;
+        padding: 8px 16px;
+        color: color(primary);
+        .svg-inline--fa {
+          margin-right: 8px;
+          color: color(active-icon);
+        }
+      }
+    }
+  }
+}

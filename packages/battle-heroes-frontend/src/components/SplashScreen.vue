@@ -1,36 +1,43 @@
 <template>
   <div class="splash-screen">
-    <div v-if="randomNFT" class="splash-screen-content">
-      <p style="font-size: 18px">
-        {{ randomNFT.name }}
-      </p>
+    <transition name="splash-screen-content" appear>
+      <div v-if="randomNFT" class="splash-screen-content">
+        <p style="font-size: 18px">
+          {{ randomNFT.name }}
+        </p>
 
-      <p>
-        <FontAwesomeIcon icon="star" />
-        <FontAwesomeIcon icon="star" />
-        <FontAwesomeIcon icon="star" />
-      </p>
+        <p>
+          <FontAwesomeIcon icon="star" />
+          <FontAwesomeIcon icon="star" />
+          <FontAwesomeIcon icon="star" />
+          RANK: {{ randomNFT.rank }} - SCORE: {{ randomNFT.score }}
+        </p>
 
-      <div class="splash-screen-image">
-        <img
-          :src="randomNFT.image_url"
-          :alt="randomNFT.name"
-          width="512"
-          height="512"
-        />
+        <div class="splash-screen-image" :class="{ 'is-loaded': imageLoaded }">
+          <img
+            :onload="onImageLoad"
+            :src="randomNFT.image_url"
+            :alt="randomNFT.name"
+            width="512"
+            height="512"
+          />
+        </div>
+
+        <ul class="splash-screen-text">
+          <li
+            v-for="attribute in randomNFT.attributes"
+            :key="attribute.trait_type"
+          >
+            <span class="splash-screen-text-secondary">
+              {{ attribute.trait_type }}
+            </span>
+            <span class="splash-screen-text-primary">
+              {{ attribute.value }}
+            </span>
+          </li>
+        </ul>
       </div>
-
-      <ul>
-        <li
-          v-for="attribute in randomNFT.attributes"
-          :key="attribute.trait_type"
-        >
-          {{ attribute.trait_type }}
-          :
-          {{ attribute.value }}
-        </li>
-      </ul>
-    </div>
+    </transition>
 
     <p class="splash-screen-message">
       <BaseSpinner />
@@ -52,6 +59,12 @@ export default {
     }
   },
 
+  data() {
+    return {
+      imageLoaded: false
+    }
+  },
+
   computed: {
     ...mapGetters({
       NFTs: 'NFT/all',
@@ -66,6 +79,14 @@ export default {
       const id = Math.floor(Math.random() * (max - min) + min)
 
       return this.NFTs.find(NFT => NFT.id === id)
+    }
+  },
+
+  methods: {
+    onImageLoad() {
+      this.$nextTick(() => {
+        this.imageLoaded = true
+      })
     }
   }
 }

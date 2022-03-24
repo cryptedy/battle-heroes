@@ -80,43 +80,30 @@
             <template #trigger>
               <PlayerAvatar :player="player" />
             </template>
-            <p>name: {{ player.name }}</p>
-            <p>Level: {{ player.level }}</p>
-            <p>Player ID: {{ player.id }}</p>
-            <p>Address: {{ player.address }}</p>
-            <p>Login from {{ player.socket_ids.length }} devices</p>
-            <p>state: {{ $filters.playerState(player.state) }}</p>
-            <p>
-              <router-link :to="{ name: 'settings.account' }">
-                ACCOUNT SETTINGS
-              </router-link>
-            </p>
-            <p>
-              <router-link :to="{ name: 'logout' }"> LOGOUT </router-link>
-            </p>
+            <AccountMenu :player="player" />
           </BaseMenu>
         </li>
       </ul>
     </nav>
 
-    <div class="app-bar-item app-bar-stats">
-      <ul class="app-bar-stats-list">
-        <li class="app-bar-stats-list-item is-level">
-          <span class="app-bar-stats-list-item-text">Lv 1</span>
+    <div class="app-bar-item app-bar-content">
+      <ul class="app-bar-content-list">
+        <li class="app-bar-content-list-item is-level">
+          <span class="app-bar-content-list-item-text">Lv 1</span>
         </li>
-        <li class="app-bar-stats-list-item is-won">
-          <span class="app-bar-stats-list-item-text">WIN 0</span>
+        <li class="app-bar-content-list-item is-won">
+          <span class="app-bar-content-list-item-text">WIN 0</span>
         </li>
-        <li class="app-bar-stats-list-item is-lost">
-          <span class="app-bar-stats-list-item-text">LOSE 0</span>
+        <li class="app-bar-content-list-item is-lost">
+          <span class="app-bar-content-list-item-text">LOSE 0</span>
         </li>
-        <li class="app-bar-stats-list-item is-heroes-count">
+        <li class="app-bar-content-list-item is-heroes-count">
           <FontAwesomeIcon icon="layer-group" />
-          <span class="app-bar-stats-list-item-text">
+          <span class="app-bar-content-list-item-text">
             {{ player.nft_ids.length }}
           </span>
         </li>
-        <li class="app-bar-stats-list-item">
+        <li class="app-bar-content-list-item">
           <PlayerState :player="player" />
 
           <div
@@ -139,6 +126,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import AccountMenu from '@/components/AccountMenu'
 import PlayerState from '@/components/PlayerState'
 import PlayerAvatar from '@/components/PlayerAvatar'
 
@@ -146,6 +134,7 @@ export default {
   name: 'TheAppBar',
 
   components: {
+    AccountMenu,
     PlayerState,
     PlayerAvatar
   },

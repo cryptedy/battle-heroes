@@ -1,5 +1,5 @@
 <template>
-  <div class="player" :class="{ 'is-online': player.socket_ids.length > 0 }">
+  <div class="player">
     <BaseDrawer direction="bottom">
       <template #trigger>
         <PlayerAvatar :player="player" />
@@ -7,29 +7,40 @@
       <PlayerNFTs :player="player" />
     </BaseDrawer>
 
-    <div class="player-info">
-      <h2 class="player-name">
-        {{ player.name }} - {{ player.socket_ids.length }} devices
-      </h2>
-      <ul class="player-info-list">
-        <li class="player-info-list-item">
-          <FontAwesomeIcon icon="star" size="1x" />
-          <span class="player-info-list-item-text">
-            {{ player.level }}
-          </span>
-        </li>
-        <li class="player-info-list-item">
-          <FontAwesomeIcon icon="layer-group" size="1x" />
-          <span class="player-info-list-item-text">
-            <BaseDialog>
-              <template #trigger>
-                {{ player.nft_ids.length }}
-              </template>
-              <PlayerNFTs :player="player" />
-            </BaseDialog>
-          </span>
-        </li>
-      </ul>
+    <div class="player-content">
+      <div class="player-content-primary">
+        <span
+          class="player-name"
+          :class="{ 'is-online': player.socket_ids.length > 0 }"
+        >
+          {{ player.name }}
+        </span>
+        <span class="player-devices">
+          {{ player.socket_ids.length }} devices
+        </span>
+      </div>
+
+      <div class="player-content-secondary">
+        <ul class="player-content-list">
+          <li class="player-content-list-item">
+            <span class="player-content-list-item-text">
+              Lv {{ player.level }}
+            </span>
+          </li>
+          <li class="player-content-list-item">
+            <span class="player-content-list-item-text"> WIN 0 </span>
+          </li>
+          <li class="player-content-list-item">
+            <span class="player-content-list-item-text"> LOSE 0 </span>
+          </li>
+          <li class="player-content-list-item">
+            <FontAwesomeIcon icon="layer-group" size="1x" />
+            <span class="player-content-list-item-text">
+              {{ player.nft_ids.length }}
+            </span>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div class="player-actions">

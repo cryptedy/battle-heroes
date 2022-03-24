@@ -7,13 +7,9 @@
     </header>
 
     <main class="game-main" role="main">
-      <section class="section">
-        <TheBattleNav :player="player" />
-      </section>
-
-      <section class="section">
+      <div class="game-main-content">
         <slot />
-      </section>
+      </div>
     </main>
 
     <footer class="game-footer">
@@ -26,7 +22,6 @@
 import { mapGetters } from 'vuex'
 import TheAppBar from '@/components/TheAppBar'
 import SplashScreen from '@/components/SplashScreen'
-import TheBattleNav from '@/components/TheBattleNav'
 import TheBottomNav from '@/components/TheBottomNav'
 
 export default {
@@ -35,7 +30,6 @@ export default {
   components: {
     TheAppBar,
     SplashScreen,
-    TheBattleNav,
     TheBottomNav
   },
 

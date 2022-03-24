@@ -1,7 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
-  faSun,
   faFire,
   faStar,
   faUser,
@@ -9,13 +8,12 @@ import {
   faUsers,
   faMessage,
   faLayerGroup,
-  faCloudShowersHeavy
+  faArrowRightFromBracket
 } from '@fortawesome/free-solid-svg-icons'
 
 export default {
   install(app) {
     library.add(
-      faSun,
       faFire,
       faStar,
       faUser,
@@ -23,7 +21,7 @@ export default {
       faUsers,
       faMessage,
       faLayerGroup,
-      faCloudShowersHeavy
+      faArrowRightFromBracket
     )
 
     app.component(FontAwesomeIcon.name, FontAwesomeIcon)

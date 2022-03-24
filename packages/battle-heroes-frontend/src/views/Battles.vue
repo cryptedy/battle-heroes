@@ -1,7 +1,5 @@
 <template>
   <TheLayoutGame>
-    <h1>BATTLES</h1>
-
     <p v-if="!battles.length > 0">No battles.</p>
 
     <BaseList v-else>

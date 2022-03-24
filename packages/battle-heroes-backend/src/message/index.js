@@ -4,7 +4,7 @@ const { nanoid } = require('@reduxjs/toolkit')
 const createMessage = (text, player) => {
   return {
     id: nanoid(),
-    player,
+    player_id: player.id,
     text,
     posted_at: moment().unix()
   }
