@@ -1,44 +1,33 @@
 <template>
-  <BaseDialog :open="dialogShown" @close="dialogShown = false">
-    <SelectNFTs :player="player" @select="onSelectNFT" />
-  </BaseDialog>
+  <div class="battle-nav">
+    <BaseDialog :open="dialogShown" @close="dialogShown = false">
+      <SelectNFTs :player="player" @select="onSelectNFT" />
+    </BaseDialog>
 
-  <BaseButton
-    v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
-    @click="randomBattle"
-  >
-    RANDOM BATTLE
-  </BaseButton>
+    <BaseButton
+      v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
+      @click="randomBattle"
+    >
+      RANDOM BATTLE
+    </BaseButton>
 
-  <BaseButton
-    v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
-    @click="createBattle"
-  >
-    CREATE BATTLE
-  </BaseButton>
+    <BaseButton
+      v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
+      @click="createBattle"
+    >
+      CREATE BATTLE
+    </BaseButton>
 
-  <BaseButton
-    v-if="playerBattle && player.state !== PLAYER_STATE.BATTLE"
-    @click="deleteBattle"
-  >
-    DELETE BATTLE
-  </BaseButton>
-  <BaseButton v-else-if="player.state === PLAYER_STATE.STANDBY">
-    IDLE
-  </BaseButton>
-
-  <div v-if="playerBattle">
-    <p>Standby Hero: {{ playerBattle.player.NFT.name }}</p>
-
-    <img
-      :src="playerBattle.player.NFT.image_url"
-      :alt="playerBattle.player.NFT.name"
-      width="128"
-      height="128"
-    />
+    <BaseButton
+      v-if="playerBattle && player.state !== PLAYER_STATE.BATTLE"
+      @click="deleteBattle"
+    >
+      DELETE BATTLE
+    </BaseButton>
+    <BaseButton v-else-if="player.state === PLAYER_STATE.STANDBY">
+      IDLE
+    </BaseButton>
   </div>
-
-  <hr />
 </template>
 
 <script>

@@ -7,10 +7,15 @@
           custom
           :to="{ name: 'home' }"
         >
-          <li class="app-bar-nav-list-item" :class="{ 'is-active': isActive }">
-            <a :href="href" @click="navigate">
-              <FontAwesomeIcon icon="house" size="2x" />
-              <span class="app-bar-nav-list-item-text"> HOME </span>
+          <li class="app-bar-nav-list-item">
+            <a
+              class="app-bar-nav-list-item-link"
+              :class="{ 'is-active': isActive }"
+              :href="href"
+              @click="navigate"
+            >
+              <FontAwesomeIcon icon="house" />
+              <span class="app-bar-nav-list-item-link-text"> HOME </span>
             </a>
           </li>
         </router-link>
@@ -19,10 +24,15 @@
           custom
           :to="{ name: 'battles' }"
         >
-          <li class="app-bar-nav-list-item" :class="{ 'is-active': isActive }">
-            <a :href="href" @click="navigate">
-              <FontAwesomeIcon icon="fire" size="2x" />
-              <span class="app-bar-nav-list-item-text"> BATTLES </span>
+          <li class="app-bar-nav-list-item">
+            <a
+              class="app-bar-nav-list-item-link"
+              :href="href"
+              :class="{ 'is-active': isActive }"
+              @click="navigate"
+            >
+              <FontAwesomeIcon icon="fire" />
+              <span class="app-bar-nav-list-item-link-text"> BATTLES </span>
             </a>
           </li>
         </router-link>
@@ -31,10 +41,15 @@
           custom
           :to="{ name: 'players' }"
         >
-          <li class="app-bar-nav-list-item" :class="{ 'is-active': isActive }">
-            <a :href="href" @click="navigate">
-              <FontAwesomeIcon icon="users" size="2x" />
-              <span class="app-bar-nav-list-item-text">PLAYERS</span>
+          <li class="app-bar-nav-list-item">
+            <a
+              class="app-bar-nav-list-item-link"
+              :href="href"
+              :class="{ 'is-active': isActive }"
+              @click="navigate"
+            >
+              <FontAwesomeIcon icon="users" />
+              <span class="app-bar-nav-list-item-link-text">PLAYERS</span>
             </a>
           </li>
         </router-link>
@@ -43,10 +58,15 @@
           custom
           :to="{ name: 'messages' }"
         >
-          <li class="app-bar-nav-list-item" :class="{ 'is-active': isActive }">
-            <a :href="href" @click="navigate">
-              <FontAwesomeIcon icon="message" size="2x" />
-              <span class="app-bar-nav-list-item-text">MESSAGES</span>
+          <li class="app-bar-nav-list-item">
+            <a
+              class="app-bar-nav-list-item-link"
+              :href="href"
+              :class="{ 'is-active': isActive }"
+              @click="navigate"
+            >
+              <FontAwesomeIcon icon="message" />
+              <span class="app-bar-nav-list-item-link-text">MESSAGES</span>
             </a>
           </li>
         </router-link>
@@ -54,7 +74,7 @@
     </nav>
 
     <nav class="app-bar-item app-bar-nav">
-      <ul class="app-bar-nav-list" style="justify-content: flex-end">
+      <ul class="app-bar-nav-list">
         <li class="app-bar-nav-list-item">
           <BaseMenu align="right">
             <template #trigger>
@@ -79,28 +99,38 @@
       </ul>
     </nav>
 
-    <div class="app-bar-item app-bar-info">
-      <ul class="app-bar-info-list">
-        <li class="app-bar-info-list-item is-level">
-          <FontAwesomeIcon icon="star" size="1x" />
-          <span class="app-bar-info-list-item-text">1</span>
+    <div class="app-bar-item app-bar-stats">
+      <ul class="app-bar-stats-list">
+        <li class="app-bar-stats-list-item is-level">
+          <span class="app-bar-stats-list-item-text">Lv 1</span>
         </li>
-        <li class="app-bar-info-list-item is-heroes-count">
-          <FontAwesomeIcon icon="layer-group" size="1x" />
-          <span class="app-bar-info-list-item-text">
+        <li class="app-bar-stats-list-item is-won">
+          <span class="app-bar-stats-list-item-text">WIN 0</span>
+        </li>
+        <li class="app-bar-stats-list-item is-lost">
+          <span class="app-bar-stats-list-item-text">LOSE 0</span>
+        </li>
+        <li class="app-bar-stats-list-item is-heroes-count">
+          <FontAwesomeIcon icon="layer-group" />
+          <span class="app-bar-stats-list-item-text">
             {{ player.nft_ids.length }}
           </span>
         </li>
-        <li class="app-bar-info-list-item is-won">
-          <FontAwesomeIcon icon="sun" size="1x" />
-          <span class="app-bar-info-list-item-text">0</span>
-        </li>
-        <li class="app-bar-info-list-item is-lost">
-          <FontAwesomeIcon icon="cloud-showers-heavy" size="1x" />
-          <span class="app-bar-info-list-item-text">0</span>
-        </li>
-        <li class="app-bar-info-list-item">
+        <li class="app-bar-stats-list-item">
           <PlayerState :player="player" />
+
+          <div
+            v-if="playerBattle"
+            style="margin-left: 16px; width: 32px; height: 32px"
+          >
+            <img
+              style="width: 100%; height: auto"
+              :src="playerBattle.player.NFT.image_url"
+              :alt="playerBattle.player.NFT.name"
+              width="512"
+              height="512"
+            />
+          </div>
         </li>
       </ul>
     </div>
@@ -122,7 +152,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      player: 'game/player'
+      player: 'game/player',
+      playerBattle: 'game/battle'
     })
   }
 }

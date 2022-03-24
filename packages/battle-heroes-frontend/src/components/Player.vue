@@ -1,6 +1,11 @@
 <template>
   <div class="player" :class="{ 'is-online': player.socket_ids.length > 0 }">
-    <PlayerAvatar :player="player" />
+    <BaseDrawer direction="bottom">
+      <template #trigger>
+        <PlayerAvatar :player="player" />
+      </template>
+      <PlayerNFTs :player="player" />
+    </BaseDrawer>
 
     <div class="player-info">
       <h2 class="player-name">
