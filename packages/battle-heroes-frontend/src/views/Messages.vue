@@ -77,8 +77,6 @@ export default {
   },
 
   mounted() {
-    console.log(this.$refs.messageList.$el)
-
     // eslint-disable-next-line no-unused-vars
     this.unsubscribeMessage = store.subscribe((mutation, state) => {
       if (mutation.type === `message/${ADD_MESSAGE}`) {
@@ -120,8 +118,6 @@ export default {
         this.hasVerticalScrollbar = getScrollbarState(
           this.$refs.messageList.$el
         ).vertical
-
-        console.log(this.scrollbarWidth)
 
         // eslint-disable-next-line no-empty
       } catch (error) {}
