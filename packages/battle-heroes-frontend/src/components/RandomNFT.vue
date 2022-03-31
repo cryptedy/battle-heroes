@@ -2,7 +2,7 @@
   <div class="random-nft">
     <transition name="random-nft-content" appear>
       <div v-if="randomNFT" class="random-nft-content">
-        <p style="font-size: 18px">
+        <p class="random-nft-name">
           {{ randomNFT.name }}
         </p>
 
