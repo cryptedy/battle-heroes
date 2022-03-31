@@ -106,7 +106,7 @@ const gameManager = (io, socket) => {
             battle.opponent_player.id === player.id
         )
       ) {
-        return console.log('Player already join the a battle')
+        return console.log('Player already joined a battle')
       }
 
       const battle = createBattle(player, NFT)
@@ -145,8 +145,8 @@ const gameManager = (io, socket) => {
     console.log('onRandomBattle', socket.id)
   }
 
-  const onNewMessage = text => {
-    console.log('onNewMessage', socket.id)
+  const onCreateMessage = text => {
+    console.log('onCreateMessage', socket.id)
 
     const player = selectSocketPlayer(socket.id)
 
@@ -178,7 +178,7 @@ const gameManager = (io, socket) => {
   socket.on('battle:random', onRandomBattle)
   socket.on('battle:delete', onDeleteBattle)
 
-  socket.on('message:new', onNewMessage)
+  socket.on('message:create', onCreateMessage)
 
   socket.on('disconnect', onDisconnect)
 }

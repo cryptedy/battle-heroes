@@ -131,7 +131,7 @@ export default {
       if (this.newMessage.length === 0 || this.newMessage.match('^( |　)+$'))
         return
 
-      this.$socket.emit('message:new', this.newMessage)
+      this.$socket.emit('message:create', this.newMessage)
 
       this.newMessage = ''
     },
