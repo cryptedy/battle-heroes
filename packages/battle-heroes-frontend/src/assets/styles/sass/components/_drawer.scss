@@ -8,8 +8,7 @@
   width: 100%;
   height: 100%;
   outline: none;
-  color: color(primary);
-  z-index: z-index(drawer);
+  // z-index: z-index(drawer);
 
   &-trigger {
     display: inline-block;
@@ -18,22 +17,13 @@
   }
 
   &-content {
-    // overflow-y: auto;
-    position: fixed;
-    background-color: palette(grey, 0);
-
-    // TODO: grid => fixed header
     display: grid;
     grid-template-rows: auto 1fr;
+    position: fixed;
 
     &.is-direction {
       &-left,
       &-right {
-        width: 80%;
-        @include mediaQuery(sm) {
-          width: 250px;
-        }
-        height: 100%;
         max-width: 80%;
       }
       &-left {
@@ -44,20 +34,10 @@
       }
       &-top,
       &-bottom {
-        width: 100%;
-        height: 40%;
-        @include mediaQuery(sm) {
-          height: 220px;
+        max-width: calc(1024px - 32px);
+        @include mediaQuery(md) {
+          max-width: calc(1024px - 48px);
         }
-        max-height: 100%;
-        // TEST
-        // width: 100%;
-        // height: 100%;
-        // top: 24px;
-        // bottom: 24px;
-        // max-height: calc(100vh - 48px);
-        // margin: 0 auto;
-        // max-width: 1024px;
       }
       &-top {
         top: 0;
@@ -120,39 +100,36 @@
     justify-content: space-between;
     align-items: center;
 
-    height: 64px;
-    @include mediaQuery(md) {
-      height: 72px;
-    }
-    // TODO
-    // max-width: 1024px;
+    height: 56px;
 
-    padding: 0 16px;
+    padding-right: 16px;
+    padding-left: 16px;
     @include mediaQuery(md) {
-      padding: 0 24px;
+      padding-right: 24px;
+      padding-left: 24px;
     }
 
-    background-color: palette(grey, 800);
-    border-bottom: 1px solid color(divider, light);
-    color: color(primary, light);
+    background-color: palette(grey, 200);
+    border-bottom: 1px solid color(divider, dark);
+    font-size: 18px;
 
     &-title {
-
+      font-weight: bold;
+      color: color(primary, dark);
     }
 
     &-actions {
       #{$font-awesome-icon-class} {
-        width: 24px;
-        height: 24px;
-        font-size: 24px;
         padding: 8px;
-        color: color(active-icon, light);
+        color: color(active-icon, dark);
       }
     }
   }
 
   &-body {
-    // TODO
     overflow: auto;
+    background-color: palette(grey, 0);
+    padding: 16px;
+    color: color(primary, dark);
   }
 }

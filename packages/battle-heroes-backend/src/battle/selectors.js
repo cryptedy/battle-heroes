@@ -5,9 +5,13 @@ const selectBattles = state => state.ids.map(id => state.entities[id])
 
 const selectors = {
   selectBattles,
+  selectBattle: createSelector(
+    selectBattles,
+    battles => battleId => battles.find(battle => battle.id === battleId)
+  ),
   selectPlayerBattle: createSelector(
     selectBattles,
-    battles => player => battles.find(battle => battle.player.id === player.id)
+    battles => playerId => battles.find(battle => battle.player.id === playerId)
   )
 }
 
@@ -15,5 +19,7 @@ const getState = () => store.getState().battle
 
 module.exports = {
   selectBattles: () => selectors.selectBattles(getState()),
-  selectPlayerBattle: player => selectors.selectPlayerBattle(getState())(player)
+  selectBattle: battleId => selectors.selectBattle(getState())(battleId),
+  selectPlayerBattle: playerId =>
+    selectors.selectPlayerBattle(getState())(playerId)
 }

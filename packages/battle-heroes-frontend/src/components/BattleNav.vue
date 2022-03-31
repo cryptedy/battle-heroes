@@ -3,14 +3,14 @@
     <div v-if="playerBattle" style="max-width: 64px">
       <img
         style="width: 100%; height: auto"
-        :src="playerBattle.player.NFT.image_url"
-        :alt="playerBattle.player.NFT.name"
+        :src="findNFT(playerBattle.player.NFT_id).image_url"
+        :alt="findNFT(playerBattle.player.NFT_id).name"
         width="512"
         height="512"
       />
     </div>
 
-    <BaseDialog :open="dialogShown" @close="dialogShown = false">
+    <BaseDialog :open="dialogShown" @close="onCloseDialog">
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
@@ -67,6 +67,7 @@ export default {
 
   computed: {
     ...mapGetters({
+      findNFT: 'NFT/find',
       playerBattle: 'game/battle'
     }),
 
@@ -76,10 +77,14 @@ export default {
   },
 
   methods: {
+    onCloseDialog() {
+      this.dialogShown = false
+    },
+
     onSelectNFT(NFT) {
       this.dialogShown = false
 
-      this.$socket.emit('battle:create', NFT)
+      this.$socket.emit('battle:create', NFT.id)
     },
 
     randomBattle() {

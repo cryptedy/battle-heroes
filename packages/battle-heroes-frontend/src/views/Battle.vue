@@ -1,6 +1,7 @@
 <template>
   <div class="battle">
     <div class="battle-ground">
+      {{ battle }}
       <div class="battle-ground-player is-opponent">
         <div class="battle-ground-player-name">PLAYER NAME</div>
 
@@ -56,7 +57,22 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  name: 'Battle'
+  name: 'Battle',
+
+  computed: {
+    ...mapGetters({
+      findNFT: 'NFT/find',
+      player: 'game/player',
+      findBattle: 'battle/find',
+      findPlayer: 'player/find'
+    }),
+
+    battle() {
+      return this.findBattle(this.$route.params.battleId)
+    }
+  }
 }
 </script>

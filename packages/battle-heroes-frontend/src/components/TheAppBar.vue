@@ -112,8 +112,8 @@
           >
             <img
               style="width: 100%; height: auto"
-              :src="playerBattle.player.NFT.image_url"
-              :alt="playerBattle.player.NFT.name"
+              :src="findNFT(playerBattle.player.NFT_id).image_url"
+              :alt="findNFT(playerBattle.player.NFT_id).name"
               width="512"
               height="512"
             />
@@ -141,6 +141,7 @@ export default {
 
   computed: {
     ...mapGetters({
+      findNFT: 'NFT/find',
       player: 'game/player',
       playerBattle: 'game/battle'
     })

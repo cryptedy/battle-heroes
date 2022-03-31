@@ -11,8 +11,8 @@
         padding: 8px 16px;
         color: color(primary);
         #{$font-awesome-icon-class} {
-          margin-right: 8px;
-          color: color(active-icon);
+          margin-right: 16px;
+          color: color(active-icon, dark);
         }
       }
     }

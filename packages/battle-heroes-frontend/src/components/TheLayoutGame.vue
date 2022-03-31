@@ -40,6 +40,29 @@ export default {
       player: 'game/player',
       isGameLogin: 'game/isLogin'
     })
+  },
+
+  mounted() {
+    this.$socket.on('battle:matched', battle => {
+      console.log('battle:matched', battle)
+
+      // TODO: user confirmation
+      // this.$dialog.open({})
+
+      this.$router.push(
+        {
+          name: 'battle',
+          params: {
+            battleId: battle.id
+          }
+        },
+        () => {}
+      )
+    })
+  },
+
+  beforeUnmount() {
+    this.$socket.off('battle:matched')
   }
 }
 </script>

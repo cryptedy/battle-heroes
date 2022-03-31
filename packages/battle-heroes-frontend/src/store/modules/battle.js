@@ -9,6 +9,7 @@ export const state = initialState()
 
 export const getters = {
   all: state => state.ids.map(id => state.entities[id]),
+  find: state => id => state.entities[id],
   count: state => state.ids.length
 }
 

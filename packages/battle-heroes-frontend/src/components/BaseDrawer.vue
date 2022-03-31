@@ -18,7 +18,7 @@
           :style="drawerContentStyleObject"
         >
           <header class="drawer-header">
-            <h1>TITLE</h1>
+            <h1 class="drawer-header-title">Title</h1>
 
             <div class="drawer-header-actions">
               <FontAwesomeIcon icon="xmark" @click="closeDrawer" />
