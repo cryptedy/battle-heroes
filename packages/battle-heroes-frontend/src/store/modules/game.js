@@ -5,7 +5,7 @@ const initialState = () => ({})
 export const state = initialState()
 
 export const getters = {
-  isLogin: (sstate, getters) => getters.player !== null,
+  isLogin: (state, getters) => getters.player !== null,
   player: (state, getters, rootState, rootGetters) => {
     if (!rootGetters['auth/isLogin']) return null
 
@@ -14,10 +14,8 @@ export const getters = {
   battle: (state, getters, rootState, rootGetters) =>
     rootGetters['battle/all'].find(
       battle => battle.player.id === getters.player.id
-    )
+    ) || null
 }
-
-export const mutations = {}
 
 export const actions = {
   login({ dispatch, rootGetters }) {
@@ -32,6 +30,8 @@ export const actions = {
             return reject(status)
           }
 
+          dispatch('addEventListeners')
+
           await dispatch('player/set', players, { root: true })
           await dispatch('battle/set', battles, { root: true })
           await dispatch('message/set', messages, { root: true })
@@ -45,6 +45,8 @@ export const actions = {
   async logout({ dispatch }) {
     console.log('game/logout')
 
+    dispatch('removeEventListeners')
+
     await dispatch('player/delete', null, { root: true })
     await dispatch('battle/delete', null, { root: true })
     await dispatch('message/delete', null, { root: true })
@@ -55,5 +57,43 @@ export const actions = {
         resolve(true)
       })
     })
+  },
+
+  addEventListeners({ dispatch }) {
+    console.log('addEventListeners')
+
+    socket.on('player:players', players =>
+      dispatch('player/set', players, { root: true })
+    )
+    socket.on('player:player', player =>
+      dispatch('player/add', player, { root: true })
+    )
+    socket.on('player:update', player =>
+      dispatch('player/update', player, { root: true })
+    )
+    socket.on('battle:battles', battles =>
+      dispatch('battle/set', battles, { root: true })
+    )
+    socket.on('battle:battle', battle =>
+      dispatch('battle/add', battle, { root: true })
+    )
+    socket.on('message:messages', messages =>
+      dispatch('message/set', messages, { root: true })
+    )
+    socket.on('message:message', message =>
+      dispatch('message/add', message, { root: true })
+    )
+  },
+
+  removeEventListeners() {
+    console.log('removeEventListeners')
+
+    socket.off('player:players')
+    socket.off('player:player')
+    socket.off('player:update')
+    socket.off('battle:battles')
+    socket.off('battle:battle')
+    socket.off('message:messages')
+    socket.off('message:message')
   }
 }

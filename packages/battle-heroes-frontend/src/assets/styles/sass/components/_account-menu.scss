@@ -10,7 +10,7 @@
         width: 100%;
         padding: 8px 16px;
         color: color(primary);
-        .svg-inline--fa {
+        #{$font-awesome-icon-class} {
           margin-right: 8px;
           color: color(active-icon);
         }

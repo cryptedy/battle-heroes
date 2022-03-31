@@ -1,5 +1,17 @@
 <template>
-  <SplashScreen v-if="isAppLoading || !isSocketConnected" />
+  <SplashScreen
+    v-if="isSocketReconnecting"
+    message="Reconnecting to server..."
+  />
+
+  <SplashScreen
+    v-else-if="!isSocketConnected"
+    message="Connecting to server..."
+  />
+
+  <SplashScreen v-else-if="isAppLoading">
+    <RandomNFT />
+  </SplashScreen>
 
   <router-view v-else />
 
@@ -8,7 +20,9 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import RandomNFT from '@/components/RandomNFT'
 import SplashScreen from '@/components/SplashScreen'
+import { getScrollbarState, getScrollbarWidth } from '@/utils/helpers'
 
 const appTitle = process.env.VUE_APP_TITLE
 
@@ -16,6 +30,7 @@ export default {
   name: 'App',
 
   components: {
+    RandomNFT,
     SplashScreen
   },
 
@@ -28,7 +43,8 @@ export default {
   computed: {
     ...mapGetters({
       isAppLoading: 'app/isLoading',
-      isSocketConnected: 'socket/isConnected'
+      isSocketConnected: 'socket/isConnected',
+      isSocketReconnecting: 'socket/isReconnecting'
     })
   },
 
@@ -58,7 +74,10 @@ export default {
     }),
 
     onWindowLoad() {
-      this.setScrollbar(this.getScrollbar())
+      this.setScrollbar({
+        ...getScrollbarState(),
+        width: getScrollbarWidth()
+      })
 
       this.setWindowSize({
         width: window.innerWidth,
@@ -72,7 +91,10 @@ export default {
     },
 
     onWindowResize() {
-      this.setScrollbar(this.getScrollbar())
+      this.setScrollbar({
+        ...getScrollbarState(),
+        width: getScrollbarWidth()
+      })
 
       this.setWindowSize({
         width: window.innerWidth,
@@ -85,23 +107,6 @@ export default {
         offsetX: window.pageXOffset,
         offsetY: window.pageYOffset
       })
-    },
-
-    getScrollbar() {
-      const result = { vertical: true, horizontal: true }
-
-      try {
-        const root =
-          document.compatMode == 'BackCompat'
-            ? document.body
-            : document.documentElement
-
-        result.vertical = root.scrollHeight > root.clientHeight
-        result.horizontal = root.scrollWidth > root.clientWidth
-        // eslint-disable-next-line no-empty
-      } catch (error) {}
-
-      return result
     }
   }
 }

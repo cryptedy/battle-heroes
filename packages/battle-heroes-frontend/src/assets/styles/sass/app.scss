@@ -1,7 +1,6 @@
 @import 'reset';
 @import 'utils';
 @import 'components';
-@import 'views';
 
 html {
   box-sizing: border-box;
@@ -65,11 +64,14 @@ body {
     margin: 0 auto;
     width: 100%;
 
-    &-content {
+    > .section {
       height: 100%;
-      margin: 0 auto;
-      padding: 0 24px;
       max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 16px;
+      @include mediaQuery(md) {
+        padding: 0 24px;
+      }
     }
   }
 
@@ -107,9 +109,6 @@ body {
 
     > .app-bar {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-
       margin: 0 auto;
       max-width: 1024px;
       padding: 0 16px;
@@ -133,13 +132,46 @@ body {
       overflow: hidden;
     }
 
-    &-content {
-      margin: 0 auto;
-      height: 100%;
-      @include mediaQuery(md) {
-        padding: 0 24px;
+    > .view {
+      &-home, &-battles, &-players, &-messages, &-settings {
+        height: 100%;
+        max-width: 1024px;
+        margin: 0 auto;
+
+        > .grid {
+          padding-right: 0;
+          padding-left: 0;
+          > .grid-row {
+            > .grid-column {
+              padding-right: 0;
+              padding-left: 0;
+            }
+          }
+        }
       }
-      max-width: 1024px;
+
+      &-home, &-settings {
+        padding: 0 16px;
+        @include mediaQuery(md) {
+          padding: 0 24px;
+        }
+      }
+
+      &-battles, &-players, &-messages {
+        @include mediaQuery(md) {
+          padding: 0 24px;
+        }
+      }
+
+      &-messages {
+        display: grid;
+        height: 100%;
+      }
+
+      &-settings {
+        padding-top: 16px;
+        padding-bottom: 16px;
+      }
     }
   }
 

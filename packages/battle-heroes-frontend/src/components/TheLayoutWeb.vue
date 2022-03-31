@@ -5,9 +5,9 @@
     </header>
 
     <main class="web-main" role="main">
-      <div class="web-main-content">
+      <section class="section">
         <slot />
-      </div>
+      </section>
     </main>
 
     <footer class="web-footer">

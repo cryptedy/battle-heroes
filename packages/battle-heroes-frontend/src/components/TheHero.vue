@@ -60,17 +60,20 @@ export default {
     this.$socket.on('player:update', player => this.updatePlayers(player))
   },
 
-  beforeUnmount() {
+  async beforeUnmount() {
     this.$socket.off('player:players')
     this.$socket.off('player:player')
     this.$socket.off('player:update')
+
+    await this.deletePlayers()
   },
 
   methods: {
     ...mapActions({
       addPlayers: 'player/add',
       setPlayers: 'player/set',
-      updatePlayers: 'player/update'
+      updatePlayers: 'player/update',
+      deletePlayers: 'player/delete'
     }),
 
     async getPlayers() {

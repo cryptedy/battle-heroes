@@ -1,6 +1,8 @@
 <template>
   <TheLayoutGame>
-    <PlayerList :players="players" />
+    <div class="view-players">
+      <PlayerList :players="players" />
+    </div>
   </TheLayoutGame>
 </template>
 

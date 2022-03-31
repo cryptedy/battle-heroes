@@ -1,21 +1,23 @@
 <template>
   <BaseEmpty v-if="!players.length > 0" />
 
-  <BaseList v-else>
-    <BaseListItem v-for="player in players" :key="player.id">
-      <Player :player="player" />
-    </BaseListItem>
+  <BaseList v-else class="player-list">
+    <PlayerListItem
+      v-for="player in players"
+      :key="player.id"
+      :player="player"
+    />
   </BaseList>
 </template>
 
 <script>
-import Player from '@/components/Player'
+import PlayerListItem from '@/components/PlayerListItem'
 
 export default {
   name: 'PlayerList',
 
   components: {
-    Player
+    PlayerListItem
   },
 
   props: {

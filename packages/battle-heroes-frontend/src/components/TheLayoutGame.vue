@@ -1,5 +1,7 @@
 <template>
-  <SplashScreen v-if="!isGameLogin" message="Connecting to game server..." />
+  <SplashScreen v-if="!isGameLogin" message="Login to server...">
+    <RandomNFT />
+  </SplashScreen>
 
   <div v-else class="game">
     <header class="game-header" role="banner">
@@ -7,9 +9,7 @@
     </header>
 
     <main class="game-main" role="main">
-      <div class="game-main-content">
-        <slot />
-      </div>
+      <slot />
     </main>
 
     <footer class="game-footer">
@@ -20,6 +20,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import RandomNFT from '@/components/RandomNFT'
 import TheAppBar from '@/components/TheAppBar'
 import SplashScreen from '@/components/SplashScreen'
 import TheBottomNav from '@/components/TheBottomNav'
@@ -28,6 +29,7 @@ export default {
   name: 'TheLayoutGame',
 
   components: {
+    RandomNFT,
     TheAppBar,
     SplashScreen,
     TheBottomNav

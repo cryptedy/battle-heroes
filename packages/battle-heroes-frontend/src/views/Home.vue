@@ -1,11 +1,13 @@
 <template>
   <TheLayoutGame>
-    <ul>
-      <li>TODO: PLAYER STATS</li>
-      <li>TODO: PLAYER RANKING</li>
-      <li>TODO: PLAYERS LIST</li>
-      <li>TODO: CURRENT BATTLES</li>
-    </ul>
+    <div class="view-home">
+      <BaseGrid>
+        <BaseCard title="PLAYER STATS"> PLAYER </BaseCard>
+        <BaseCard title="PLAYER RANKING"> PLAYER RANKING </BaseCard>
+        <BaseCard title="PLAYER RANKING"> PLAYER RANKING </BaseCard>
+        <BaseCard title="CURRENT BATTLES"> CURRENT BATTLES </BaseCard>
+      </BaseGrid>
+    </div>
   </TheLayoutGame>
 </template>
 

@@ -1,6 +1,8 @@
 <template>
   <TheLayoutGame>
-    <router-view />
+    <div class="view-settings">
+      <router-view />
+    </div>
   </TheLayoutGame>
 </template>
 

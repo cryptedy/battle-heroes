@@ -1,5 +1,5 @@
 <template>
-  <div class="message">
+  <BaseListItem class="message-list-item">
     <BaseDrawer direction="bottom">
       <template #trigger>
         <PlayerAvatar :player="messagePlayer" />
@@ -9,12 +9,18 @@
 
     <div class="message-content">
       <div class="player-content-primary">
-        <span
-          class="player-name"
-          :class="{ 'is-online': messagePlayer.socket_ids.length > 0 }"
-        >
-          {{ messagePlayer.name }}
-        </span>
+        <BaseDrawer direction="bottom">
+          <template #trigger>
+            <span
+              class="player-name"
+              :class="{ 'is-online': messagePlayer.socket_ids.length > 0 }"
+            >
+              {{ messagePlayer.name }}
+            </span>
+          </template>
+          <PlayerNFTs :player="messagePlayer" />
+        </BaseDrawer>
+
         <span class="message-posted-at">
           {{ $filters.datetime(message.posted_at) }}
         </span>
@@ -28,7 +34,7 @@
     <div class="message-actions">
       <BaseButton v-if="canDelete">DELETE</BaseButton>
     </div>
-  </div>
+  </BaseListItem>
 </template>
 
 <script>
@@ -37,7 +43,7 @@ import PlayerNFTs from '@/components/PlayerNFTs'
 import PlayerAvatar from '@/components/PlayerAvatar'
 
 export default {
-  name: 'Message',
+  name: 'MessageListItem',
 
   components: {
     PlayerNFTs,

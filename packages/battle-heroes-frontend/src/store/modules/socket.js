@@ -1,19 +1,28 @@
 import { socket } from '@/plugins'
-import { SET_SOCKET_CONNECTED } from '../mutation-types'
+import {
+  SET_SOCKET_CONNECTED,
+  SET_SOCKET_RECONNECTING
+} from '../mutation-types'
 
 const initialState = () => ({
-  connected: false
+  connected: false,
+  reconnecting: false
 })
 
 export const state = initialState()
 
 export const getters = {
-  isConnected: state => state.connected
+  isConnected: state => state.connected,
+  isReconnecting: state => state.reconnecting
 }
 
 export const mutations = {
   [SET_SOCKET_CONNECTED](state, { connected }) {
     state.connected = connected
+  },
+
+  [SET_SOCKET_RECONNECTING](state, { reconnecting }) {
+    state.reconnecting = reconnecting
   }
 }
 
@@ -38,19 +47,15 @@ export const actions = {
     console.log('onError', error)
   },
 
-  async onReconnect(context, attempt) {
-    console.log('onReconnect', attempt)
+  async onReconnecting({ commit }) {
+    console.log('onReconnecting')
+
+    commit(SET_SOCKET_RECONNECTING, { reconnecting: true })
   },
 
-  async onReconnectAttempt(context, attempt) {
-    console.log('onReconnectAttempt', attempt)
-  },
+  async onReconnect({ commit }) {
+    console.log('onReconnect')
 
-  async onReconnectError(context, error) {
-    console.log('onReconnectError', error)
-  },
-
-  async onReconnectFailed() {
-    console.log('onReconnectFailed')
+    commit(SET_SOCKET_RECONNECTING, { reconnecting: false })
   }
 }

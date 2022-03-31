@@ -1,5 +1,15 @@
 <template>
   <div class="battle-nav">
+    <div v-if="playerBattle" style="max-width: 64px">
+      <img
+        style="width: 100%; height: auto"
+        :src="playerBattle.player.NFT.image_url"
+        :alt="playerBattle.player.NFT.name"
+        width="512"
+        height="512"
+      />
+    </div>
+
     <BaseDialog :open="dialogShown" @close="dialogShown = false">
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
@@ -36,7 +46,7 @@ import { PLAYER_STATE } from '@/utils/constants'
 import SelectNFTs from '@/components/SelectNFTs'
 
 export default {
-  name: 'TheBattleNav',
+  name: 'BattleNav',
 
   components: {
     SelectNFTs

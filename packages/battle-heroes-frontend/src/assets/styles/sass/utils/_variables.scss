@@ -7,13 +7,11 @@ $breakpoints: (
 ) !default;
 
 $z-indexes: (
-  'progress-bar': 9,
-  'dialog': 8,
-  'loading-splash': 7,
-  'drawer': 6,
-  'menu': 5,
-  'overlay': 4,
-  'global-navigation': 3,
-  'global-header': 2,
-  'global-content': 1,
+  'dialog': 5,
+  'loading-splash': 4,
+  'drawer': 3,
+  'menu': 2,
+  'overlay': 1,
 ) !default;
+
+$font-awesome-icon-class: '.svg-inline--fa'

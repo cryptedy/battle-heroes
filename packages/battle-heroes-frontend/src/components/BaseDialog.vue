@@ -17,9 +17,11 @@
 
       <transition name="dialog-content">
         <div v-if="dialogContentShown" class="dialog-content">
-          <span v-if="$slots.trigger || programmatic">
-            <BaseButton @click="closeDialog">CLOSE</BaseButton>
-          </span>
+          <header>
+            <template v-if="$slots.trigger || programmatic">
+              <BaseButton @click="closeDialog">CLOSE</BaseButton>
+            </template>
+          </header>
 
           <template v-if="programmatic">
             DATA

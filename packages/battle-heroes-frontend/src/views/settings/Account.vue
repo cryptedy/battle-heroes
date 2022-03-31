@@ -1,11 +1,7 @@
 <template>
-  <h1>ACCOUNT</h1>
-
-  <p>
-    <router-link :to="{ name: 'logout' }" style="color: white">
-      LOGOUT
-    </router-link>
-  </p>
+  <router-link v-slot="{ href, navigate }" custom :to="{ name: 'logout' }">
+    <BaseButton :href="href" @click="navigate"> LOGOUT </BaseButton>
+  </router-link>
 
   <p>name: {{ player.name }}</p>
 

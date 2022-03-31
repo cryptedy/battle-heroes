@@ -1,16 +1,15 @@
 <template>
-  <BaseButton v-if="!isMetaMaskEnabled" class="button is-diabled" disabled>
-    Please install MetaMask
-  </BaseButton>
-
   <BaseButton
-    v-else
-    class="button"
-    :disabled="loading"
+    class="button login-button"
+    :disabled="!isMetaMaskEnabled || loading"
     @click="loginWithMetaMask"
   >
-    <BaseSpinner v-if="loading" />
-    LOGIN
+    <template v-if="!isMetaMaskEnabled"> Please install MetaMask </template>
+
+    <template v-else>
+      <BaseSpinner v-if="loading" />
+      LOGIN
+    </template>
   </BaseButton>
 </template>
 

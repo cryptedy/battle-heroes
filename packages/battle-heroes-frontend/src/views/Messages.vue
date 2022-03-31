@@ -1,9 +1,12 @@
 <template>
   <TheLayoutGame>
-    <div class="messages">
-      <div ref="messageList" class="message-list">
-        <MessageList :messages="messages" />
-      </div>
+    <div class="view-messages">
+      <MessageList
+        ref="messageList"
+        :messages="messages"
+        v-bind="$attrs"
+        :style="messageListStyleObject"
+      />
 
       <transition name="message-form">
         <div v-if="messageFormShown" class="message-form">
@@ -25,8 +28,9 @@
 import store from '@/store'
 import { mapGetters } from 'vuex'
 import MessageList from '@/components/MessageList'
-import TheLayoutGame from '@/components/TheLayoutGame'
+import { getScrollbarState } from '@/utils/helpers'
 import { ADD_MESSAGE } from '@/store/mutation-types'
+import TheLayoutGame from '@/components/TheLayoutGame'
 
 export default {
   name: 'Messages',
@@ -38,55 +42,94 @@ export default {
 
   data() {
     return {
-      unsubscribe: null,
+      unsubscribeMessage: null,
       messageFormShown: false,
-      newMessage: ''
+      newMessage: '',
+      hasVerticalScrollbar: false
     }
   },
 
   computed: {
     ...mapGetters({
-      messages: 'message/all'
-    })
+      messages: 'message/all',
+      windowHeight: 'window/height',
+      scrollbarWidth: 'scrollbar/width'
+    }),
+
+    messageListStyleObject() {
+      let paddingRight = 0
+
+      if (this.hasVerticalScrollbar) {
+        paddingRight = this.scrollbarWidth
+      }
+
+      return {
+        paddingRight: paddingRight > 0 ? `${paddingRight}px` : paddingRight
+      }
+    }
+  },
+
+  watch: {
+    // eslint-disable-next-line no-unused-vars
+    windowHeight(value, oldValue) {
+      this.setHasVerticalScrollbar()
+    }
   },
 
   mounted() {
+    console.log(this.$refs.messageList.$el)
+
+    // eslint-disable-next-line no-unused-vars
+    this.unsubscribeMessage = store.subscribe((mutation, state) => {
+      if (mutation.type === `message/${ADD_MESSAGE}`) {
+        this.$nextTick(() => {
+          this.scrollToBottom()
+          this.setHasVerticalScrollbar()
+        })
+      }
+    })
+
     this.messageFormShown = true
 
-    document.querySelector('.game-main').classList.add('has-chat-animation')
+    const $gameMain = document.querySelector('.game-main')
 
-    setTimeout(() => {
-      document
-        .querySelector('.game-main')
-        .classList.remove('has-chat-animation')
-    }, 2250)
+    if ($gameMain) {
+      $gameMain.classList.add('has-chat-animation')
 
-    this.$nextTick(() => this.scrollToBottom())
+      setTimeout(() => {
+        $gameMain.classList.remove('has-chat-animation')
+      }, 2250)
+    }
+
+    this.$nextTick(() => {
+      this.scrollToBottom()
+      this.setHasVerticalScrollbar()
+    })
   },
 
   beforeUnmount() {
-    if (this.unsubscribe) {
-      this.unsubscribe()
-      this.unsubscribe = null
+    if (this.unsubscribeMessage) {
+      this.unsubscribeMessage()
+      this.unsubscribeMessage = null
     }
   },
 
   methods: {
+    setHasVerticalScrollbar() {
+      try {
+        this.hasVerticalScrollbar = getScrollbarState(
+          this.$refs.messageList.$el
+        ).vertical
+
+        console.log(this.scrollbarWidth)
+
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
+    },
+
     sendMessage() {
       if (this.newMessage.length === 0 || this.newMessage.match('^( |　)+$'))
         return
-
-      // eslint-disable-next-line no-unused-vars
-      this.unsubscribe = store.subscribe((mutation, state) => {
-        if (mutation.type === `message/${ADD_MESSAGE}`) {
-          this.$nextTick(() => {
-            this.scrollToBottom()
-          })
-
-          this.unsubscribe()
-          this.unsubscribe = null
-        }
-      })
 
       this.$socket.emit('message:new', this.newMessage)
 
@@ -95,10 +138,12 @@ export default {
 
     scrollToBottom() {
       try {
-        this.$refs.messageList.scrollTo(0, this.$refs.messageList.scrollHeight)
-      } catch (error) {
-        //
-      }
+        this.$refs.messageList.$el.scrollTo(
+          0,
+          this.$refs.messageList.$el.scrollHeight
+        )
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
     }
   }
 }

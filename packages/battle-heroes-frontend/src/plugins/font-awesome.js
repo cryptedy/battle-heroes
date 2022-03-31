@@ -5,7 +5,9 @@ import {
   faStar,
   faUser,
   faHouse,
+  faTimes,
   faUsers,
+  faXmark,
   faMessage,
   faLayerGroup,
   faArrowRightFromBracket
@@ -18,7 +20,9 @@ export default {
       faStar,
       faUser,
       faHouse,
+      faTimes,
       faUsers,
+      faXmark,
       faMessage,
       faLayerGroup,
       faArrowRightFromBracket

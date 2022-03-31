@@ -1,21 +1,23 @@
 <template>
   <BaseEmpty v-if="!messages.length > 0" />
 
-  <BaseList v-else>
-    <BaseListItem v-for="message in messages" :key="message.id">
-      <Message :message="message" />
-    </BaseListItem>
+  <BaseList v-else class="message-list">
+    <MessageListItem
+      v-for="message in messages"
+      :key="message.id"
+      :message="message"
+    />
   </BaseList>
 </template>
 
 <script>
-import Message from '@/components/Message'
+import MessageListItem from '@/components/MessageListItem'
 
 export default {
   name: 'MessageList',
 
   components: {
-    Message
+    MessageListItem
   },
 
   props: {

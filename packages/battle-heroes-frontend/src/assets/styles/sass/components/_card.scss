@@ -1,0 +1,27 @@
+.card {
+  @include clearfix;
+  border-radius: 3px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+
+  &-header {
+    padding: 16px;
+    border: 1px solid palette(grey, 400);
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    background-color: palette(grey, 800);
+
+    &-title {
+      font-weight: bold;
+      color: color(secondary, light);
+    }
+  }
+
+  &-body {
+    @include clearfix;
+    padding: 16px;
+    border-radius: 3px;
+    border: 1px solid palette(grey, 400);
+    background-color: palette(grey, 800);
+    color: color(primary, light);
+  }
+}

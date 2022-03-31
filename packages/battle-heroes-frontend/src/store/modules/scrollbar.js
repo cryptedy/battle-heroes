@@ -1,22 +1,5 @@
 import { SET_SCROLLBAR, SET_SCROLLBAR_WIDTH } from '../mutation-types'
 
-function getScrollbarWidth() {
-  const outer = document.createElement('div')
-  outer.style.visibility = 'hidden'
-  outer.style.overflow = 'scroll'
-
-  document.body.appendChild(outer)
-
-  const inner = document.createElement('div')
-  outer.appendChild(inner)
-
-  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth
-
-  outer.parentNode.removeChild(outer)
-
-  return scrollbarWidth
-}
-
 const initialState = () => ({
   vertical: false,
   horizontal: false,
@@ -44,10 +27,9 @@ export const mutations = {
 
 export const actions = {
   set({ commit }, payload) {
-    commit(SET_SCROLLBAR, payload)
+    const { vertical, horizontal, width } = payload
 
-    commit(SET_SCROLLBAR_WIDTH, {
-      width: payload.vertical ? getScrollbarWidth() : 0
-    })
+    commit(SET_SCROLLBAR, { vertical, horizontal })
+    commit(SET_SCROLLBAR_WIDTH, { width })
   }
 }

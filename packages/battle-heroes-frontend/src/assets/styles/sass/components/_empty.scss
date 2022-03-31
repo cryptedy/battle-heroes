@@ -1,6 +1,8 @@
 .empty {
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding: 0 16px;
+  @include mediaQuery(md) {
+    padding: 0;
+  }
 
   &-content {
     padding: 16px 0;

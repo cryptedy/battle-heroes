@@ -1,5 +1,5 @@
 <template>
-  <div class="player">
+  <BaseListItem class="player-list-item">
     <BaseDrawer direction="bottom">
       <template #trigger>
         <PlayerAvatar :player="player" />
@@ -9,12 +9,18 @@
 
     <div class="player-content">
       <div class="player-content-primary">
-        <span
-          class="player-name"
-          :class="{ 'is-online': player.socket_ids.length > 0 }"
-        >
-          {{ player.name }}
-        </span>
+        <BaseDrawer direction="bottom">
+          <template #trigger>
+            <span
+              class="player-name"
+              :class="{ 'is-online': player.socket_ids.length > 0 }"
+            >
+              {{ player.name }}
+            </span>
+          </template>
+          <PlayerNFTs :player="player" />
+        </BaseDrawer>
+
         <span class="player-devices">
           {{ player.socket_ids.length }} devices
         </span>
@@ -46,7 +52,7 @@
     <div class="player-actions">
       <PlayerState :player="player" />
     </div>
-  </div>
+  </BaseListItem>
 </template>
 
 <script>
@@ -55,7 +61,7 @@ import PlayerState from '@/components/PlayerState'
 import PlayerAvatar from '@/components/PlayerAvatar'
 
 export default {
-  name: 'Player',
+  name: 'PlayerListItem',
 
   components: {
     PlayerNFTs,

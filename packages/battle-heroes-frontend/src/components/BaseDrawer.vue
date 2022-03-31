@@ -15,12 +15,19 @@
           v-if="drawerContentShown"
           class="drawer-content"
           :class="`is-direction-${direction}`"
+          :style="drawerContentStyleObject"
         >
-          <span v-if="$slots.trigger">
-            <BaseButton @click="closeDrawer">CLOSE</BaseButton>
-          </span>
+          <header class="drawer-header">
+            <h1>TITLE</h1>
 
-          <slot />
+            <div class="drawer-header-actions">
+              <FontAwesomeIcon icon="xmark" @click="closeDrawer" />
+            </div>
+          </header>
+
+          <main class="drawer-body">
+            <slot />
+          </main>
         </div>
       </transition>
     </div>
@@ -79,6 +86,13 @@ export default {
 
     transitionName() {
       return `drawer-content-${this.direction}`
+    },
+
+    drawerContentStyleObject() {
+      return {
+        width: this.width,
+        height: this.height
+      }
     }
   },
 

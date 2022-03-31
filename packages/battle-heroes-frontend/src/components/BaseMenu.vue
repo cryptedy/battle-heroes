@@ -79,7 +79,8 @@ export default {
   computed: {
     ...mapGetters({
       scrollbarWidth: 'scrollbar/width',
-      windowDimensions: 'window/dimensions'
+      windowDimensions: 'window/dimensions',
+      hasHorizontalScrollbar: 'scrollbar/hasHorizontal'
     }),
 
     attempting() {
@@ -101,7 +102,7 @@ export default {
         right =
           this.windowDimensions.width -
           (this.triggerDimensions.left + this.triggerDimensions.width) -
-          this.scrollbarWidth
+          (this.hasHorizontalScrollbar ? this.scrollbarWidth : 0)
       }
 
       // TODO

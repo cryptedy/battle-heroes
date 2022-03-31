@@ -1,5 +1,7 @@
 .accordion {
   &-trigger {
-    display: inline;
+    display: inline-block;
+    user-select: none;
+    cursor: pointer;
   }
 }

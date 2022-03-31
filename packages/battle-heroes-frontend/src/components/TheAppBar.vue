@@ -88,16 +88,16 @@
 
     <div class="app-bar-item app-bar-content">
       <ul class="app-bar-content-list">
-        <li class="app-bar-content-list-item is-level">
+        <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">Lv 1</span>
         </li>
-        <li class="app-bar-content-list-item is-won">
+        <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">WIN 0</span>
         </li>
-        <li class="app-bar-content-list-item is-lost">
+        <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">LOSE 0</span>
         </li>
-        <li class="app-bar-content-list-item is-heroes-count">
+        <li class="app-bar-content-list-item">
           <FontAwesomeIcon icon="layer-group" />
           <span class="app-bar-content-list-item-text">
             {{ player.nft_ids.length }}

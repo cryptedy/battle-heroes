@@ -5,19 +5,6 @@ export default function createWebSocketPlugin(socket) {
     socket.on('connect_error', error =>
       store.dispatch('socket/onConnectError', error)
     )
-
     socket.io.on('error', error => store.dispatch('socket/onError', error))
-    socket.io.on('reconnect', attempt =>
-      store.dispatch('socket/onReconnect', attempt)
-    )
-    socket.io.on('reconnect_attempt', attempt =>
-      store.dispatch('socket/onReconnectAttempt', attempt)
-    )
-    socket.io.on('reconnect_error', error =>
-      store.dispatch('socket/onReconnectError', error)
-    )
-    socket.io.on('reconnect_failed', () =>
-      store.dispatch('socket/onReconnectFailed')
-    )
   }
 }
