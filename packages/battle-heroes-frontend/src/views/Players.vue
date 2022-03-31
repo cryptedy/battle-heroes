@@ -1,7 +1,7 @@
 <template>
   <TheLayoutGame>
     <div class="view-players">
-      <PlayerList :players="players" />
+      <PlayerList :players="sortedPlayers" />
     </div>
   </TheLayoutGame>
 </template>
@@ -22,7 +22,13 @@ export default {
   computed: {
     ...mapGetters({
       players: 'player/all'
-    })
+    }),
+
+    sortedPlayers() {
+      const players = this.players
+
+      return players.sort((a, b) => b.socket_ids.length - a.socket_ids.length)
+    }
   }
 }
 </script>
