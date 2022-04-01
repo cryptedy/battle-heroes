@@ -15,14 +15,6 @@ export default {
     window.addEventListener('offline', event => {
       store.dispatch('network/onOffline')
 
-      // TEST 1
-      if (store.getters['game/isLogin']) {
-        store.dispatch('game/logout')
-      }
-
-      // TEST 2
-      // socket.disconnect()
-
       console.log('The network connection has been lost.')
     })
   }
