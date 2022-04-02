@@ -65,7 +65,7 @@ export default {
     this.$socket.off('player:player')
     this.$socket.off('player:update')
 
-    await this.deletePlayers()
+    await this.resetPlayers()
   },
 
   methods: {
@@ -73,7 +73,7 @@ export default {
       addPlayers: 'player/add',
       setPlayers: 'player/set',
       updatePlayers: 'player/update',
-      deletePlayers: 'player/delete'
+      resetPlayers: 'player/reset'
     }),
 
     async getPlayers() {

@@ -1,5 +1,5 @@
 import Moralis from 'moralis/dist/moralis.min.js'
-import { SET_USER, DELETE_USER } from '../mutation-types'
+import { RESET_USER, SET_USER } from '../mutation-types'
 
 const SIGNING_MESSAGE = `Login to ${process.env.VUE_APP_TITLE}`
 
@@ -22,12 +22,12 @@ export const getters = {
 }
 
 export const mutations = {
-  [SET_USER](state, { user }) {
+  [RESET_USER](state) {
+    const { user } = initialState()
     state.user = user
   },
 
-  [DELETE_USER](state) {
-    const { user } = initialState()
+  [SET_USER](state, { user }) {
     state.user = user
   }
 }
@@ -47,7 +47,7 @@ export const actions = {
         commit(SET_USER, { user })
       }
     } catch (error) {
-      commit(DELETE_USER)
+      commit(RESET_USER)
 
       throw new Error(error)
     }
@@ -65,7 +65,7 @@ export const actions = {
         commit(SET_USER, { user })
       }
     } catch (error) {
-      commit(DELETE_USER)
+      commit(RESET_USER)
 
       throw new Error(error)
     }
@@ -79,7 +79,7 @@ export const actions = {
     } catch (error) {
       throw new Error(error)
     } finally {
-      commit(DELETE_USER)
+      commit(RESET_USER)
     }
   }
 }

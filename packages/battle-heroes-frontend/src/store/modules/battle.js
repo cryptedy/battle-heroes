@@ -1,6 +1,6 @@
 import {
+  RESET_BATTLES,
   SET_BATTLES,
-  DELETE_BATTLES,
   ADD_BATTLE,
   UPDATE_BATTLE,
   REMOVE_BATTLE
@@ -20,18 +20,18 @@ export const getters = {
 }
 
 export const mutations = {
+  [RESET_BATTLES](state) {
+    const { entities, ids } = initialState()
+
+    state.entities = entities
+    state.ids = ids
+  },
+
   [SET_BATTLES](state, { battles }) {
     battles.forEach(battle => {
       state.entities = { ...state.entities, [battle.id]: battle }
     })
     state.ids = battles.map(battle => battle.id)
-  },
-
-  [DELETE_BATTLES](state) {
-    const { entities, ids } = initialState()
-
-    state.entities = entities
-    state.ids = ids
   },
 
   [ADD_BATTLE](state, { battle }) {
@@ -51,16 +51,16 @@ export const mutations = {
 }
 
 export const actions = {
+  reset({ commit }) {
+    console.log('battle/reset')
+
+    commit(RESET_BATTLES)
+  },
+
   set({ commit }, battles) {
     console.log('battle/set', battles)
 
     commit(SET_BATTLES, { battles })
-  },
-
-  delete({ commit }) {
-    console.log('battle/delete')
-
-    commit(DELETE_BATTLES)
   },
 
   add({ commit }, battle) {

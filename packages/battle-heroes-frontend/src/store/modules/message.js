@@ -1,6 +1,6 @@
 import {
+  RESET_MESSAGES,
   SET_MESSAGES,
-  DELETE_MESSAGES,
   ADD_MESSAGE,
   REMOVE_MESSAGE
 } from '../mutation-types'
@@ -17,18 +17,18 @@ export const getters = {
 }
 
 export const mutations = {
+  [RESET_MESSAGES](state) {
+    const { entities, ids } = initialState()
+
+    state.entities = entities
+    state.ids = ids
+  },
+
   [SET_MESSAGES](state, { messages }) {
     messages.forEach(message => {
       state.entities = { ...state.entities, [message.id]: message }
     })
     state.ids = messages.map(message => message.id)
-  },
-
-  [DELETE_MESSAGES](state) {
-    const { entities, ids } = initialState()
-
-    state.entities = entities
-    state.ids = ids
   },
 
   [ADD_MESSAGE](state, { message }) {
@@ -44,16 +44,16 @@ export const mutations = {
 }
 
 export const actions = {
+  reset({ commit }) {
+    console.log('message/reset')
+
+    commit(RESET_MESSAGES)
+  },
+
   set({ commit }, messages) {
     console.log('message/set', messages)
 
     commit(SET_MESSAGES, { messages })
-  },
-
-  delete({ commit }) {
-    console.log('message/delete')
-
-    commit(DELETE_MESSAGES)
   },
 
   add({ commit }, message) {

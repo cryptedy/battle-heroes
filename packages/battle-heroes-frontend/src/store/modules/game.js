@@ -47,9 +47,9 @@ export const actions = {
 
     dispatch('removeEventListeners')
 
-    await dispatch('player/delete', null, { root: true })
-    await dispatch('battle/delete', null, { root: true })
-    await dispatch('message/delete', null, { root: true })
+    await dispatch('player/reset', null, { root: true })
+    await dispatch('battle/reset', null, { root: true })
+    await dispatch('message/reset', null, { root: true })
 
     return new Promise(resolve => {
       socket.emit('game:logout', async () => {

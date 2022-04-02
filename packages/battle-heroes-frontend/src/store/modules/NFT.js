@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_URL } from '@/utils/constants'
-import { SET_NFTS, DELETE_NFTS } from '../mutation-types'
+import { RESET_NFTS, SET_NFTS } from '../mutation-types'
 
 const initialState = () => {
   return {
@@ -20,6 +20,13 @@ export const getters = {
 }
 
 export const mutations = {
+  [RESET_NFTS](state) {
+    const { entities, ids } = initialState()
+
+    state.entities = entities
+    state.ids = ids
+  },
+
   [SET_NFTS](state, { NFTs }) {
     const entities = {}
 
@@ -30,13 +37,6 @@ export const mutations = {
     // bulk assignment for better performance
     state.entities = entities
     state.ids = NFTs.map(NFT => NFT.id).sort((a, b) => a - b)
-  },
-
-  [DELETE_NFTS](state) {
-    const { entities, ids } = initialState()
-
-    state.entities = entities
-    state.ids = ids
   }
 }
 
@@ -49,7 +49,7 @@ export const actions = {
 
       commit(SET_NFTS, { NFTs })
     } catch (error) {
-      commit(DELETE_NFTS)
+      commit(RESET_NFTS)
 
       throw new Error(error)
     }

@@ -1,8 +1,8 @@
 import {
-  ADD_PLAYER,
+  RESET_PLAYERS,
   SET_PLAYERS,
-  UPDATE_PLAYER,
-  DELETE_PLAYERS
+  ADD_PLAYER,
+  UPDATE_PLAYER
 } from '../mutation-types'
 
 const initialState = () => ({
@@ -19,18 +19,18 @@ export const getters = {
 }
 
 export const mutations = {
+  [RESET_PLAYERS](state) {
+    const { entities, ids } = initialState()
+
+    state.entities = entities
+    state.ids = ids
+  },
+
   [SET_PLAYERS](state, { players }) {
     players.forEach(player => {
       state.entities = { ...state.entities, [player.id]: player }
     })
     state.ids = players.map(player => player.id)
-  },
-
-  [DELETE_PLAYERS](state) {
-    const { entities, ids } = initialState()
-
-    state.entities = entities
-    state.ids = ids
   },
 
   [ADD_PLAYER](state, { player }) {
@@ -44,16 +44,16 @@ export const mutations = {
 }
 
 export const actions = {
+  async reset({ commit }) {
+    console.log('player/reset')
+
+    commit(RESET_PLAYERS)
+  },
+
   async set({ commit }, players) {
     console.log('player/set', players)
 
     commit(SET_PLAYERS, { players })
-  },
-
-  async delete({ commit }) {
-    console.log('player/delete')
-
-    commit(DELETE_PLAYERS)
   },
 
   async add({ commit }, player) {
