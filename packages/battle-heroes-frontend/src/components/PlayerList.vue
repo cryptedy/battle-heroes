@@ -1,5 +1,5 @@
 <template>
-  <BaseEmpty v-if="!players.length > 0" />
+  <BaseEmpty v-if="!players.length > 0" text="NO PLAYERS" />
 
   <BaseList v-else class="player-list">
     <PlayerListItem

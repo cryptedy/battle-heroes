@@ -63,6 +63,8 @@
   &-name {
     font-weight: bold;
 
+    color: color(disabled, light);
+
     &.is-online {
       color: palette(green, 500);
     }

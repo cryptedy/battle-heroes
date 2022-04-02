@@ -1,4 +1,9 @@
-import { SET_MESSAGES, DELETE_MESSAGES, ADD_MESSAGE } from '../mutation-types'
+import {
+  SET_MESSAGES,
+  DELETE_MESSAGES,
+  ADD_MESSAGE,
+  REMOVE_MESSAGE
+} from '../mutation-types'
 
 const initialState = () => ({
   entities: {},
@@ -29,6 +34,12 @@ export const mutations = {
   [ADD_MESSAGE](state, { message }) {
     state.entities = { ...state.entities, [message.id]: message }
     state.ids.push(message.id)
+  },
+
+  [REMOVE_MESSAGE](state, { messageId }) {
+    delete state.entities[messageId]
+    const index = state.ids.findIndex(id => id === messageId)
+    if (index !== -1) state.ids.splice(index, 1)
   }
 }
 
@@ -49,5 +60,11 @@ export const actions = {
     console.log('message/add', message)
 
     commit(ADD_MESSAGE, { message })
+  },
+
+  remove({ commit }, messageId) {
+    console.log('message/remove', messageId)
+
+    commit(REMOVE_MESSAGE, { messageId })
   }
 }

@@ -28,7 +28,11 @@
 
             <BaseButton @click="cancelDialog"> CANCEL </BaseButton>
 
-            <BaseButton :disabled="confirmLoading" @click="confirmDialog">
+            <BaseButton
+              :disabled="confirmLoading"
+              type="primary"
+              @click="confirmDialog"
+            >
               <BaseSpinner v-if="confirmLoading" />
               OK
             </BaseButton>

@@ -1,5 +1,5 @@
 <template>
-  <BaseEmpty v-if="!battles.length > 0" />
+  <BaseEmpty v-if="!battles.length > 0" text="NO BATTLES" />
 
   <BaseList v-else class="battle-list">
     <BattleListItem

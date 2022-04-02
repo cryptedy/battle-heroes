@@ -42,7 +42,6 @@ export default {
 
   data() {
     return {
-      unsubscribeMessage: null,
       messageFormShown: false,
       newMessage: '',
       hasVerticalScrollbar: false
@@ -78,7 +77,7 @@ export default {
 
   mounted() {
     // eslint-disable-next-line no-unused-vars
-    this.unsubscribeMessage = store.subscribe((mutation, state) => {
+    this.unsubscribeNewMessage = store.subscribe((mutation, state) => {
       if (mutation.type === `message/${ADD_MESSAGE}`) {
         this.$nextTick(() => {
           this.scrollToBottom()
@@ -106,10 +105,7 @@ export default {
   },
 
   beforeUnmount() {
-    if (this.unsubscribeMessage) {
-      this.unsubscribeMessage()
-      this.unsubscribeMessage = null
-    }
+    this.unsubscribeNewMessage()
   },
 
   methods: {

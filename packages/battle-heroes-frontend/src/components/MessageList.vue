@@ -1,5 +1,5 @@
 <template>
-  <BaseEmpty v-if="!messages.length > 0" />
+  <BaseEmpty v-if="!messages.length > 0" text="NO MESSAGES" />
 
   <BaseList v-else class="message-list">
     <MessageListItem

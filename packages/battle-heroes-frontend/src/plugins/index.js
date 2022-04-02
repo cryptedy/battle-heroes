@@ -1,4 +1,3 @@
-import i18nPlugin from './i18n'
 import { socket } from './socket'
 import dialogPlugin from './dialog'
 import socketPlugin from './socket'
@@ -10,7 +9,6 @@ import networkHandlerPlugin from './network-handler'
 export default {
   // eslint-disable-next-line no-unused-vars
   install(app, options) {
-    app.use(i18nPlugin)
     app.use(dialogPlugin)
     app.use(socketPlugin)
     app.use(moralisPlugin)

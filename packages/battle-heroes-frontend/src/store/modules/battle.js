@@ -1,4 +1,9 @@
-import { SET_BATTLES, DELETE_BATTLES, ADD_BATTLE } from '../mutation-types'
+import {
+  SET_BATTLES,
+  DELETE_BATTLES,
+  ADD_BATTLE,
+  REMOVE_BATTLE
+} from '../mutation-types'
 
 const initialState = () => ({
   entities: {},
@@ -31,6 +36,12 @@ export const mutations = {
   [ADD_BATTLE](state, { battle }) {
     state.entities = { ...state.entities, [battle.id]: battle }
     state.ids.push(battle.id)
+  },
+
+  [REMOVE_BATTLE](state, { battleId }) {
+    delete state.entities[battleId]
+    const index = state.ids.findIndex(id => id === battleId)
+    if (index !== -1) state.ids.splice(index, 1)
   }
 }
 
@@ -51,5 +62,11 @@ export const actions = {
     console.log('battle/add', battle)
 
     commit(ADD_BATTLE, { battle })
+  },
+
+  remove({ commit }, battleId) {
+    console.log('battle/remove', battleId)
+
+    commit(REMOVE_BATTLE, { battleId })
   }
 }

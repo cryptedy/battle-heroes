@@ -1,7 +1,7 @@
 <template>
   <div class="empty">
     <div class="empty-content">
-      <p class="empty-message">{{ message }}</p>
+      <p class="empty-text">{{ text }}</p>
     </div>
   </div>
 </template>
@@ -11,7 +11,7 @@ export default {
   name: 'BaseEmpty',
 
   props: {
-    message: {
+    text: {
       type: String,
       required: false,
       default: 'NO DATA'

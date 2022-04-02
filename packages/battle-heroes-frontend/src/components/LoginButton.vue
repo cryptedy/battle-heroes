@@ -2,6 +2,7 @@
   <BaseButton
     class="button login-button"
     :disabled="!isMetaMaskEnabled || loading"
+    type="primary"
     @click="loginWithMetaMask"
   >
     <template v-if="!isMetaMaskEnabled"> Please install MetaMask </template>

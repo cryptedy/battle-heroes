@@ -1,6 +1,7 @@
 const store = require('../store')
-const { add } = require('./slice').actions
+const { add, remove } = require('./slice').actions
 
 module.exports = {
-  addMessage: payload => store.dispatch(add(payload))
+  addMessage: payload => store.dispatch(add(payload)),
+  removeMessage: payload => store.dispatch(remove(payload))
 }

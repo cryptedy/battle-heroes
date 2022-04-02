@@ -5,8 +5,7 @@ const { selectPlayer } = require('../player/selectors')
 class Battle {
   #privateField = 'PRIVATE'
 
-  constructor(io, playerId, playerNFTId) {
-    console.log(io)
+  constructor(playerId, playerNFTId) {
     this.id = nanoid()
     this.turn = 1
 
@@ -17,7 +16,6 @@ class Battle {
 
     this.player = this.createPlayer(playerId, playerNFTId)
     this.opponent_player = this.createPlayer(null, null)
-    this.io = io
   }
 
   createPlayer(playerId, playerNFTId) {
@@ -47,16 +45,6 @@ class Battle {
   join(opponentPlayerId, NFTId) {
     this.opponent_player.id = opponentPlayerId
     this.opponent_player.NFT_id = NFTId
-
-    this.getPlayer().socket_ids.forEach(socketId => {
-      console.log(socketId)
-      this.io.to(socketId).emit('battle:matched', this)
-    })
-
-    this.getOpponentPlayer().socket_ids.forEach(socketId => {
-      console.log(socketId)
-      this.io.to(socketId).emit('battle:matched', this)
-    })
   }
 
   nextTurn() {
@@ -73,7 +61,7 @@ class Battle {
   }
 }
 
-const createBattle = (io, player, NFTId) => new Battle(io, player.id, NFTId)
+const createBattle = (playerId, NFTId) => new Battle(playerId, NFTId)
 
 module.exports = {
   createBattle

@@ -22,12 +22,15 @@ const corsOptions = {
 
 // DEBUG
 // const store = require('./store')
+// const { selectPlayers } = require('./player/selectors')
 // const { selectBattles } = require('./battle/selectors')
 // setInterval(() => {
 //   const state = store.getState()
 //   console.log(`Players ${state.player.ids.length}`)
-//   // console.log(`Battles ${state.battle.ids.length}`)
+//   console.log(`Battles ${state.battle.ids.length}`)
+//   console.log(selectPlayers())
 //   console.log(selectBattles())
+//   console.log(state.battle)
 // }, 5000)
 
 const main = async () => {

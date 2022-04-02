@@ -34,9 +34,8 @@
       }
       &-top,
       &-bottom {
-        max-width: calc(1024px - 32px);
         @include mediaQuery(md) {
-          max-width: calc(1024px - 48px);
+          max-width: 1024px;
         }
       }
       &-top {

@@ -9,22 +9,19 @@ module.exports = createSlice({
   name: 'battle',
   initialState,
   reducers: {
-    add: (state, action) => {
-      console.log('battle/add')
+    add: (state, { payload: battle }) => {
+      console.log('battle/add', battle)
 
-      state.entities[action.payload.id] = action.payload
-      state.ids.push(action.payload.id)
+      state.entities[battle.id] = battle
+      state.ids.push(battle.id)
     },
-    remove: (state, action) => {
-      console.log('battle/remove')
+    remove: (state, { payload: battleId }) => {
+      console.log('battle/remove', battleId)
 
-      delete state.entities[action.payload.id]
+      delete state.entities[battleId]
 
-      const index = state.ids.findIndex(id => id === action.payload.id)
-
-      if (index != -1) {
-        state.ids.splice(index, 1)
-      }
+      const index = state.ids.findIndex(id => id === battleId)
+      if (index !== -1) state.ids.splice(index, 1)
     }
   }
 })

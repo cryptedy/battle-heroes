@@ -1,5 +1,5 @@
 <template>
-  <button class="button" :disabled="disabled">
+  <button class="button" :class="`is-type-${type}`" :disabled="disabled">
     <slot />
   </button>
 </template>
@@ -9,6 +9,16 @@ export default {
   name: 'BaseButton',
 
   props: {
+    type: {
+      type: String,
+      required: false,
+      default: 'default',
+      validator: value =>
+        ['default', 'primary', 'warning', 'success', 'danger'].indexOf(
+          value
+        ) !== -1
+    },
+
     disabled: {
       type: Boolean,
       required: false,

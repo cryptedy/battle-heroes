@@ -36,6 +36,7 @@
 
       <BaseButton
         v-if="battle.player.id !== player.id"
+        type="primary"
         @click="requestBattle(battle)"
       >
         BATTLE!

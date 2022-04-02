@@ -9,17 +9,17 @@ module.exports = createSlice({
   name: 'NFT',
   initialState,
   reducers: {
-    set: (state, action) => {
-      console.log('NFT/set')
+    set: (state, { payload: NFTs }) => {
+      console.log('NFT/set', NFTs)
 
       const entities = {}
 
-      for (const NFT of action.payload) {
+      for (const NFT of NFTs) {
         entities[NFT.id] = NFT
       }
 
       state.entities = entities
-      state.ids = action.payload.map(NFT => NFT.id)
+      state.ids = NFTs.map(NFT => NFT.id)
     }
   }
 })

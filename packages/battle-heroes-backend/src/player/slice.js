@@ -9,48 +9,48 @@ module.exports = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    set: (state, action) => {
-      console.log('player/set', action)
+    set: (state, { payload: players }) => {
+      console.log('player/set', players)
 
       const entities = {}
 
-      const availableUsers = action.payload.filter(
-        user => user.address !== undefined
-      )
+      const availableUsers = players.filter(user => user.address !== undefined)
 
       for (const availableUser of availableUsers) {
         entities[availableUser.id] = availableUser
       }
 
       state.entities = entities
-      state.ids = action.payload.map(player => player.id)
+      state.ids = players.map(player => player.id)
     },
-    add: (state, action) => {
-      console.log('player/add', action)
+    add: (state, { payload: player }) => {
+      console.log('player/add', player)
 
-      state.entities[action.payload.id] = action.payload
-      state.ids.push(action.payload.id)
+      state.entities[player.id] = player
+      state.ids.push(player.id)
     },
-    updateState: (state, action) => {
-      console.log('player/updateState', action)
+    update: (state, { payload }) => {
+      console.log('player/update', payload)
 
-      state.entities[action.payload.player.id].state = action.payload.state
+      const { playerId, payload: newState } = payload
+
+      state.entities[playerId] = { ...state.entities[playerId], ...newState }
     },
-    addSocket: (state, action) => {
-      console.log('player/addSocket', action)
+    addSocket: (state, { payload }) => {
+      console.log('player/addSocket', payload)
 
-      const { player, socket } = action.payload
+      const { playerId, socketId } = payload
 
-      state.entities[player.id].socket_ids.push(socket.id)
+      state.entities[playerId].socket_ids.push(socketId)
     },
-    removeSocket: (state, action) => {
-      console.log('player/removeSocket', action)
+    removeSocket: (state, { payload }) => {
+      console.log('player/removeSocket', payload)
 
-      const { player, socket } = action.payload
+      const { playerId, socketId: removeSocketId } = payload
 
-      state.entities[player.id].socket_ids = state.entities[
-        player.id
-      ].socket_ids.filter(socketId => socketId !== socket.id)
+      state.entities[playerId].socket_ids = state.entities[
+        playerId
+      ].socket_ids.filter(socketId => socketId !== removeSocketId)
     }
   }
 })

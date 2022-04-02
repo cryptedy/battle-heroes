@@ -16,12 +16,16 @@
   <router-view v-else />
 
   <div id="teleport"></div>
+
+  <TheNotification />
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import RandomNFT from '@/components/RandomNFT'
 import SplashScreen from '@/components/SplashScreen'
+import { NOTIFICATION_TYPE } from '@/utils/constants'
+import TheNotification from '@/components/TheNotification'
 import { getScrollbarState, getScrollbarWidth } from '@/utils/helpers'
 
 const appTitle = process.env.VUE_APP_TITLE
@@ -31,7 +35,8 @@ export default {
 
   components: {
     RandomNFT,
-    SplashScreen
+    SplashScreen,
+    TheNotification
   },
 
   data() {
@@ -43,6 +48,7 @@ export default {
   computed: {
     ...mapGetters({
       isAppLoading: 'app/isLoading',
+      notifications: 'notification/all',
       isSocketConnected: 'socket/isConnected',
       isSocketReconnecting: 'socket/isReconnecting'
     })
@@ -56,6 +62,23 @@ export default {
 
   async mounted() {
     this.$socket.connect()
+
+    this.unwatchNetwork = this.$store.watch(
+      (state, getters) => getters['network/isOnline'],
+      (value, oldValue) => {
+        if (value) {
+          this.addNotification({
+            message: 'ONLINE!',
+            type: NOTIFICATION_TYPE.SUCCESS
+          })
+        } else if (oldValue) {
+          this.addNotification({
+            message: 'FOOLINE!',
+            type: NOTIFICATION_TYPE.ERROR
+          })
+        }
+      }
+    )
   },
 
   beforeUnmount() {
@@ -64,13 +87,16 @@ export default {
     window.removeEventListener('load', this.onWindowLoad)
     window.removeEventListener('resize', this.onWindowResize)
     window.removeEventListener('scroll', this.onWindowScroll)
+
+    this.unwatchNetwork()
   },
 
   methods: {
     ...mapActions({
+      setScrollbar: 'scrollbar/set',
       setWindowSize: 'window/setSize',
-      setWindowOffset: 'window/setOffset',
-      setScrollbar: 'scrollbar/set'
+      addNotification: 'notification/add',
+      setWindowOffset: 'window/setOffset'
     }),
 
     onWindowLoad() {

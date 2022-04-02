@@ -16,6 +16,7 @@
 
     <BaseButton
       v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
+      type="primary"
       @click="randomBattle"
     >
       RANDOM BATTLE
@@ -23,6 +24,7 @@
 
     <BaseButton
       v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
+      type="primary"
       @click="createBattle"
     >
       CREATE BATTLE
@@ -30,11 +32,15 @@
 
     <BaseButton
       v-if="playerBattle && player.state !== PLAYER_STATE.BATTLE"
+      type="danger"
       @click="deleteBattle"
     >
       DELETE BATTLE
     </BaseButton>
-    <BaseButton v-else-if="player.state === PLAYER_STATE.STANDBY">
+    <BaseButton
+      v-else-if="player.state === PLAYER_STATE.STANDBY"
+      type="primary"
+    >
       IDLE
     </BaseButton>
   </div>
@@ -96,7 +102,7 @@ export default {
     },
 
     deleteBattle() {
-      this.$socket.emit('battle:delete')
+      this.$socket.emit('battle:delete', this.playerBattle.id)
     }
   }
 }

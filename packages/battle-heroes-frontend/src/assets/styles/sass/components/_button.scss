@@ -1,14 +1,37 @@
 .button {
   height: 36px;
   padding: 0 16px;
+  border: 1px solid transparent;
   border-radius: 3px;
-  background-color: palette(blue, 500);
-  color: palette(grey, 0);
   cursor: pointer;
 
+  &.is-type {
+    &-default {
+      border-color: palette(grey, 500);
+      background-color: palette(gray, 0);
+      color: color(primary, dark);
+    }
+    &-primary {
+      background-color: palette(blue, 500);
+      color: color(primary, light);
+    }
+    &-warning {
+      background-color: palette(orange, 500);
+      color: color(primary, light);
+    }
+    &-success {
+      background-color: palette(green, 500);
+      color: color(primary, light);
+    }
+    &-danger {
+      background-color: palette(red, 500);
+      color: color(primary, light);
+    }
+  }
+
   &[disabled] {
-    background-color: palette(grey, 500);
-    color: palette(grey, 300);
+    background-color: color(inactive-icon, light);
+    color: color(disabled, light);
   }
 
   & + & {

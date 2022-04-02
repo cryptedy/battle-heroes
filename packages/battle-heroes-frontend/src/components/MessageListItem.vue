@@ -32,7 +32,9 @@
     </div>
 
     <div class="message-actions">
-      <BaseButton v-if="canDelete">DELETE</BaseButton>
+      <BaseButton v-if="canDelete" type="danger" @click="deleteMessage">
+        DELETE
+      </BaseButton>
     </div>
   </BaseListItem>
 </template>
@@ -69,6 +71,12 @@ export default {
 
     canDelete() {
       return this.player.id === this.messagePlayer.id
+    }
+  },
+
+  methods: {
+    deleteMessage() {
+      this.$socket.emit('message:delete', this.message.id)
     }
   }
 }
