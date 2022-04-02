@@ -154,8 +154,7 @@ const gameManager = (io, socket) => {
       if (battle) {
         battle.join(player.id, NFTId)
 
-        // TODO: update one
-        io.emit('battle:battles', selectBattles())
+        io.emit('battle:update', selectBattle(battle.id))
       }
     }
   }
@@ -202,9 +201,9 @@ const gameManager = (io, socket) => {
   socket.on('game:logout', onLogout)
 
   socket.on('battle:create', onCreateBattle)
+  socket.on('battle:delete', onDeleteBattle)
   socket.on('battle:request', onRequestBattle)
   socket.on('battle:random', onRandomBattle)
-  socket.on('battle:delete', onDeleteBattle)
 
   // socket.on('battle:move', onMoveBattle)
 

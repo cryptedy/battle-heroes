@@ -2,6 +2,7 @@ import {
   SET_BATTLES,
   DELETE_BATTLES,
   ADD_BATTLE,
+  UPDATE_BATTLE,
   REMOVE_BATTLE
 } from '../mutation-types'
 
@@ -38,6 +39,10 @@ export const mutations = {
     state.ids.push(battle.id)
   },
 
+  [UPDATE_BATTLE](state, { battle }) {
+    state.entities[battle.id] = battle
+  },
+
   [REMOVE_BATTLE](state, { battleId }) {
     delete state.entities[battleId]
     const index = state.ids.findIndex(id => id === battleId)
@@ -62,6 +67,12 @@ export const actions = {
     console.log('battle/add', battle)
 
     commit(ADD_BATTLE, { battle })
+  },
+
+  update({ commit }, battle) {
+    console.log('battle/update', battle)
+
+    commit(UPDATE_BATTLE, { battle })
   },
 
   remove({ commit }, battleId) {

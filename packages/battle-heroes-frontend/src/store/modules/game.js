@@ -77,6 +77,9 @@ export const actions = {
     socket.on('battle:battle', battle =>
       dispatch('battle/add', battle, { root: true })
     )
+    socket.on('battle:update', battle =>
+      dispatch('battle/update', battle, { root: true })
+    )
     socket.on('battle:delete', battleId =>
       dispatch('battle/remove', battleId, { root: true })
     )
@@ -99,6 +102,7 @@ export const actions = {
     socket.off('player:update')
     socket.off('battle:battles')
     socket.off('battle:battle')
+    socket.off('battle:update')
     socket.off('battle:delete')
     socket.off('message:messages')
     socket.off('message:message')
