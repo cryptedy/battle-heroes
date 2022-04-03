@@ -8,7 +8,6 @@ const createNotification = notification =>
       id: uuidv4(),
       message: '',
       type: NOTIFICATION_TYPE.INFORMATION,
-      dismissable: true,
       timeout: 6000
     },
     notification
@@ -45,7 +44,7 @@ export const actions = {
 
     commit(ADD_NOTIFICATION, { notification })
 
-    if (notification.dismissable) {
+    if (notification.timeout > 0) {
       setTimeout(() => {
         dispatch('remove', notification.id)
       }, notification.timeout)

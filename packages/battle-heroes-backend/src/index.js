@@ -34,11 +34,17 @@ const corsOptions = {
 // }, 5000)
 
 const main = async () => {
-  const NFTs = await getNFTs()
-  setNFTs(NFTs)
+  try {
+    const NFTs = await getNFTs()
+    setNFTs(NFTs)
 
-  const players = await getPlayers()
-  setPlayers(players)
+    const players = await getPlayers()
+    setPlayers(players)
+  } catch (error) {
+    console.log(error)
+
+    process.exit(1)
+  }
 
   const app = express()
   app.use(cors(corsOptions)).use(api)
@@ -49,13 +55,11 @@ const main = async () => {
     cors: corsOptions
   })
 
-  const onConnection = socket => {
+  io.on('connection', socket => {
     console.log('onConnection', socket.id)
 
     gameManager(io, socket)
-  }
-
-  io.on('connection', onConnection)
+  })
 
   server.listen(PORT, () => {
     console.log(`Listening on ${server.address().port}`)

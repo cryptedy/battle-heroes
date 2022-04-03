@@ -10,7 +10,7 @@ module.exports = createSlice({
   initialState,
   reducers: {
     set: (state, { payload: NFTs }) => {
-      console.log('NFT/set', NFTs)
+      console.log('NFT/set', NFTs.length)
 
       const entities = {}
 

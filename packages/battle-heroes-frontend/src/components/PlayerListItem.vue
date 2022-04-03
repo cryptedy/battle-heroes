@@ -30,14 +30,18 @@
         <ul class="player-content-list">
           <li class="player-content-list-item">
             <span class="player-content-list-item-text">
-              Lv {{ player.level }}
+              EXP {{ player.exp }}
             </span>
           </li>
           <li class="player-content-list-item">
-            <span class="player-content-list-item-text"> WIN 0 </span>
+            <span class="player-content-list-item-text">
+              WIN {{ player.win }}
+            </span>
           </li>
           <li class="player-content-list-item">
-            <span class="player-content-list-item-text"> LOSE 0 </span>
+            <span class="player-content-list-item-text">
+              LOSE {{ player.lose }}
+            </span>
           </li>
           <li class="player-content-list-item">
             <FontAwesomeIcon icon="layer-group" size="1x" />

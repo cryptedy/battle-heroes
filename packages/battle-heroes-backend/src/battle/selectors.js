@@ -8,10 +8,6 @@ const selectors = {
   selectBattle: createSelector(
     selectBattles,
     battles => battleId => battles.find(battle => battle.id === battleId)
-  ),
-  selectPlayerBattle: createSelector(
-    selectBattles,
-    battles => playerId => battles.find(battle => battle.player.id === playerId)
   )
 }
 
@@ -19,7 +15,5 @@ const getState = () => store.getState().battle
 
 module.exports = {
   selectBattles: () => selectors.selectBattles(getState()),
-  selectBattle: battleId => selectors.selectBattle(getState())(battleId),
-  selectPlayerBattle: playerId =>
-    selectors.selectPlayerBattle(getState())(playerId)
+  selectBattle: battleId => selectors.selectBattle(getState())(battleId)
 }

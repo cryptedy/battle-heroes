@@ -1,67 +1,29 @@
 const { nanoid } = require('@reduxjs/toolkit')
-const { selectNFT } = require('../NFT/selectors')
-const { selectPlayer } = require('../player/selectors')
 
-class Battle {
-  #privateField = 'PRIVATE'
+const createBattlePlayer = (playerId, playerNFTId) => {
+  const maxHealth = 100
+  const maxMana = 100
 
-  constructor(playerId, playerNFTId) {
-    this.id = nanoid()
-    this.turn = 1
-
-    // this.players = {
-    //   1: this.createPlayer(playerId, playerNFTId),
-    //   2: null
-    // }
-
-    this.player = this.createPlayer(playerId, playerNFTId)
-    this.opponent_player = this.createPlayer(null, null)
-  }
-
-  createPlayer(playerId, playerNFTId) {
-    const maxHealth = 100
-    const maxMana = 100
-
-    return {
-      id: playerId,
-      NFT_id: playerNFTId,
-      maxHealth: maxHealth,
-      health: maxHealth,
-      maxMana: maxMana,
-      mana: maxMana,
-      inventory: [],
-      actions: []
-    }
-  }
-
-  getPlayer() {
-    return selectPlayer(this.player.id)
-  }
-
-  getOpponentPlayer() {
-    return selectPlayer(this.opponent_player.id)
-  }
-
-  join(opponentPlayerId, NFTId) {
-    this.opponent_player.id = opponentPlayerId
-    this.opponent_player.NFT_id = NFTId
-  }
-
-  nextTurn() {
-    //
-  }
-
-  toJSON() {
-    return {
-      privateField: this.#privateField,
-      id: this.id,
-      player: this.player,
-      opponent_player: this.opponent_player
-    }
+  return {
+    id: playerId,
+    NFT_id: playerNFTId,
+    max_health: maxHealth,
+    health: maxHealth,
+    max_mana: maxMana,
+    mana: maxMana,
+    inventory: [],
+    actions: []
   }
 }
 
-const createBattle = (playerId, NFTId) => new Battle(playerId, NFTId)
+const createBattle = (playerId, NFTId) => {
+  return {
+    id: nanoid(),
+    turn: 1,
+    player: createBattlePlayer(playerId, NFTId),
+    opponent_player: createBattlePlayer(null, null)
+  }
+}
 
 module.exports = {
   createBattle

@@ -1,7 +1,7 @@
-const { getUsers } = require('../user')
-const { getUserProfile } = require('../user')
+const { updatePlayer } = require('./actions')
 const { getNFTIdsForAddress } = require('../NFT')
 const { PLAYER_STATE } = require('../utils/constants')
+const { getUsers, updateUser, getUserProfile } = require('../user')
 
 const getPlayers = async () => {
   const players = []
@@ -29,12 +29,30 @@ const createPlayer = async user => {
     address: user.address,
     socket_ids: [],
     nft_ids: NFTIds,
-    level: 1,
+    exp: user.exp,
+    win: user.win,
+    lose: user.lose,
     state: PLAYER_STATE.IDLE
   }
 }
 
+const updatePlayerStats = async (playerId, payload) => {
+  console.log('updatePlayerStats', playerId, payload)
+
+  const user = await updateUser(playerId, payload)
+
+  updatePlayer({
+    playerId,
+    payload: {
+      exp: user.exp,
+      win: user.win,
+      lose: user.lose
+    }
+  })
+}
+
 module.exports = {
   getPlayers,
-  createPlayer
+  createPlayer,
+  updatePlayerStats
 }

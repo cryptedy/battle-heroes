@@ -1,5 +1,6 @@
+const { findUser } = require('../user')
 const { createBattle } = require('../battle')
-const { createPlayer } = require('../player')
+const { createPlayer, updatePlayerStats } = require('../player')
 const { createMessage } = require('../message')
 const { addMessage, removeMessage } = require('../message/actions')
 const { PLAYER_STATE } = require('../utils/constants')
@@ -17,11 +18,7 @@ const {
   selectUserPlayer,
   selectSocketPlayer
 } = require('../player/selectors')
-const {
-  selectBattles,
-  selectBattle,
-  selectPlayerBattle
-} = require('../battle/selectors')
+const { selectBattles, selectBattle } = require('../battle/selectors')
 
 const gameManager = (io, socket) => {
   const PROCESS_LOGIN = 'PROCESS_LOGIN'
@@ -51,18 +48,46 @@ const gameManager = (io, socket) => {
     const player = selectUserPlayer(user.id)
 
     if (player) {
+      console.log('onLogin => player found')
       // TODO: update player tokenIds
 
       addPlayerSocket({ playerId: player.id, socketId: socket.id })
 
-      socket.broadcast.emit('player:update', selectPlayer(player.id))
+      try {
+        await updatePlayerStats(player.id, {
+          type: 'exp',
+          value: player.exp + 10
+        })
+        console.log('updatePlayerStats DONE!', selectPlayer(player.id))
+
+        socket.broadcast.emit('player:update', selectPlayer(player.id))
+      } catch (error) {
+        const { message, stack } = error
+
+        socket.emit('error', { message, stack })
+      }
     } else {
-      const newPlayer = await createPlayer(user)
+      console.log('onLogin => player not found, create new player')
 
-      addPlayer(newPlayer)
-      addPlayerSocket({ playerId: newPlayer.id, socketId: socket.id })
+      try {
+        const newUser = await findUser(user.id)
+        const newPlayer = await createPlayer(newUser)
 
-      socket.broadcast.emit('player:player', selectPlayer(newPlayer.id))
+        addPlayer(newPlayer)
+        addPlayerSocket({ playerId: newPlayer.id, socketId: socket.id })
+
+        await updatePlayerStats(newPlayer.id, {
+          type: 'exp',
+          value: newPlayer.exp + 10
+        })
+        console.log('updatePlayerStats DONE!', selectPlayer(newPlayer.id))
+
+        socket.broadcast.emit('player:player', selectPlayer(newPlayer.id))
+      } catch (error) {
+        const { message, stack } = error
+
+        socket.emit('error', { message, stack })
+      }
     }
 
     const players = selectPlayers()
@@ -95,7 +120,7 @@ const gameManager = (io, socket) => {
     }
   }
 
-  const onCreateBattle = NFTId => {
+  const onCreateBattle = async NFTId => {
     console.log('onCreateBattle', socket.id, NFTId)
 
     const player = selectSocketPlayer(socket.id)
@@ -152,7 +177,7 @@ const gameManager = (io, socket) => {
       const battle = selectBattle(battleId)
 
       if (battle) {
-        battle.join(player.id, NFTId)
+        // TODO: join battle
 
         io.emit('battle:update', selectBattle(battle.id))
       }

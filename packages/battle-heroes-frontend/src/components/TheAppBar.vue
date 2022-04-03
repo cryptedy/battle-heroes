@@ -89,13 +89,19 @@
     <div class="app-bar-item app-bar-content">
       <ul class="app-bar-content-list">
         <li class="app-bar-content-list-item">
-          <span class="app-bar-content-list-item-text">Lv 1</span>
+          <span class="app-bar-content-list-item-text">
+            EXP {{ player.exp }}
+          </span>
         </li>
         <li class="app-bar-content-list-item">
-          <span class="app-bar-content-list-item-text">WIN 0</span>
+          <span class="app-bar-content-list-item-text">
+            WIN {{ player.win }}
+          </span>
         </li>
         <li class="app-bar-content-list-item">
-          <span class="app-bar-content-list-item-text">LOSE 0</span>
+          <span class="app-bar-content-list-item-text">
+            LOSE {{ player.lose }}
+          </span>
         </li>
         <li class="app-bar-content-list-item">
           <FontAwesomeIcon icon="layer-group" />
