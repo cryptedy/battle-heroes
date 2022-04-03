@@ -22,7 +22,7 @@
         </BaseDrawer>
 
         <span class="player-devices">
-          {{ player.socket_ids.length }} devices
+          {{ player.socket_ids.length }}
         </span>
       </div>
 
