@@ -6,7 +6,7 @@
           <PlayerAvatar :player="player" />
         </template>
         <PlayerDetail :player="player" />
-        <PlayerNFTList :player="player" />
+        <NFTList :player="player" />
       </BaseDrawer>
     </div>
 
@@ -21,7 +21,7 @@
           </template>
 
           <PlayerDetail :player="player" />
-          <PlayerNFTList :player="player" />
+          <NFTList :player="player" />
         </BaseDrawer>
 
         <span class="player-devices">
@@ -43,7 +43,7 @@ import PlayerState from '@/components/PlayerState'
 import PlayerStats from '@/components/PlayerStats'
 import PlayerAvatar from '@/components/PlayerAvatar'
 import PlayerDetail from '@/components/PlayerDetail'
-import PlayerNFTList from '@/components/PlayerNFTList'
+import NFTList from '@/components/NFTList'
 
 export default {
   name: 'PlayerListItem',
@@ -53,7 +53,7 @@ export default {
     PlayerStats,
     PlayerAvatar,
     PlayerDetail,
-    PlayerNFTList
+    NFTList
   },
 
   props: {

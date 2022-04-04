@@ -56,7 +56,7 @@ const gameManager = (io, socket) => {
       try {
         await updatePlayerStats(player.id, {
           type: 'exp',
-          value: player.exp + 10
+          value: player.exp + 1
         })
         console.log('updatePlayerStats DONE!', selectPlayer(player.id))
 
@@ -78,7 +78,7 @@ const gameManager = (io, socket) => {
 
         await updatePlayerStats(newPlayer.id, {
           type: 'exp',
-          value: newPlayer.exp + 10
+          value: newPlayer.exp + 1
         })
         console.log('updatePlayerStats DONE!', selectPlayer(newPlayer.id))
 

@@ -3,9 +3,6 @@
   padding-bottom: 4px;
 
   &-item {
-    border-bottom: 1px solid color(divider, dark);
-    &:last-child {
-      border-bottom: none;
-    }
+    //
   }
 }

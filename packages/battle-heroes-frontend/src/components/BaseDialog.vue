@@ -17,15 +17,21 @@
 
       <transition name="dialog-content">
         <div v-if="dialogContentShown" class="dialog-content">
-          <header>
-            <template v-if="$slots.trigger || programmatic">
-              <BaseButton @click="closeDialog">CLOSE</BaseButton>
-            </template>
+          <header class="dialog-header">
+            <h1 class="dialog-header-title">
+              {{ title }}
+            </h1>
+
+            <div class="dialog-header-actions">
+              <FontAwesomeIcon icon="xmark" @click="closeDialog" />
+            </div>
           </header>
 
-          <template v-if="programmatic">
-            DATA
+          <main class="drawer-body">
+            <slot />
+          </main>
 
+          <footer v-if="programmatic" class="drawer-footer">
             <BaseButton @click="cancelDialog"> CANCEL </BaseButton>
 
             <BaseButton
@@ -36,9 +42,7 @@
               <BaseSpinner v-if="confirmLoading" />
               OK
             </BaseButton>
-          </template>
-
-          <slot v-else />
+          </footer>
         </div>
       </transition>
     </div>
@@ -54,6 +58,23 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+
+    title: {
+      type: String,
+      required: true
+    },
+
+    width: {
+      type: String,
+      required: false,
+      default: '100%'
+    },
+
+    height: {
+      type: String,
+      required: false,
+      default: '100%'
     },
 
     programmatic: {
@@ -105,6 +126,13 @@ export default {
   computed: {
     attempting() {
       return this.attemptingToOpen || this.attemptingToClose
+    },
+
+    drawerContentStyleObject() {
+      return {
+        width: this.width,
+        height: this.height
+      }
     }
   },
 

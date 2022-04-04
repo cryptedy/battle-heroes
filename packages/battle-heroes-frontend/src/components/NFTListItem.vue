@@ -1,12 +1,12 @@
 <template>
-  <BaseListItem class="player-nft-list-item">
+  <BaseListItem class="nft-list-item">
     <BaseNFT :nft="nft" />
   </BaseListItem>
 </template>
 
 <script>
 export default {
-  name: 'PlayerNFTListItem',
+  name: 'NFTListItem',
 
   props: {
     nft: {

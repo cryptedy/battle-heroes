@@ -1,35 +1,33 @@
 <template>
   <BaseListItem class="battle-list-item">
-    <div class="battle-content">
-      <div class="battle-content-primary">
+    <div class="battle-list-item-primary">
+      <img
+        :src="findNFT(battle.player.NFT_id).image_url"
+        :alt="findNFT(battle.player.NFT_id).name"
+        width="512"
+        height="512"
+      />
+      {{ findNFT(battle.player.NFT_id).name }}
+      -
+      {{ findPlayer(battle.player.id).name }}
+    </div>
+
+    <div class="battle-list-item-secondary">
+      <template v-if="battle.opponent_player.id">
+        VS
         <img
-          :src="findNFT(battle.player.NFT_id).image_url"
-          :alt="findNFT(battle.player.NFT_id).name"
+          :src="findNFT(battle.opponent_player.NFT_id).image_url"
+          :alt="findNFT(battle.opponent_player.NFT_id).name"
           width="512"
           height="512"
         />
-        {{ findNFT(battle.player.NFT_id).name }}
+        {{ findNFT(battle.opponent_player.NFT_id).name }}
         -
-        {{ findPlayer(battle.player.id).name }}
-      </div>
-
-      <div class="battle-content-secondary">
-        <template v-if="battle.opponent_player.id">
-          VS
-          <img
-            :src="findNFT(battle.opponent_player.NFT_id).image_url"
-            :alt="findNFT(battle.opponent_player.NFT_id).name"
-            width="512"
-            height="512"
-          />
-          {{ findNFT(battle.opponent_player.NFT_id).name }}
-          -
-          {{ findPlayer(battle.opponent_player.id).name }}
-        </template>
-      </div>
+        {{ findPlayer(battle.opponent_player.id).name }}
+      </template>
     </div>
 
-    <div class="player-actions">
+    <div class="battle-list-item-actions">
       <BaseDialog :open="dialogShown" @close="onCloseDialog">
         <SelectNFTs :player="player" @select="onSelectNFT" />
       </BaseDialog>

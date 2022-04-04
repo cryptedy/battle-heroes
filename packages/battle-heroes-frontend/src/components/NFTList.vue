@@ -1,8 +1,8 @@
 <template>
   <BaseEmpty v-if="!playerNFTs.length > 0" text="NO NFTs" />
 
-  <BaseList v-else class="player-nft-list">
-    <PlayerNFTListItem
+  <BaseList v-else class="nft-list">
+    <NFTListItem
       v-for="playerNFT in playerNFTs"
       :key="playerNFT.id"
       :nft="playerNFT"
@@ -12,13 +12,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import PlayerNFTListItem from '@/components/PlayerNFTListItem'
+import NFTListItem from '@/components/NFTListItem'
 
 export default {
-  name: 'PlayerNFTList',
+  name: 'NFTList',
 
   components: {
-    PlayerNFTListItem
+    NFTListItem
   },
 
   props: {

@@ -6,7 +6,7 @@
           <PlayerAvatar :player="messagePlayer" />
         </template>
         <PlayerDetail :player="messagePlayer" />
-        <PlayerNFTList :player="messagePlayer" />
+        <NFTList :player="messagePlayer" />
       </BaseDrawer>
     </div>
 
@@ -22,7 +22,7 @@
             </template>
 
             <PlayerDetail :player="messagePlayer" />
-            <PlayerNFTList :player="messagePlayer" />
+            <NFTList :player="messagePlayer" />
           </BaseDrawer>
         </div>
 
@@ -48,7 +48,7 @@
 import { mapGetters } from 'vuex'
 import PlayerAvatar from '@/components/PlayerAvatar'
 import PlayerDetail from '@/components/PlayerDetail'
-import PlayerNFTList from '@/components/PlayerNFTList'
+import NFTList from '@/components/NFTList'
 
 export default {
   name: 'MessageListItem',
@@ -56,7 +56,7 @@ export default {
   components: {
     PlayerAvatar,
     PlayerDetail,
-    PlayerNFTList
+    NFTList
   },
 
   props: {

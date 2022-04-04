@@ -117,7 +117,7 @@
             style="margin-left: 16px; width: 32px; height: 32px"
           >
             <img
-              style="width: 100%; height: auto"
+              style="width: 100%; height: auto; border-radius: 2px"
               :src="findNFT(playerBattle.player.NFT_id).image_url"
               :alt="findNFT(playerBattle.player.NFT_id).name"
               width="512"

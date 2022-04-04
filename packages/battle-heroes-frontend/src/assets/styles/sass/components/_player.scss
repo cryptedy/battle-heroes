@@ -74,8 +74,8 @@
       gap: 4px;
     }
 
-    & + .player-nft-list {
-      margin-top: 24px;
+    & + .nft-list {
+      margin-top: 16px;
     }
   }
 
@@ -83,6 +83,10 @@
     &-item {
       display: flex;
       gap: 16px;
+      border-bottom: 1px solid color(divider, light);
+      &:last-child {
+        border-bottom: none;
+      }
       padding-top: 12px;
       padding-right: 16px;
       padding-bottom: 12px;
@@ -118,29 +122,6 @@
 
     .player-stats-list {
       gap: 8px;
-    }
-  }
-
-  &-nft-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-
-    @include mediaQuery(sm) {
-      grid-template-columns: repeat(4, 1fr);
-    }
-    @include mediaQuery(md) {
-      grid-template-columns: repeat(5, 1fr);
-    }
-    @include mediaQuery(lg) {
-      grid-template-columns: repeat(6, 1fr);
-    }
-
-    &-item {
-      .nft-image {
-        width: 100%;
-        height: auto;
-      }
     }
   }
 }

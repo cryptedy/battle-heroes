@@ -4,12 +4,27 @@
   }
 
   &-meta {
-    margin-bottom: 4px;
     color: color(secondary, dark);
-    font-size: 12px;
+  }
 
-    .nft-rarity {
-      color: palette(yellow, 800);
+  &-rarity {
+    color: palette(yellow, 800);
+  }
+
+  &-attribute {
+    display: flex;
+    flex-wrap: wrap;
+
+    &-list {
+
+    }
+
+    &-type {
+      flex-grow: 1;
+    }
+
+    &-value {
+    //
     }
   }
 
@@ -18,6 +33,29 @@
       width: 100%;
       height: auto;
       border-radius: 2px;
+    }
+  }
+
+  &-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+
+    @include mediaQuery(sm) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @include mediaQuery(md) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @include mediaQuery(lg) {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    &-item {
+      .nft-image {
+        width: 100%;
+        height: auto;
+      }
     }
   }
 }

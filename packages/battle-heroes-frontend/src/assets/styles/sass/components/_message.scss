@@ -51,6 +51,10 @@
     &-item {
       display: flex;
       gap: 16px;
+      border-bottom: 1px solid color(divider, light);
+      &:last-child {
+        border-bottom: none;
+      }
       padding-top: 12px;
       padding-right: 16px;
       padding-bottom: 12px;

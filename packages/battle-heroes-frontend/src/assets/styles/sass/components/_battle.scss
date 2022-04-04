@@ -74,80 +74,21 @@
         padding-right: 0;
         padding-left: 0;
       }
-    }
-  }
 
-  &-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-
-    &-primary {
-      //
-    }
-
-    &-scondary {
-      //
-    }
-
-    &-list {
-      display: flex;
-      gap: 8px;
-
-      &-item {
-        #{$font-awesome-icon-class} {
-          margin-right: 6px;
-        }
-
-        &-text {
-          //
+      &-primary {
+        img {
+          width: 100%;
+          height: auto;
         }
       }
-    }
-  }
 
-  &-actions {
-    display: flex;
-    align-items: center;
-  }
+      &-secondary {
+        flex-grow: 1;
+      }
 
-  &-avatar {
-    width: 42px;
-    height: 42px;
-
-    > img {
-      object-fit: cover;
-      border-radius: 50%;
-    }
-  }
-
-  &-name {
-    font-weight: bold;
-
-    &.is-online {
-      color: palette(green, 500);
-    }
-  }
-
-  &-devices {
-    margin-left: 8px;
-    color: color(secondary, light)
-  }
-
-  &-state {
-    padding: 6px 12px;
-    min-width: 80px;
-    border-radius: 3px;
-    text-align: center;
-    color: palette(gray, 0);
-
-    &.is-idle {
-      background-color: palette(gray, 500);
-    }
-
-    &.is-standby {
-      background-color: palette(green, 500);
+      &-actions {
+        //
+      }
     }
   }
 }
