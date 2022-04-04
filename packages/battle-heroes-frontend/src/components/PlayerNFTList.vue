@@ -1,25 +1,25 @@
 <template>
   <BaseEmpty v-if="!playerNFTs.length > 0" text="NO NFTs" />
 
-  <div v-else style="padding: 16px; text-align: center">
-    <img
+  <BaseList v-else class="player-nft-list">
+    <PlayerNFTListItem
       v-for="playerNFT in playerNFTs"
       :key="playerNFT.id"
-      style="cursor: pointer"
-      :src="playerNFT.image_url"
-      :alt="playerNFT.name"
-      width="512"
-      height="512"
-      @click="select(playerNFT)"
+      :nft="playerNFT"
     />
-  </div>
+  </BaseList>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import PlayerNFTListItem from '@/components/PlayerNFTListItem'
 
 export default {
-  name: 'SelectNFTs',
+  name: 'PlayerNFTList',
+
+  components: {
+    PlayerNFTListItem
+  },
 
   props: {
     player: {
@@ -28,8 +28,6 @@ export default {
     }
   },
 
-  emits: ['select'],
-
   computed: {
     ...mapGetters({
       NFTsByPlayer: 'NFT/byPlayer'
@@ -37,12 +35,6 @@ export default {
 
     playerNFTs() {
       return this.NFTsByPlayer(this.player)
-    }
-  },
-
-  methods: {
-    select(NFT) {
-      this.$emit('select', NFT)
     }
   }
 }

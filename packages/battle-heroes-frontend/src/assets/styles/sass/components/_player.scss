@@ -1,68 +1,15 @@
 .player {
-  &-list {
-    &-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding-top: 12px;
-      padding-right: 16px;
-      padding-bottom: 12px;
-      padding-left: 16px;
-      @include mediaQuery(md) {
-        padding-right: 0;
-        padding-left: 0;
-      }
-    }
-  }
-
-  &-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-
-    &-primary {
-      //
-    }
-
-    &-scondary {
-      //
-    }
-
-    &-list {
-      display: flex;
-      gap: 8px;
-
-      &-item {
-        #{$font-awesome-icon-class} {
-          margin-right: 6px;
-        }
-
-        &-text {
-          //
-        }
-      }
-    }
-  }
-
-  &-actions {
-    display: flex;
-    align-items: center;
-  }
-
   &-avatar {
-    width: 42px;
-    height: 42px;
-
     > img {
       object-fit: cover;
       border-radius: 50%;
+      width: 100%;
+      height: auto;
     }
   }
 
   &-name {
     font-weight: bold;
-
     color: color(disabled, light);
 
     &.is-online {
@@ -70,9 +17,14 @@
     }
   }
 
-  &-devices {
-    margin-left: 8px;
-    color: color(secondary, light)
+  &-stats {
+    &-list {
+      display: flex;
+
+      #{$font-awesome-icon-class} {
+        margin-right: 4px;
+      }
+    }
   }
 
   &-state {
@@ -88,6 +40,107 @@
 
     &.is-standby {
       background-color: palette(green, 500);
+    }
+  }
+
+  &-detail {
+    display: flex;
+    gap: 20px;
+
+    &-primary {
+      //
+    }
+
+    &-secondary {
+      flex-grow: 1;
+    }
+
+    &-nfts {
+
+    }
+
+    .player-avatar {
+        width: 128px;
+        height: 128px;
+    }
+
+    .player-name {
+      font-size: 23px;
+      margin-bottom: 4px;
+    }
+
+    .player-stats-list {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    & + .player-nft-list {
+      margin-top: 24px;
+    }
+  }
+
+  &-list {
+    &-item {
+      display: flex;
+      gap: 16px;
+      padding-top: 12px;
+      padding-right: 16px;
+      padding-bottom: 12px;
+      padding-left: 16px;
+      @include mediaQuery(md) {
+        padding-right: 0;
+        padding-left: 0;
+      }
+
+      &-primary {
+        //
+      }
+
+      &-secondary {
+        flex-grow: 1;
+      }
+
+      &-actions {
+        //
+      }
+    }
+
+    .player-avatar {
+      width: 42px;
+      height: 42px;
+    }
+
+    .player-devices {
+      margin-left: 8px;
+      color: color(secondary, light);
+      font-size: 12px;
+    }
+
+    .player-stats-list {
+      gap: 8px;
+    }
+  }
+
+  &-nft-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+
+    @include mediaQuery(sm) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @include mediaQuery(md) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @include mediaQuery(lg) {
+      grid-template-columns: repeat(6, 1fr);
+    }
+
+    &-item {
+      .nft-image {
+        width: 100%;
+        height: auto;
+      }
     }
   }
 }

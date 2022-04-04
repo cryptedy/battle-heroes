@@ -18,7 +18,9 @@
           :style="drawerContentStyleObject"
         >
           <header class="drawer-header">
-            <h1 class="drawer-header-title">Title</h1>
+            <h1 class="drawer-header-title">
+              {{ title }}
+            </h1>
 
             <div class="drawer-header-actions">
               <FontAwesomeIcon icon="xmark" @click="closeDrawer" />
@@ -51,6 +53,11 @@ export default {
       default: 'left',
       validator: value =>
         ['top', 'right', 'left', 'bottom'].indexOf(value) !== -1
+    },
+
+    title: {
+      type: String,
+      required: true
     },
 
     width: {

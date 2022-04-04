@@ -1,24 +1,27 @@
 <template>
   <BaseListItem class="player-list-item">
-    <BaseDrawer direction="bottom">
-      <template #trigger>
-        <PlayerAvatar :player="player" />
-      </template>
-      <PlayerNFTs :player="player" />
-    </BaseDrawer>
+    <div class="player-list-item-primary">
+      <BaseDrawer direction="bottom" :title="player.name">
+        <template #trigger>
+          <PlayerAvatar :player="player" />
+        </template>
+        <PlayerDetail :player="player" />
+        <PlayerNFTList :player="player" />
+      </BaseDrawer>
+    </div>
 
-    <div class="player-content">
-      <div class="player-content-primary">
-        <BaseDrawer direction="bottom">
+    <div class="player-list-item-secondary">
+      <div
+        class="player-name"
+        :class="{ 'is-online': player.socket_ids.length > 0 }"
+      >
+        <BaseDrawer direction="bottom" :title="player.name">
           <template #trigger>
-            <span
-              class="player-name"
-              :class="{ 'is-online': player.socket_ids.length > 0 }"
-            >
-              {{ player.name }}
-            </span>
+            {{ player.name }}
           </template>
-          <PlayerNFTs :player="player" />
+
+          <PlayerDetail :player="player" />
+          <PlayerNFTList :player="player" />
         </BaseDrawer>
 
         <span class="player-devices">
@@ -26,51 +29,31 @@
         </span>
       </div>
 
-      <div class="player-content-secondary">
-        <ul class="player-content-list">
-          <li class="player-content-list-item">
-            <span class="player-content-list-item-text">
-              EXP {{ player.exp }}
-            </span>
-          </li>
-          <li class="player-content-list-item">
-            <span class="player-content-list-item-text">
-              WIN {{ player.win }}
-            </span>
-          </li>
-          <li class="player-content-list-item">
-            <span class="player-content-list-item-text">
-              LOSE {{ player.lose }}
-            </span>
-          </li>
-          <li class="player-content-list-item">
-            <FontAwesomeIcon icon="layer-group" size="1x" />
-            <span class="player-content-list-item-text">
-              {{ player.nft_ids.length }}
-            </span>
-          </li>
-        </ul>
-      </div>
+      <PlayerStats :player="player" />
     </div>
 
-    <div class="player-actions">
+    <div class="player-list-item-actions">
       <PlayerState :player="player" />
     </div>
   </BaseListItem>
 </template>
 
 <script>
-import PlayerNFTs from '@/components/PlayerNFTs'
 import PlayerState from '@/components/PlayerState'
+import PlayerStats from '@/components/PlayerStats'
 import PlayerAvatar from '@/components/PlayerAvatar'
+import PlayerDetail from '@/components/PlayerDetail'
+import PlayerNFTList from '@/components/PlayerNFTList'
 
 export default {
   name: 'PlayerListItem',
 
   components: {
-    PlayerNFTs,
     PlayerState,
-    PlayerAvatar
+    PlayerStats,
+    PlayerAvatar,
+    PlayerDetail,
+    PlayerNFTList
   },
 
   props: {

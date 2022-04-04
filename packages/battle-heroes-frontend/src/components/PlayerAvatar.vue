@@ -3,10 +3,10 @@
     <img
       v-if="!player.avatar_url"
       src="@/assets/images/blank-avatar.png"
-      :width="width"
-      :height="height"
+      width="100"
+      height="100"
     />
-    <img v-else :src="player.avatar_url" :width="width" :height="height" />
+    <img v-else :src="player.avatar_url" width="100" height="100" />
   </div>
 </template>
 
@@ -18,16 +18,6 @@ export default {
     player: {
       type: Object,
       required: true
-    },
-
-    width: {
-      type: Number,
-      default: 42
-    },
-
-    height: {
-      type: Number,
-      default: 42
     }
   }
 }

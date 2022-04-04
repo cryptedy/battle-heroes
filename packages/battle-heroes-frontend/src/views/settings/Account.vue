@@ -7,7 +7,7 @@
 
   <ul style="display: flex; flex-wrap: wrap; gap: 2px; justify-content: center">
     <li v-for="playerNFT in playerNFTs" :key="playerNFT.id">
-      <img :src="playerNFT.image_url" alt="" width="64" height="64" />
+      <img :src="playerNFT.image_url" alt="" width="512" height="512" />
     </li>
   </ul>
 </template>

@@ -1,0 +1,23 @@
+.nft {
+  &-name {
+    font-weight: bold;
+  }
+
+  &-meta {
+    margin-bottom: 4px;
+    color: color(secondary, dark);
+    font-size: 12px;
+
+    .nft-rarity {
+      color: palette(yellow, 800);
+    }
+  }
+
+  &-image {
+    > img {
+      width: 100%;
+      height: auto;
+      border-radius: 2px;
+    }
+  }
+}

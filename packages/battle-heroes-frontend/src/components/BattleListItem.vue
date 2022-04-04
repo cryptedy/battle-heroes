@@ -5,8 +5,8 @@
         <img
           :src="findNFT(battle.player.NFT_id).image_url"
           :alt="findNFT(battle.player.NFT_id).name"
-          width="64"
-          height="64"
+          width="512"
+          height="512"
         />
         {{ findNFT(battle.player.NFT_id).name }}
         -
@@ -19,8 +19,8 @@
           <img
             :src="findNFT(battle.opponent_player.NFT_id).image_url"
             :alt="findNFT(battle.opponent_player.NFT_id).name"
-            width="64"
-            height="64"
+            width="512"
+            height="512"
           />
           {{ findNFT(battle.opponent_player.NFT_id).name }}
           -

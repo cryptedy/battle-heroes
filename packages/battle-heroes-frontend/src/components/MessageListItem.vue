@@ -1,32 +1,37 @@
 <template>
   <BaseListItem class="message-list-item">
-    <BaseDrawer direction="bottom">
-      <template #trigger>
-        <PlayerAvatar :player="messagePlayer" />
-      </template>
-      <PlayerNFTs :player="messagePlayer" />
-    </BaseDrawer>
+    <div class="message-list-item-primary">
+      <BaseDrawer direction="bottom" :title="messagePlayer.name">
+        <template #trigger>
+          <PlayerAvatar :player="messagePlayer" />
+        </template>
+        <PlayerDetail :player="messagePlayer" />
+        <PlayerNFTList :player="messagePlayer" />
+      </BaseDrawer>
+    </div>
 
-    <div class="message-content">
-      <div class="player-content-primary">
-        <BaseDrawer direction="bottom">
-          <template #trigger>
-            <span
-              class="player-name"
-              :class="{ 'is-online': messagePlayer.socket_ids.length > 0 }"
-            >
+    <div class="message-list-item-secondary">
+      <div class="message-meta">
+        <div
+          class="player-name"
+          :class="{ 'is-online': messagePlayer.socket_ids.length > 0 }"
+        >
+          <BaseDrawer direction="bottom" :title="messagePlayer.name">
+            <template #trigger>
               {{ messagePlayer.name }}
-            </span>
-          </template>
-          <PlayerNFTs :player="messagePlayer" />
-        </BaseDrawer>
+            </template>
+
+            <PlayerDetail :player="messagePlayer" />
+            <PlayerNFTList :player="messagePlayer" />
+          </BaseDrawer>
+        </div>
 
         <span class="message-posted-at">
           {{ $filters.datetime(message.posted_at) }}
         </span>
       </div>
 
-      <div class="player-content-secondary">
+      <div class="message-text">
         {{ message.text }}
       </div>
     </div>
@@ -41,15 +46,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import PlayerNFTs from '@/components/PlayerNFTs'
 import PlayerAvatar from '@/components/PlayerAvatar'
+import PlayerDetail from '@/components/PlayerDetail'
+import PlayerNFTList from '@/components/PlayerNFTList'
 
 export default {
   name: 'MessageListItem',
 
   components: {
-    PlayerNFTs,
-    PlayerAvatar
+    PlayerAvatar,
+    PlayerDetail,
+    PlayerNFTList
   },
 
   props: {

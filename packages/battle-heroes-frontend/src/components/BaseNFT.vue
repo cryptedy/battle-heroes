@@ -1,52 +1,41 @@
 <template>
-  <img :src="nft.image_url" :alt="nft.name" width="64" height="64" />
+  <div class="nft">
+    <h1 class="nft-name">
+      {{ nft.name }}
+    </h1>
 
-  <p>
-    <span>★★★☆☆</span>
-  </p>
+    <div class="nft-meta">
+      <span class="nft-rarity">
+        <FontAwesomeIcon icon="star" />
+        <FontAwesomeIcon icon="star" />
+        <FontAwesomeIcon icon="star" />
+      </span>
 
-  <p>
-    <strong>{{ nft.name }}</strong>
-    -
-    <span style="color: red">Rank: #{{ nft.rank }}</span>
-    -
-    <span style="color: blue">Score: {{ nft.score }}</span>
-  </p>
+      {{ nft.rank }} - {{ nft.score }}
+    </div>
 
-  <ul>
-    <li>HP: {{ Math.floor(Math.random() * 255) }}</li>
-    <li>ATK: {{ Math.floor(Math.random() * 255) }}</li>
-    <li>DEF: {{ Math.floor(Math.random() * 255) }}</li>
-    <li>AGI: {{ Math.floor(Math.random() * 255) }}</li>
-    <li>TYPE: XXX</li>
-  </ul>
+    <div class="nft-image">
+      <img :src="nft.image_url" :alt="nft.name" width="512" height="512" />
+    </div>
 
-  <base-accordion :open="false">
-    <template #trigger="scopeProps">
-      <a style="color: blue; cursor: pointer">
-        <span v-if="scopeProps.open">▼</span>
-        <span v-else>▶</span>
-        Attributes
-      </a>
-    </template>
-
-    <ul>
-      <li v-for="attribute in nft.attributes" :key="attribute.trait_type">
-        <hr />
-        <p>
-          <strong>{{ attribute.trait_type }}</strong>
-          =>
-          <strong>{{ attribute.value }}</strong>
-        </p>
-        <p>
-          <span style="color: blue"> Score: +{{ attribute.score }} </span>
-          -
-          <span style="color: red"> {{ attribute.rarity }}% </span>
-          have this trait
-        </p>
-      </li>
-    </ul>
-  </base-accordion>
+    <!-- <div class="nft-attributes">
+      <ul>
+        <li v-for="attribute in nft.attributes" :key="attribute.trait_type">
+          <p>
+            <strong>{{ attribute.trait_type }}</strong>
+            =>
+            <strong>{{ attribute.value }}</strong>
+          </p>
+          <p>
+            <span style="color: blue"> Score: +{{ attribute.score }} </span>
+            -
+            <span style="color: red"> {{ attribute.rarity }}% </span>
+            have this trait
+          </p>
+        </li>
+      </ul>
+    </div> -->
+  </div>
 </template>
 
 <script>
