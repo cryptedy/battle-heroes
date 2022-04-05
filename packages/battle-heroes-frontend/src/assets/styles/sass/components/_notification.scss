@@ -66,8 +66,9 @@
         button {
           width: 32px;
           height: 32px;
-          &:hover {
-            color: palette(gray, 200);
+          color: color(inactive-icon, light);
+          &:hover, &:active {
+            color: color(active-icon, light);
           }
         }
       }

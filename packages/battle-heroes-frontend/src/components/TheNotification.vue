@@ -22,7 +22,7 @@
         </div>
         <div class="notification-list-item-actions">
           <button @click="removeNotification(notification.id)">
-            <FontAwesomeIcon icon="times" />
+            <FontAwesomeIcon icon="xmark" />
           </button>
         </div>
       </li>

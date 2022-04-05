@@ -69,8 +69,21 @@
       }
 
       &-secondary {
+        display: flex;
         flex-direction: column;
         flex-grow: 1;
+        gap: 2px;
+      }
+
+      &-actions {
+        button {
+          width: 32px;
+          height: 32px;
+          color: color(inactive-icon, light);
+          &:hover, &:active {
+            color: color(active-icon, light);
+          }
+        }
       }
 
       .player-avatar {

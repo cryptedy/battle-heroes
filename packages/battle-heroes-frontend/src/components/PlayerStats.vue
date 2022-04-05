@@ -13,7 +13,9 @@
         </span>
       </li>
       <li class="player-stats-list-item">
-        <FontAwesomeIcon icon="layer-group" size="1x" />
+        <span class="player-stats-list-item-icon">
+          <FontAwesomeIcon icon="layer-group" />
+        </span>
         <span class="player-stats-list-item-text">
           {{ player.nft_ids.length }}
         </span>

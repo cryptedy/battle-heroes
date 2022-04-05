@@ -1,5 +1,5 @@
 <template>
-  <BaseDrawer direction="bottom">
+  <BaseDrawer direction="bottom" :title="player.name">
     <template #trigger>
       <div
         class="player-state"

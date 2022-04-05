@@ -23,7 +23,9 @@
             </h1>
 
             <div class="dialog-header-actions">
-              <FontAwesomeIcon icon="xmark" @click="closeDialog" />
+              <button @click="closeDialog">
+                <FontAwesomeIcon icon="xmark" />
+              </button>
             </div>
           </header>
 

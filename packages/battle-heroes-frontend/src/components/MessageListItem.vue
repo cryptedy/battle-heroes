@@ -36,10 +36,10 @@
       </div>
     </div>
 
-    <div class="message-actions">
-      <BaseButton v-if="canDelete" type="danger" @click="deleteMessage">
-        DELETE
-      </BaseButton>
+    <div class="message-list-item-actions">
+      <button v-if="canDelete" @click="deleteMessage">
+        <FontAwesomeIcon icon="xmark" />
+      </button>
     </div>
   </BaseListItem>
 </template>

@@ -21,8 +21,13 @@
     &-list {
       display: flex;
 
-      #{$font-awesome-icon-class} {
-        margin-right: 4px;
+      &-item {
+        &-icon {
+          margin-right: 4px;
+        }
+        &-text {
+          //
+        }
       }
     }
   }
@@ -101,7 +106,10 @@
       }
 
       &-secondary {
+        display: flex;
+        flex-direction: column;
         flex-grow: 1;
+        gap: 2px;
       }
 
       &-actions {

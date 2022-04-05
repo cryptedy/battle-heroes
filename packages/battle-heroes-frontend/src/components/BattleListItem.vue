@@ -28,7 +28,11 @@
     </div>
 
     <div class="battle-list-item-actions">
-      <BaseDialog :open="dialogShown" @close="onCloseDialog">
+      <BaseDialog
+        :open="dialogShown"
+        title="Select NFTs"
+        @close="onCloseDialog"
+      >
         <SelectNFTs :player="player" @select="onSelectNFT" />
       </BaseDialog>
 

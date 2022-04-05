@@ -23,7 +23,9 @@
             </h1>
 
             <div class="drawer-header-actions">
-              <FontAwesomeIcon icon="xmark" @click="closeDrawer" />
+              <button @click="closeDrawer">
+                <FontAwesomeIcon icon="xmark" />
+              </button>
             </div>
           </header>
 

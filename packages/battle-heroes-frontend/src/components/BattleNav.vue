@@ -10,7 +10,7 @@
       />
     </div>
 
-    <BaseDialog :open="dialogShown" @close="onCloseDialog">
+    <BaseDialog :open="dialogShown" title="Select NFTs" @close="onCloseDialog">
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
@@ -47,8 +47,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { PLAYER_STATE } from '@/utils/constants'
+import { mapGetters, mapActions } from 'vuex'
+import { PLAYER_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 import SelectNFTs from '@/components/SelectNFTs'
 
 export default {
@@ -83,6 +83,10 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      addNotification: 'notification/add'
+    }),
+
     onCloseDialog() {
       this.dialogShown = false
     },
@@ -91,6 +95,11 @@ export default {
       this.dialogShown = false
 
       this.$socket.emit('battle:create', NFT.id)
+
+      this.addNotification({
+        message: 'Battle created!',
+        type: NOTIFICATION_TYPE.SUCCESS
+      })
     },
 
     randomBattle() {
@@ -103,6 +112,11 @@ export default {
 
     deleteBattle() {
       this.$socket.emit('battle:delete', this.playerBattle.id)
+
+      this.addNotification({
+        message: 'Battle deleted!',
+        type: NOTIFICATION_TYPE.SUCCESS
+      })
     }
   }
 }
