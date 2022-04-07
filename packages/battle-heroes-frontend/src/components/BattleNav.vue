@@ -1,10 +1,10 @@
 <template>
   <div class="battle-nav">
-    <div v-if="playerBattle" style="max-width: 64px">
+    <div v-if="battle" style="max-width: 64px">
       <img
         style="width: 100%; height: auto"
-        :src="findNFT(playerBattle.player.NFT_id).image_url"
-        :alt="findNFT(playerBattle.player.NFT_id).name"
+        :src="NFT.image_url"
+        :alt="NFT.name"
         width="512"
         height="512"
       />
@@ -15,7 +15,7 @@
     </BaseDialog>
 
     <BaseButton
-      v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
+      v-if="!battle && player.state === PLAYER_STATE.IDLE"
       type="primary"
       @click="randomBattle"
     >
@@ -23,7 +23,7 @@
     </BaseButton>
 
     <BaseButton
-      v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
+      v-if="!battle && player.state === PLAYER_STATE.IDLE"
       type="primary"
       @click="createBattle"
     >
@@ -31,7 +31,11 @@
     </BaseButton>
 
     <BaseButton
-      v-if="playerBattle && player.state !== PLAYER_STATE.BATTLE"
+      v-if="
+        battle &&
+        (battle.state === BATTLE_STATE.ENDED ||
+          player.state !== PLAYER_STATE.BATTLE)
+      "
       type="danger"
       @click="deleteBattle"
     >
@@ -48,7 +52,11 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { PLAYER_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
+import {
+  PLAYER_STATE,
+  BATTLE_STATE,
+  NOTIFICATION_TYPE
+} from '@/utils/constants'
 import SelectNFTs from '@/components/SelectNFTs'
 
 export default {
@@ -74,11 +82,19 @@ export default {
   computed: {
     ...mapGetters({
       findNFT: 'NFT/find',
-      playerBattle: 'game/battle'
+      battle: 'game/battle'
     }),
 
     PLAYER_STATE() {
       return PLAYER_STATE
+    },
+
+    BATTLE_STATE() {
+      return BATTLE_STATE
+    },
+
+    NFT() {
+      return this.findNFT(this.battle.NFTs[1].id)
     }
   },
 
@@ -111,7 +127,7 @@ export default {
     },
 
     deleteBattle() {
-      this.$socket.emit('battle:delete', this.playerBattle.id)
+      this.$socket.emit('battle:delete', this.battle.id)
 
       this.addNotification({
         message: 'Battle deleted!',

@@ -8,18 +8,18 @@
   color: color(primary);
   // z-index: z-index(menu);
 
+  &-trigger {
+    display: inline-block;
+    user-select: none;
+    cursor: pointer;
+  }
+
   &-content {
     background-color: palette(grey, 0);
     border: 1px solid palette(grey, 400);
     border-radius: 2px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
     white-space: normal;
-
-    &-trigger {
-      display: inline-block;
-      user-select: none;
-      cursor: pointer;
-    }
 
     &-enter-active {
       transition: all 200ms;

@@ -39,23 +39,22 @@
         </span>
 
         <p>RANK: {{ nft.rank }}</p>
-
         <p>SCORE: {{ nft.score }}</p>
       </div>
-    </div>
 
-    <ul class="nft-attribute-list">
-      <li
-        v-for="attribute in nft.attributes"
-        :key="attribute.trait_type"
-        class="nft-attribute-list-item"
-      >
-        <dl class="nft-attribute">
-          <dt class="nft-attribute-type">{{ attribute.trait_type }}</dt>
-          <dd class="nft-attribute-value">{{ attribute.value }}</dd>
-        </dl>
-      </li>
-    </ul>
+      <ul class="nft-attribute-list">
+        <li
+          v-for="attribute in nft.attributes"
+          :key="attribute.trait_type"
+          class="nft-attribute-list-item"
+        >
+          <dl class="nft-attribute">
+            <dt class="nft-attribute-type">{{ attribute.trait_type }}</dt>
+            <dd class="nft-attribute-value">{{ attribute.value }}</dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
   </BaseDialog>
 </template>
 

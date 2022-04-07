@@ -113,13 +113,13 @@
           <PlayerState :player="player" />
 
           <div
-            v-if="playerBattle"
+            v-if="battle"
             style="margin-left: 16px; width: 32px; height: 32px"
           >
             <img
               style="width: 100%; height: auto; border-radius: 2px"
-              :src="findNFT(playerBattle.player.NFT_id).image_url"
-              :alt="findNFT(playerBattle.player.NFT_id).name"
+              :src="NFT.image_url"
+              :alt="NFT.name"
               width="512"
               height="512"
             />
@@ -148,9 +148,13 @@ export default {
   computed: {
     ...mapGetters({
       findNFT: 'NFT/find',
-      player: 'game/player',
-      playerBattle: 'game/battle'
-    })
+      battle: 'game/battle',
+      player: 'game/player'
+    }),
+
+    NFT() {
+      return this.findNFT(this.battle.NFTs[1].id)
+    }
   }
 }
 </script>

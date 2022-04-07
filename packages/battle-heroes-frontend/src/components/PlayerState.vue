@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import BattleNav from '@/components/BattleNav'
 
 export default {
@@ -35,12 +34,6 @@ export default {
     return {
       dialogShown: false
     }
-  },
-
-  computed: {
-    ...mapGetters({
-      playerBattle: 'game/battle'
-    })
   }
 }
 </script>

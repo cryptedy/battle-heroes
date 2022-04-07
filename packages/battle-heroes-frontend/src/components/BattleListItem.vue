@@ -1,29 +1,21 @@
 <template>
   <BaseListItem class="battle-list-item">
     <div class="battle-list-item-primary">
-      <img
-        :src="findNFT(battle.player.NFT_id).image_url"
-        :alt="findNFT(battle.player.NFT_id).name"
-        width="512"
-        height="512"
-      />
-      {{ findNFT(battle.player.NFT_id).name }}
+      <img :src="NFT1.image_url" :alt="NFT1.name" width="512" height="512" />
+      {{ NFT1.name }}
       -
-      {{ findPlayer(battle.player.id).name }}
+      {{ player1.name }}
     </div>
 
     <div class="battle-list-item-secondary">
-      <template v-if="battle.opponent_player.id">
+      <template v-if="!player2"> NO PLAYER 2 </template>
+      <template v-else>
         VS
-        <img
-          :src="findNFT(battle.opponent_player.NFT_id).image_url"
-          :alt="findNFT(battle.opponent_player.NFT_id).name"
-          width="512"
-          height="512"
-        />
-        {{ findNFT(battle.opponent_player.NFT_id).name }}
+
+        <img :src="NFT2.image_url" :alt="NFT2.name" width="512" height="512" />
+        {{ NFT2.name }}
         -
-        {{ findPlayer(battle.opponent_player.id).name }}
+        {{ player2.name }}
       </template>
     </div>
 
@@ -37,7 +29,7 @@
       </BaseDialog>
 
       <BaseButton
-        v-if="battle.player.id !== player.id"
+        v-if="player1.id !== player.id"
         type="primary"
         @click="requestBattle(battle)"
       >
@@ -77,7 +69,23 @@ export default {
       findNFT: 'NFT/find',
       player: 'game/player',
       findPlayer: 'player/find'
-    })
+    }),
+
+    player1() {
+      return this.findPlayer(this.battle.players[1].id)
+    },
+
+    player2() {
+      return this.findPlayer(this.battle.players[2].id)
+    },
+
+    NFT1() {
+      return this.findNFT(this.battle.NFTs[1].id)
+    },
+
+    NFT2() {
+      return this.findNFT(this.battle.NFTs[1].id)
+    }
   },
 
   methods: {

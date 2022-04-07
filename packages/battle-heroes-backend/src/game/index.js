@@ -3,9 +3,20 @@ const { createBattle } = require('../battle')
 const { createPlayer, updatePlayerStats } = require('../player')
 const { createMessage } = require('../message')
 const { addMessage, removeMessage } = require('../message/actions')
-const { PLAYER_STATE } = require('../utils/constants')
+const {
+  PLAYER_STATE,
+  PLAYER_MOVE,
+  BATTLE_STATE
+} = require('../utils/constants')
 const { selectMessages } = require('../message/selectors')
-const { addBattle, removeBattle } = require('../battle/actions')
+const {
+  addBattle,
+  removeBattle,
+  updateBattle,
+  updateBattleStatus,
+  joinBattle,
+  changeTurn
+} = require('../battle/actions')
 const {
   addPlayer,
   updatePlayer,
@@ -18,11 +29,14 @@ const {
   selectUserPlayer,
   selectSocketPlayer
 } = require('../player/selectors')
-const { selectBattles, selectBattle } = require('../battle/selectors')
+const {
+  selectBattles,
+  selectBattle,
+  selectPlayerBattle
+} = require('../battle/selectors')
 
 const gameManager = (io, socket) => {
   const PROCESS_LOGIN = 'PROCESS_LOGIN'
-
   const PROCESS = {
     [PROCESS_LOGIN]: false
   }
@@ -48,7 +62,6 @@ const gameManager = (io, socket) => {
     const player = selectUserPlayer(user.id)
 
     if (player) {
-      console.log('onLogin => player found')
       // TODO: update player tokenIds
 
       addPlayerSocket({ playerId: player.id, socketId: socket.id })
@@ -67,8 +80,6 @@ const gameManager = (io, socket) => {
         socket.emit('error', { message, stack })
       }
     } else {
-      console.log('onLogin => player not found, create new player')
-
       try {
         const newUser = await findUser(user.id)
         const newPlayer = await createPlayer(newUser)
@@ -140,6 +151,7 @@ const gameManager = (io, socket) => {
       const battle = createBattle(player.id, NFTId)
 
       addBattle(battle)
+
       updatePlayer({
         playerId: player.id,
         payload: { state: PLAYER_STATE.STANDBY }
@@ -156,36 +168,112 @@ const gameManager = (io, socket) => {
     removeBattle(battleId)
     io.emit('battle:delete', battleId)
 
-    const player = selectSocketPlayer(socket.id)
+    const player1 = selectSocketPlayer(socket.id)
 
-    if (player) {
+    if (player1) {
       updatePlayer({
-        playerId: player.id,
+        playerId: player1.id,
         payload: { state: PLAYER_STATE.IDLE }
       })
 
-      io.emit('player:update', selectPlayer(player.id))
+      io.emit('player:update', selectPlayer(player1.id))
     }
   }
 
   const onRequestBattle = (battleId, NFTId) => {
-    console.log('onStartBattle', socket.id, battleId, NFTId)
+    console.log('onRequestBattle', socket.id, battleId, NFTId)
 
-    const player = selectSocketPlayer(socket.id)
+    const player2 = selectSocketPlayer(socket.id)
 
-    if (player) {
+    if (player2) {
       const battle = selectBattle(battleId)
 
       if (battle) {
-        // TODO: join battle
+        joinBattle({ battleId: battle.id, playerId: player2.id, NFTId })
 
-        io.emit('battle:update', selectBattle(battle.id))
+        const player1 = selectPlayer(battle.player1.id)
+
+        updatePlayer({
+          playerId: player1.id,
+          payload: { state: PLAYER_STATE.BATTLE }
+        })
+
+        updatePlayer({
+          playerId: player2.id,
+          payload: { state: PLAYER_STATE.BATTLE }
+        })
+
+        updateBattle({
+          battleId: battle.id,
+          payload: { state: BATTLE_STATE.STARTED }
+        })
+
+        io.emit('battle:matched', battleId)
+        io.emit('battle:update', selectBattle(battleId))
+        io.emit('player:update', selectPlayer(player1.id))
+        io.emit('player:update', selectPlayer(player2.id))
+      } else {
+        // TODO: emit error
       }
     }
   }
 
   const onRandomBattle = () => {
     console.log('onRandomBattle', socket.id)
+  }
+
+  const onPlayerMove = move => {
+    console.log('onPlayerMove', socket.id, move)
+
+    const player = selectSocketPlayer(socket.id)
+
+    if (player) {
+      const battle = selectPlayerBattle(player.id)
+
+      if (battle) {
+        const playerNumber = battle.players[1].id === player.id ? 1 : 2
+        const opponentNumber = playerNumber === 1 ? 2 : 1
+
+        if (move === PLAYER_MOVE.ATTACK) {
+          // const attack = battle.status[playerNumber].attack
+          // const defence = battle.status[opponentNumber].defence
+          const damage = 30
+          let hp = battle.status[opponentNumber].hp - damage
+
+          if (hp < 0) {
+            hp = 0
+          }
+
+          updateBattleStatus({
+            battleId: battle.id,
+            playerNumber: opponentNumber,
+            payload: { hp }
+          })
+
+          if (hp === 0) {
+            updatePlayer({
+              playerId: battle.players[playerNumber].id,
+              payload: { state: PLAYER_STATE.IDLE }
+            })
+
+            updatePlayer({
+              playerId: battle.players[opponentNumber].id,
+              payload: { state: PLAYER_STATE.IDLE }
+            })
+
+            updateBattle({
+              battleId: battle.id,
+              payload: { state: BATTLE_STATE.ENDED }
+            })
+          }
+
+          changeTurn(battle.id)
+
+          // TODO: emit to players
+          io.emit('battle:update', selectBattle(battle.id))
+        }
+      }
+    }
   }
 
   const onCreateMessage = text => {
@@ -224,17 +312,13 @@ const gameManager = (io, socket) => {
 
   socket.on('game:login', onLogin)
   socket.on('game:logout', onLogout)
-
   socket.on('battle:create', onCreateBattle)
   socket.on('battle:delete', onDeleteBattle)
   socket.on('battle:request', onRequestBattle)
   socket.on('battle:random', onRandomBattle)
-
-  // socket.on('battle:move', onMoveBattle)
-
+  socket.on('player:move', onPlayerMove)
   socket.on('message:create', onCreateMessage)
   socket.on('message:delete', onDeleteMessage)
-
   socket.on('disconnect', onDisconnect)
 }
 

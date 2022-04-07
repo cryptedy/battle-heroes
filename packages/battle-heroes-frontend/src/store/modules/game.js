@@ -11,10 +11,17 @@ export const getters = {
 
     return rootGetters['player/find'](rootGetters['auth/user'].id) || null
   },
-  battle: (state, getters, rootState, rootGetters) =>
-    rootGetters['battle/all'].find(
-      battle => battle.player.id === getters.player.id
-    ) || null
+  battle: (state, getters, rootState, rootGetters) => {
+    if (!getters.isLogin) return null
+
+    return (
+      rootGetters['battle/all'].find(
+        battle =>
+          battle.player1.id === getters.player.id ||
+          (battle.player2 && battle.player2.id === getters.player.id)
+      ) || null
+    )
+  }
 }
 
 export const actions = {

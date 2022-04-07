@@ -1,5 +1,8 @@
 .player {
   &-avatar {
+    width: 42px;
+    height: 42px;
+
     > img {
       object-fit: cover;
       border-radius: 50%;
@@ -65,8 +68,8 @@
     }
 
     .player-avatar {
-        width: 128px;
-        height: 128px;
+      width: 128px;
+      height: 128px;
     }
 
     .player-name {

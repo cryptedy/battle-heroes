@@ -1,9 +1,9 @@
 const moment = require('moment')
-const { nanoid } = require('@reduxjs/toolkit')
+const { v4: uuidv4 } = require('uuid')
 
 const createMessage = (text, player) => {
   return {
-    id: nanoid(),
+    id: uuidv4(),
     player_id: player.id,
     text,
     posted_at: moment().unix()

@@ -21,10 +21,23 @@ const METADATA_URL = `${STATIC_RESOURCE_URL}/metadata`
 const IMAGE_URL = `${STATIC_RESOURCE_URL}/images`
 
 const PLAYER_STATE = Object.freeze({
-  IDLE: 1,
-  STANDBY: 2,
-  BATTLE: 3
+  IDLE: 'IDLE',
+  STANDBY: 'STANDBY',
+  BATTLE: 'BATTLE'
 })
+
+const PLAYER_MOVE = Object.freeze({
+  ATTACK: 'ATTACK',
+  SPELL: 'SPELL',
+  DEFENCE: 'DEFENCE',
+  RUN: 'RUN'
+})
+
+const BATTLE_STATE = {
+  CREATED: 'CREATED',
+  STARTED: 'STARTED',
+  ENDED: 'ENDED'
+}
 
 module.exports = Object.freeze({
   COLLECTION_ID,
@@ -32,5 +45,7 @@ module.exports = Object.freeze({
   STATIC_RESOURCE_URL,
   METADATA_URL,
   IMAGE_URL,
-  PLAYER_STATE
+  PLAYER_STATE,
+  PLAYER_MOVE,
+  BATTLE_STATE
 })

@@ -43,8 +43,8 @@ export default {
   },
 
   mounted() {
-    this.$socket.on('battle:matched', battle => {
-      console.log('battle:matched', battle)
+    this.$socket.on('battle:matched', battleId => {
+      console.log('battle:matched', battleId)
 
       // TODO: user confirmation
       // this.$dialog.open({})
@@ -53,7 +53,7 @@ export default {
         {
           name: 'battle',
           params: {
-            battleId: battle.id
+            battleId: battleId
           }
         },
         () => {}
