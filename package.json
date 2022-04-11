@@ -21,7 +21,7 @@
   "dependencies": {
     "axios": "^0.26.0",
     "moment": "^2.29.1",
-    "moralis": "^1.5.8",
+    "moralis": "^1.5.9",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 const { updatePlayer } = require('./actions')
+const { selectPlayer } = require('./selectors')
 const { getNFTIdsForAddress } = require('../NFT')
 const { PLAYER_STATE } = require('../utils/constants')
 const { getUsers, updateUser, getUserProfile } = require('../user')
@@ -39,7 +40,9 @@ const createPlayer = async user => {
 const updatePlayerStats = async (playerId, payload) => {
   console.log('updatePlayerStats', playerId, payload)
 
-  const user = await updateUser(playerId, payload)
+  const player = selectPlayer(playerId)
+
+  const user = await updateUser(player.user_id, payload)
 
   updatePlayer({
     playerId,

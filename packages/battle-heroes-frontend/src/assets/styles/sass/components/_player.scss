@@ -49,6 +49,10 @@
     &.is-standby {
       background-color: palette(green, 500);
     }
+
+    &.is-battle {
+      background-color: palette(orange, 500);
+    }
   }
 
   &-detail {
@@ -116,7 +120,7 @@
       }
 
       &-actions {
-        //
+        align-self: center;
       }
     }
 

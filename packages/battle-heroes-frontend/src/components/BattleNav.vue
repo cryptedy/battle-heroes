@@ -1,10 +1,10 @@
 <template>
   <div class="battle-nav">
-    <div v-if="battle" style="max-width: 64px">
+    <div v-if="playerBattle" style="max-width: 64px">
       <img
         style="width: 100%; height: auto"
-        :src="NFT.image_url"
-        :alt="NFT.name"
+        :src="playerNFT.image_url"
+        :alt="playerNFT.name"
         width="512"
         height="512"
       />
@@ -15,7 +15,7 @@
     </BaseDialog>
 
     <BaseButton
-      v-if="!battle && player.state === PLAYER_STATE.IDLE"
+      v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
       type="primary"
       @click="randomBattle"
     >
@@ -23,7 +23,7 @@
     </BaseButton>
 
     <BaseButton
-      v-if="!battle && player.state === PLAYER_STATE.IDLE"
+      v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
       type="primary"
       @click="createBattle"
     >
@@ -32,8 +32,8 @@
 
     <BaseButton
       v-if="
-        battle &&
-        (battle.state === BATTLE_STATE.ENDED ||
+        playerBattle &&
+        (playerBattle.state === BATTLE_STATE.ENDED ||
           player.state !== PLAYER_STATE.BATTLE)
       "
       type="danger"
@@ -52,12 +52,12 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import SelectNFTs from '@/components/SelectNFTs'
 import {
   PLAYER_STATE,
   BATTLE_STATE,
   NOTIFICATION_TYPE
 } from '@/utils/constants'
-import SelectNFTs from '@/components/SelectNFTs'
 
 export default {
   name: 'BattleNav',
@@ -81,8 +81,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      findNFT: 'NFT/find',
-      battle: 'game/battle'
+      playerNFT: 'battle/playerNFT',
+      playerBattle: 'game/playerBattle'
     }),
 
     PLAYER_STATE() {
@@ -91,10 +91,6 @@ export default {
 
     BATTLE_STATE() {
       return BATTLE_STATE
-    },
-
-    NFT() {
-      return this.findNFT(this.battle.NFTs[1].id)
     }
   },
 
@@ -127,11 +123,13 @@ export default {
     },
 
     deleteBattle() {
-      this.$socket.emit('battle:delete', this.battle.id)
-
-      this.addNotification({
-        message: 'Battle deleted!',
-        type: NOTIFICATION_TYPE.SUCCESS
+      this.$socket.emit('battle:delete', this.playerBattle.id, status => {
+        if (status) {
+          this.addNotification({
+            message: 'Battle deleted!',
+            type: NOTIFICATION_TYPE.SUCCESS
+          })
+        }
       })
     }
   }

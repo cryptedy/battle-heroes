@@ -35,22 +35,6 @@ module.exports = createSlice({
       const { playerId, payload: newState } = payload
 
       state.entities[playerId] = { ...state.entities[playerId], ...newState }
-    },
-    addSocket: (state, { payload }) => {
-      console.log('player/addSocket', payload)
-
-      const { playerId, socketId } = payload
-
-      state.entities[playerId].socket_ids.push(socketId)
-    },
-    removeSocket: (state, { payload }) => {
-      console.log('player/removeSocket', payload)
-
-      const { playerId, socketId: removeSocketId } = payload
-
-      state.entities[playerId].socket_ids = state.entities[
-        playerId
-      ].socket_ids.filter(socketId => socketId !== removeSocketId)
     }
   }
 })

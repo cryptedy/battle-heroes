@@ -1,7 +1,9 @@
 <template>
   <BaseListItem class="battle-list-item">
     <div class="battle-list-item-primary">
-      <img :src="NFT1.image_url" :alt="NFT1.name" width="512" height="512" />
+      <div style="width: 64px; height: 64px">
+        <img :src="NFT1.image_url" :alt="NFT1.name" width="512" height="512" />
+      </div>
       {{ NFT1.name }}
       -
       {{ player1.name }}
@@ -12,7 +14,14 @@
       <template v-else>
         VS
 
-        <img :src="NFT2.image_url" :alt="NFT2.name" width="512" height="512" />
+        <div style="width: 64px; height: 64px">
+          <img
+            :src="NFT2.image_url"
+            :alt="NFT2.name"
+            width="512"
+            height="512"
+          />
+        </div>
         {{ NFT2.name }}
         -
         {{ player2.name }}
@@ -28,10 +37,14 @@
         <SelectNFTs :player="player" @select="onSelectNFT" />
       </BaseDialog>
 
+      <BaseButton v-if="isPlayerBattle" type="danger" @click="deleteBattle">
+        DELETE
+      </BaseButton>
+
       <BaseButton
-        v-if="player1.id !== player.id"
+        v-if="!playerBattle && !isPlayerBattle"
         type="primary"
-        @click="requestBattle(battle)"
+        @click="joinBattle"
       >
         BATTLE!
       </BaseButton>
@@ -40,8 +53,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import SelectNFTs from '@/components/SelectNFTs'
+import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   name: 'BattleListItem',
@@ -68,8 +82,13 @@ export default {
     ...mapGetters({
       findNFT: 'NFT/find',
       player: 'game/player',
-      findPlayer: 'player/find'
+      findPlayer: 'player/find',
+      playerBattle: 'game/playerBattle'
     }),
+
+    BATTLE_STATE() {
+      return BATTLE_STATE
+    },
 
     player1() {
       return this.findPlayer(this.battle.players[1].id)
@@ -80,30 +99,49 @@ export default {
     },
 
     NFT1() {
-      return this.findNFT(this.battle.NFTs[1].id)
+      return this.findNFT(this.battle.players[1].NFT_id)
     },
 
     NFT2() {
-      return this.findNFT(this.battle.NFTs[1].id)
+      return this.findNFT(this.battle.players[2].NFT_id)
+    },
+
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
     }
   },
 
   methods: {
+    ...mapActions({
+      addNotification: 'notification/add'
+    }),
+
     onCloseDialog() {
       this.dialogShown = false
       this.selectedBattle = null
     },
 
     onSelectNFT(NFT) {
-      this.$socket.emit('battle:request', this.selectedBattle.id, NFT.id)
+      this.$socket.emit('battle:join', this.selectedBattle.id, NFT.id)
 
       this.selectedBattle = null
       this.dialogShown = false
     },
 
-    requestBattle(battle) {
-      this.selectedBattle = battle
+    joinBattle() {
+      this.selectedBattle = this.battle
       this.dialogShown = true
+    },
+
+    deleteBattle() {
+      this.$socket.emit('battle:delete', this.playerBattle.id, status => {
+        if (status) {
+          this.addNotification({
+            message: 'Battle deleted!',
+            type: NOTIFICATION_TYPE.SUCCESS
+          })
+        }
+      })
     }
   }
 }

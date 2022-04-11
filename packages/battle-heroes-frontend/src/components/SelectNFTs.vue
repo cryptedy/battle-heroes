@@ -1,17 +1,25 @@
 <template>
   <BaseEmpty v-if="!playerNFTs.length > 0" text="NO NFTs" />
 
-  <div v-else style="padding: 16px; text-align: center">
-    <img
-      v-for="playerNFT in playerNFTs"
-      :key="playerNFT.id"
-      style="cursor: pointer"
-      :src="playerNFT.image_url"
-      :alt="playerNFT.name"
-      width="512"
-      height="512"
-      @click="select(playerNFT)"
-    />
+  <div v-else class="nft">
+    <ul class="nft-list">
+      <li
+        v-for="playerNFT in playerNFTs"
+        :key="playerNFT.id"
+        class="nft-list-item"
+      >
+        <div class="nft-image">
+          <img
+            :src="playerNFT.image_url"
+            :alt="playerNFT.name"
+            width="512"
+            height="512"
+            style="cursor: pointer"
+            @click="select(playerNFT)"
+          />
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 

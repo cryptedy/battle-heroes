@@ -47,7 +47,6 @@ export default {
       console.log('battle:matched', battleId)
 
       // TODO: user confirmation
-      // this.$dialog.open({})
 
       this.$router.push(
         {

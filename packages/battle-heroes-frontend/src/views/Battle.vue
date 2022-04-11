@@ -1,42 +1,52 @@
 <template>
   <div class="battle">
-    <div v-if="!battle">
+    <template v-if="!battle">
       <p>Battle not found.</p>
-      <router-link :to="{ name: 'home' }"> Back to home </router-link>
-    </div>
+      <p>
+        <router-link :to="{ name: 'battles' }">BATTLE LIST</router-link>
+      </p>
+    </template>
 
-    <div v-else-if="starting">
-      <p>BATTLE START!</p>
+    <!-- <template v-else-if="isBattleEnded">
+      <p>The battle is over</p>
+      <p>
+        <router-link :to="{ name: 'battles' }">BATTLE LIST</router-link>
+      </p>
 
-      <div>
-        <p>
-          {{ player1.name }}
-        </p>
-        <p>
-          {{ NFT1.name }}
-        </p>
-        <p>
-          <img :src="NFT1.image_url" alt="" width="512" height="512" />
-        </p>
+      <template v-if="game">
+        <p v-if="playerStatus.hp > opponentStatus.hp">YOU WINI!</p>
+        <p v-else>YOU LOSE!</p>
+      </template>
+    </template> -->
 
-        <p>VS</p>
+    <template v-else-if="!game">
+      <p>GAME LOADING...</p>
 
-        <p>
-          {{ player2.name }}
-        </p>
-        <p>
-          {{ NFT2.name }}
-        </p>
-        <p>
-          <img :src="NFT2.image_url" alt="" width="512" height="512" />
-        </p>
-      </div>
-    </div>
+      <p>
+        {{ player1.name }}
+      </p>
+      <p>
+        {{ NFT1.name }}
+      </p>
+      <p>
+        <img :src="NFT1.image_url" :alt="NFT1.name" width="512" height="512" />
+      </p>
+
+      <p>VS</p>
+
+      <p>
+        {{ player2.name }}
+      </p>
+      <p>
+        {{ NFT2.name }}
+      </p>
+      <p>
+        <img :src="NFT2.image_url" :alt="NFT2.name" width="512" height="512" />
+      </p>
+    </template>
 
     <template v-else>
       <div class="battle-ground">
-        <p>TURN: {{ battle.turn }}</p>
-
         <div
           class="battle-ground-player"
           :class="{ 'is-current-turn': !canMove }"
@@ -63,48 +73,26 @@
               />
             </div>
             <div class="battle-health-bar">
-              {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
+              HP => {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
             </div>
-            <!-- <div class="battle-ground-nft-status">
+            <div class="battle-ground-nft-status">
               <ul>
-                <li>
-                  <dl>
-                    <dt>Attack</dt>
-                    <dd>{{ opponentStatus.attack }}</dd>
-                  </dl>
-                </li>
-                <li>
-                  <dl>
-                    <dt>Defense</dt>
-                    <dd>{{ opponentStatus.defense }}</dd>
-                  </dl>
-                </li>
-                <li>
-                  <dl>
-                    <dt>Speed</dt>
-                    <dd>{{ opponentStatus.speed }}</dd>
-                  </dl>
-                </li>
+                <li>Attack => {{ opponentStatus.attack }}</li>
+                <li>Defense => {{ opponentStatus.defense }}</li>
+                <li>Speed => {{ opponentStatus.speed }}</li>
               </ul>
-            </div> -->
-            <!-- <div class="battle-ground-nft-attributes">
-              <ul class="nft-attribute-list">
+            </div>
+            <div class="battle-ground-nft-attributes">
+              <ul>
                 <li
                   v-for="opponentNFTAttribute in opponentNFT.attributes"
                   :key="opponentNFTAttribute.trait_type"
-                  class="nft-attribute-list-item"
                 >
-                  <dl class="nft-attribute">
-                    <dt class="nft-attribute-type">
-                      {{ opponentNFTAttribute.trait_type }}
-                    </dt>
-                    <dd class="nft-attribute-value">
-                      {{ opponentNFTAttribute.value }}
-                    </dd>
-                  </dl>
+                  {{ opponentNFTAttribute.trait_type }} =>
+                  {{ opponentNFTAttribute.value }}
                 </li>
               </ul>
-            </div> -->
+            </div>
           </div>
         </div>
 
@@ -129,58 +117,33 @@
               <img :src="playerNFT.image_url" alt="" width="512" height="512" />
             </div>
             <div class="battle-health-bar">
-              {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
+              HP => {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
             </div>
-            <!-- <div class="battle-ground-nft-status">
+            <div class="battle-ground-nft-status">
               <ul>
-                <li>
-                  <dl>
-                    <dt>Attack</dt>
-                    <dd>{{ playerStatus.attack }}</dd>
-                  </dl>
-                </li>
-                <li>
-                  <dl>
-                    <dt>Defense</dt>
-                    <dd>{{ playerStatus.defense }}</dd>
-                  </dl>
-                </li>
-                <li>
-                  <dl>
-                    <dt>Speed</dt>
-                    <dd>{{ playerStatus.speed }}</dd>
-                  </dl>
-                </li>
+                <li>Attack => {{ playerStatus.attack }}</li>
+                <li>Defense => {{ playerStatus.defense }}</li>
+                <li>Speed => {{ playerStatus.speed }}</li>
               </ul>
-            </div> -->
-            <!-- <div class="battle-ground-nft-attributes">
-              <ul class="nft-attribute-list">
+            </div>
+            <div class="battle-ground-nft-attributes">
+              <ul>
                 <li
                   v-for="playerNFTAttribute in playerNFT.attributes"
                   :key="playerNFTAttribute.trait_type"
-                  class="nft-attribute-list-item"
                 >
-                  <dl class="nft-attribute">
-                    <dt class="nft-attribute-type">
-                      {{ playerNFTAttribute.trait_type }}
-                    </dt>
-                    <dd class="nft-attribute-value">
-                      {{ playerNFTAttribute.value }}
-                    </dd>
-                  </dl>
+                  {{ playerNFTAttribute.trait_type }} =>
+                  {{ playerNFTAttribute.value }}
                 </li>
               </ul>
-            </div> -->
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="battle-messages">
-        <p v-if="isEnded">GAME OVER</p>
-
+      <div ref="messages" class="battle-messages">
         <ul>
-          <!-- <li v-for="index in 100" :key="index">BATTLE MESSAGE #{{ index }}</li> -->
-          <li v-for="(message, index) in battle.messages" :key="index">
+          <li v-for="(message, index) in game.messages" :key="index">
             {{ message }}
           </li>
         </ul>
@@ -202,6 +165,19 @@
           </li>
         </ul>
       </div>
+
+      <div class="battle-foo">
+        <template v-if="isBattleEnded">
+          <p v-if="playerStatus.hp > opponentStatus.hp">YOU WINI!</p>
+          <p v-else>YOU LOSE!</p>
+        </template>
+
+        <p>BATTLE STATE: {{ battle.state }}</p>
+        <p>PLAYER KEY: {{ playerKey }}</p>
+        <p>TURN: {{ game.turn }}</p>
+        <p>CURRENT_PLAYER: {{ game.current_player }}</p>
+        <p>CAN MOVE: {{ canMove }}</p>
+      </div>
     </template>
   </div>
 </template>
@@ -213,9 +189,17 @@ import { PLAYER_MOVE, BATTLE_STATE } from '@/utils/constants'
 export default {
   name: 'Battle',
 
+  // eslint-disable-next-line no-unused-vars
+  beforeRouteLeave(to, from) {
+    const answer = window.confirm('Do you really want to leave?')
+
+    if (!answer) return false
+  },
+
   data() {
     return {
-      starting: false
+      game: null,
+      loading: false
     }
   },
 
@@ -240,62 +224,139 @@ export default {
     },
 
     NFT1() {
-      return this.findNFT(this.battle.NFTs[1].id)
+      return this.findNFT(this.battle.players[1].NFT_id)
     },
 
     NFT2() {
-      return this.findNFT(this.battle.NFTs[2].id)
+      return this.findNFT(this.battle.players[2].NFT_id)
     },
 
-    playerNumber() {
-      return this.battle.players[1].id === this.player.id ? 1 : 2
+    playerKey() {
+      const playerKey = Object.keys(this.battle.players).find(
+        playerKey => this.battle.players[playerKey].id === this.player.id
+      )
+
+      return Number.parseInt(playerKey)
     },
 
-    playerNFT() {
-      return this.findNFT(this.battle.NFTs[this.playerNumber].id)
+    opponentPlayerKey() {
+      return this.playerKey === 1 ? 2 : 1
     },
 
-    playerStatus() {
-      return this.battle.status[this.playerNumber]
-    },
-
-    opponentNumber() {
-      return this.playerNumber === 1 ? 2 : 1
+    opponentPlayerId() {
+      return this.battle.players[this.opponentPlayerKey].id
     },
 
     opponentPlayer() {
-      return this.findPlayer(this.battle.players[this.opponentNumber].id)
+      return this.findPlayer(this.opponentPlayerId)
+    },
+
+    playerNFTId() {
+      return this.battle.players[this.playerKey].NFT_id
+    },
+
+    opponentNFTId() {
+      return this.battle.players[this.opponentPlayerKey].NFT_id
+    },
+
+    playerNFT() {
+      return this.findNFT(this.playerNFTId)
     },
 
     opponentNFT() {
-      return this.findNFT(this.battle.NFTs[this.opponentNumber].id)
+      return this.findNFT(this.opponentNFTId)
+    },
+
+    playerStatus() {
+      return this.game.players[this.playerKey]
     },
 
     opponentStatus() {
-      return this.battle.status[this.opponentNumber]
+      return this.game.players[this.opponentPlayerKey]
     },
 
-    isEnded() {
+    isBattleEnded() {
       return this.battle.state === BATTLE_STATE.ENDED
     },
 
     canMove() {
-      return !this.isEnded && this.battle.current_move === this.playerNumber
+      return (
+        !this.isBattleEnded &&
+        !this.loading &&
+        this.game.current_player === this.playerKey
+      )
     }
   },
 
   mounted() {
-    this.starting = true
+    if (this.battle) {
+      this.$socket.emit('battle:start', this.battle.id, ({ status, game }) => {
+        console.log('battle:start', status, game)
 
-    setTimeout(() => {
-      this.starting = false
-    }, 5000)
+        if (status) {
+          this.$socket.on('game:update', game => {
+            console.log('game:update', game)
+            this.game = game
+
+            this.$nextTick(() => this.scrollToBottom())
+
+            this.loading = false
+          })
+
+          this.game = game
+          this.$nextTick(() => this.scrollToBottom(false))
+
+          // setTimeout(() => {
+          //   this.game = game
+          //   this.$nextTick(() => this.scrollToBottom(false))
+          // }, 5000)
+        }
+      })
+    }
+  },
+
+  beforeMount() {
+    // if (this.isBattleEnded) {
+    //   this.$socket.emit('battle:leave', this.battle.id)
+    // }
+
+    this.$socket.off('game:update')
   },
 
   methods: {
     attack() {
+      if (!this.canMove) return
+
+      this.loading = true
+
       this.$socket.emit('player:move', PLAYER_MOVE.ATTACK)
+    },
+
+    scrollToBottom(smooth = true) {
+      try {
+        if (smooth) {
+          this.$refs.messages.scrollTo({
+            top: this.$refs.messages.scrollHeight,
+            behavior: 'smooth'
+          })
+        } else {
+          this.$refs.messages.scrollTo(0, this.$refs.messages.scrollHeight)
+        }
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
     }
+
+    // leaveBattle() {
+    //   if (this.isBattleEnded) {
+    //     this.$socket.emit('battle:leave', this.battle.id)
+    //   }
+    //   this.$router.push(
+    //     {
+    //       name: 'home'
+    //     },
+    //     () => {}
+    //   )
+    // }
   }
 }
 </script>

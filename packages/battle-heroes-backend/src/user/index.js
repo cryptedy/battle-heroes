@@ -99,8 +99,10 @@ Moralis.Cloud.define('updateUser', async request => {
   const query = new Moralis.Query('User')
   query.equalTo('objectId', objectId)
   const user = await query.first({ useMasterKey: true })
-  const { type, value } = payload
-  user.set(type, value)
+  Object.keys(payload).forEach(key => {
+    const value = payload[key]
+    user.set(key, value)
+  })
   await user.save(null, { useMasterKey: true })
   return user
 })

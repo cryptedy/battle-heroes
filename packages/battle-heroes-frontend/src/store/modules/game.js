@@ -5,20 +5,20 @@ const initialState = () => ({})
 export const state = initialState()
 
 export const getters = {
-  isLogin: (state, getters) => getters.player !== null,
   player: (state, getters, rootState, rootGetters) => {
     if (!rootGetters['auth/isLogin']) return null
 
     return rootGetters['player/find'](rootGetters['auth/user'].id) || null
   },
-  battle: (state, getters, rootState, rootGetters) => {
+  isLogin: (state, getters) => getters.player !== null,
+  playerBattle: (state, getters, rootState, rootGetters) => {
     if (!getters.isLogin) return null
 
     return (
       rootGetters['battle/all'].find(
         battle =>
-          battle.player1.id === getters.player.id ||
-          (battle.player2 && battle.player2.id === getters.player.id)
+          battle.players[1].id === getters.player.id ||
+          battle.players[2].id === getters.player.id
       ) || null
     )
   }
@@ -90,6 +90,9 @@ export const actions = {
     socket.on('battle:delete', battleId =>
       dispatch('battle/remove', battleId, { root: true })
     )
+    // socket.on('battle:matched', battleId =>
+    //   dispatch('battle/matched', battleId, { root: true })
+    // )
     socket.on('message:messages', messages =>
       dispatch('message/set', messages, { root: true })
     )
@@ -111,6 +114,7 @@ export const actions = {
     socket.off('battle:battle')
     socket.off('battle:update')
     socket.off('battle:delete')
+    // socket.off('battle:matched')
     socket.off('message:messages')
     socket.off('message:message')
     socket.off('message:delete')

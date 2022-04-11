@@ -75,11 +75,15 @@
         padding-left: 0;
       }
 
-      &-primary {
+      &-primary, &-secondary {
         img {
           width: 100%;
           height: auto;
         }
+      }
+
+      &-primary {
+        //
       }
 
       &-secondary {
@@ -87,7 +91,7 @@
       }
 
       &-actions {
-        //
+        align-self: center;
       }
     }
   }

@@ -43,6 +43,10 @@ const tryReconnect = () => {
 
 socket.io.on('close', tryReconnect)
 
+socket.on('test', battleId => {
+  console.log('test', battleId)
+})
+
 export default {
   // eslint-disable-next-line no-unused-vars
   install(app, options) {

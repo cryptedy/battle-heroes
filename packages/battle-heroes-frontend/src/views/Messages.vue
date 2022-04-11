@@ -99,7 +99,7 @@ export default {
     }
 
     this.$nextTick(() => {
-      this.scrollToBottom()
+      this.scrollToBottom(false)
       this.setHasVerticalScrollbar()
     })
   },
@@ -128,12 +128,19 @@ export default {
       this.newMessage = ''
     },
 
-    scrollToBottom() {
+    scrollToBottom(smooth = true) {
       try {
-        this.$refs.messageList.$el.scrollTo(
-          0,
-          this.$refs.messageList.$el.scrollHeight
-        )
+        if (smooth) {
+          this.$refs.messageList.$el.scrollTo({
+            top: this.$refs.messageList.$el.scrollHeight,
+            behavior: 'smooth'
+          })
+        } else {
+          this.$refs.messageList.$el.scrollTo(
+            0,
+            this.$refs.messageList.$el.scrollHeight
+          )
+        }
         // eslint-disable-next-line no-empty
       } catch (error) {}
     }

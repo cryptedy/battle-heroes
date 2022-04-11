@@ -33,8 +33,12 @@ export const actions = {
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
   },
 
-  async onDisconnect({ commit }) {
-    console.log('onDisconnect')
+  async onDisconnect({ commit }, reason) {
+    console.log('onDisconnect', reason)
+
+    if (reason === 'io server disconnect') {
+      socket.connect()
+    }
 
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
   },

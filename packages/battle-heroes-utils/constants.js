@@ -35,6 +35,7 @@ const PLAYER_MOVE = Object.freeze({
 
 const BATTLE_STATE = {
   CREATED: 'CREATED',
+  READY: 'READY',
   STARTED: 'STARTED',
   ENDED: 'ENDED'
 }

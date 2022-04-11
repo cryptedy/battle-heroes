@@ -36,25 +36,15 @@ module.exports = createSlice({
       const { battleId, playerId, NFTId } = payload
 
       state.entities[battleId].players[2].id = playerId
-      state.entities[battleId].NFTs[2].id = NFTId
+      state.entities[battleId].players[2].NFT_id = NFTId
     },
-    changeTurn: (state, { payload: battleId }) => {
-      console.log('battle/changeTurn', battleId)
+    leave: (state, { payload }) => {
+      console.log('battle/leave', payload)
 
-      state.entities[battleId].turn++
+      const { battleId, playerNumber } = payload
 
-      state.entities[battleId].current_move =
-        state.entities[battleId].current_move === 1 ? 2 : 1
-    },
-    updateStatus: (state, { payload }) => {
-      console.log('battle/updateStatus', payload)
-
-      const { battleId, playerNumber, payload: newState } = payload
-
-      state.entities[battleId].status[playerNumber] = {
-        ...state.entities[battleId].status[playerNumber],
-        ...newState
-      }
+      state.entities[battleId].players[playerNumber].id = null
+      state.entities[battleId].players[playerNumber].NFT_id = null
     }
   }
 })

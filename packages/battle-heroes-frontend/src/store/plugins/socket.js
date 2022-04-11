@@ -9,9 +9,10 @@ export default function createWebSocketPlugin(socket) {
         timeout: 0
       })
     })
-
     socket.on('connect', () => store.dispatch('socket/onConnect'))
-    socket.on('disconnect', () => store.dispatch('socket/onDisconnect'))
+    socket.on('disconnect', reason =>
+      store.dispatch('socket/onDisconnect', reason)
+    )
     socket.on('connect_error', error =>
       store.dispatch('socket/onConnectError', error)
     )
