@@ -5,6 +5,10 @@
   min-height: 100vh;
   padding: 24px 16px;
 
+  a {
+    color: inherit
+  }
+
   &-status {
     grid-row: 1;
     padding: 12px 16px;
@@ -65,10 +69,6 @@
     grid-column: 1;
     padding: 16px;
     border: 1px solid palette(grey, 0);
-
-    a {
-      color: inherit
-    }
   }
 
   &-list {

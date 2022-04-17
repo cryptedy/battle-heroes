@@ -20,8 +20,13 @@
         </template>
         <p>
           Turn {{ game.turn }}
-          <span v-if="canMove">YOUR TURN</span>
-          <span v-else>WAIT FOR OPPONENT MOVE</span>
+          <template v-if="!isGameFinished">
+            <span v-if="canMove">YOUR TURN</span>
+            <span v-else>WAIT FOR OPPONENT MOVE</span>
+          </template>
+        </p>
+        <p v-if="isGameFinished">
+          <router-link :to="{ name: 'battles' }">LEAVE BATTLE</router-link>
         </p>
       </div>
 
@@ -130,21 +135,13 @@
       </div>
 
       <div class="battle-controls">
-        <template v-if="isGameFinished">
-          <p>
-            <router-link :to="{ name: 'battles' }">LEAVE BATTLE</router-link>
-          </p>
-        </template>
-
-        <template v-else>
-          <button :disabled="!canMove" @click="attack">ATTACK</button>
-          -
-          <button :disabled="!canMove">SPELL</button>
-          -
-          <button :disabled="!canMove">DEFFENCE</button>
-          -
-          <button :disabled="!canMove">RUN</button>
-        </template>
+        <button :disabled="!canMove" @click="attack">ATTACK</button>
+        -
+        <button :disabled="!canMove">SPELL</button>
+        -
+        <button :disabled="!canMove">DEFFENCE</button>
+        -
+        <button :disabled="!canMove">RUN</button>
       </div>
     </template>
   </div>
