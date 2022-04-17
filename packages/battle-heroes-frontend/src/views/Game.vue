@@ -1,61 +1,38 @@
 <template>
   <div class="battle">
     <template v-if="!battle">
-      <p>Battle not found.</p>
+      <p>The battle not found</p>
       <p>
         <router-link :to="{ name: 'battles' }">BATTLE LIST</router-link>
       </p>
     </template>
-
-    <!-- <template v-else-if="isBattleEnded">
-      <p>The battle is over</p>
-      <p>
-        <router-link :to="{ name: 'battles' }">BATTLE LIST</router-link>
-      </p>
-
-      <template v-if="game">
-        <p v-if="playerStatus.hp > opponentStatus.hp">YOU WINI!</p>
-        <p v-else>YOU LOSE!</p>
-      </template>
-    </template> -->
 
     <template v-else-if="!game">
       <p>GAME LOADING...</p>
-
-      <p>
-        {{ player1.name }}
-      </p>
-      <p>
-        {{ NFT1.name }}
-      </p>
-      <p>
-        <img :src="NFT1.image_url" :alt="NFT1.name" width="512" height="512" />
-      </p>
-
-      <p>VS</p>
-
-      <p>
-        {{ player2.name }}
-      </p>
-      <p>
-        {{ NFT2.name }}
-      </p>
-      <p>
-        <img :src="NFT2.image_url" :alt="NFT2.name" width="512" height="512" />
-      </p>
+      <p>{{ player1.name }} VS {{ player2.name }}</p>
     </template>
 
     <template v-else>
+      <div class="battle-status">
+        <template v-if="isGameFinished">
+          <p v-if="playerStatus.hp > opponentStatus.hp">YOU WINI!</p>
+          <p v-else>YOU LOSE!</p>
+        </template>
+        <p>
+          Turn {{ game.turn }}
+          <span v-if="canMove">YOUR TURN</span>
+          <span v-else>WAIT FOR OPPONENT MOVE</span>
+        </p>
+      </div>
+
       <div class="battle-ground">
         <div
           class="battle-ground-player"
-          :class="{ 'is-current-turn': !canMove }"
+          :class="{
+            'is-current-turn': !canMove,
+            shake: opponentState.takingDamage
+          }"
         >
-          <div>
-            <span v-if="canMove"> YOUR TURN </span>
-            <span v-else> WAIT FOR OPPONENT MOVE </span>
-          </div>
-
           <div class="battle-ground-player-name">
             {{ opponentPlayer.name }}
           </div>
@@ -72,10 +49,14 @@
                 height="512"
               />
             </div>
+            <HealthBar
+              :max-hp="opponentStatus.max_hp"
+              :hp="opponentStatus.hp"
+            />
             <div class="battle-health-bar">
               HP => {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
             </div>
-            <div class="battle-ground-nft-status">
+            <!-- <div class="battle-ground-nft-status">
               <ul>
                 <li>Attack => {{ opponentStatus.attack }}</li>
                 <li>Defense => {{ opponentStatus.defense }}</li>
@@ -92,19 +73,17 @@
                   {{ opponentNFTAttribute.value }}
                 </li>
               </ul>
-            </div>
+            </div> -->
           </div>
         </div>
 
         <div
           class="battle-ground-player"
-          :class="{ 'is-current-turn': canMove }"
+          :class="{
+            'is-current-turn': canMove,
+            shake: playerState.takingDamage
+          }"
         >
-          <div>
-            <span v-if="canMove"> YOUR TURN </span>
-            <span v-else> WAIT FOR OPPONENT MOVE </span>
-          </div>
-
           <div class="battle-ground-player-name">
             {{ player.name }}
           </div>
@@ -116,10 +95,11 @@
             <div class="battle-ground-nft-image">
               <img :src="playerNFT.image_url" alt="" width="512" height="512" />
             </div>
+            <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
             <div class="battle-health-bar">
               HP => {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
             </div>
-            <div class="battle-ground-nft-status">
+            <!-- <div class="battle-ground-nft-status">
               <ul>
                 <li>Attack => {{ playerStatus.attack }}</li>
                 <li>Defense => {{ playerStatus.defense }}</li>
@@ -136,7 +116,7 @@
                   {{ playerNFTAttribute.value }}
                 </li>
               </ul>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -150,56 +130,65 @@
       </div>
 
       <div class="battle-controls">
-        <ul>
-          <li>
-            <button :disabled="!canMove" @click="attack">ATTACK</button>
-          </li>
-          <li>
-            <button :disabled="!canMove">SPELL</button>
-          </li>
-          <li>
-            <button :disabled="!canMove">DEFFENCE</button>
-          </li>
-          <li>
-            <button :disabled="!canMove">RUN</button>
-          </li>
-        </ul>
-      </div>
-
-      <div class="battle-foo">
-        <template v-if="isBattleEnded">
-          <p v-if="playerStatus.hp > opponentStatus.hp">YOU WINI!</p>
-          <p v-else>YOU LOSE!</p>
+        <template v-if="isGameFinished">
+          <p>
+            <router-link :to="{ name: 'battles' }">LEAVE BATTLE</router-link>
+          </p>
         </template>
 
-        <p>BATTLE STATE: {{ battle.state }}</p>
-        <p>PLAYER KEY: {{ playerKey }}</p>
-        <p>TURN: {{ game.turn }}</p>
-        <p>CURRENT_PLAYER: {{ game.current_player }}</p>
-        <p>CAN MOVE: {{ canMove }}</p>
+        <template v-else>
+          <button :disabled="!canMove" @click="attack">ATTACK</button>
+          -
+          <button :disabled="!canMove">SPELL</button>
+          -
+          <button :disabled="!canMove">DEFFENCE</button>
+          -
+          <button :disabled="!canMove">RUN</button>
+        </template>
       </div>
     </template>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { PLAYER_MOVE, BATTLE_STATE } from '@/utils/constants'
+import { mapGetters, mapActions } from 'vuex'
+import HealthBar from '@/components/HealthBar'
+import { scrollToBottom } from '@/utils/helpers'
+import { PLAYER_MOVE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
-  name: 'Battle',
+  name: 'Game',
+
+  components: {
+    HealthBar
+  },
+
+  unwatch: {
+    playerHp: null,
+    opponentHp: null,
+    isGameFinished: null
+  },
 
   // eslint-disable-next-line no-unused-vars
   beforeRouteLeave(to, from) {
-    const answer = window.confirm('Do you really want to leave?')
+    if (this.game && !this.isGameFinished) {
+      window.confirm('You cannot leave this page during the battle.')
 
-    if (!answer) return false
+      return false
+    }
   },
 
   data() {
     return {
+      loading: false,
+      battle: null,
       game: null,
-      loading: false
+      playerState: {
+        takingDamage: false
+      },
+      opponentState: {
+        takingDamage: false
+      }
     }
   },
 
@@ -210,10 +199,6 @@ export default {
       findBattle: 'battle/find',
       findPlayer: 'player/find'
     }),
-
-    battle() {
-      return this.findBattle(this.$route.params.battleId)
-    },
 
     player1() {
       return this.findPlayer(this.battle.players[1].id)
@@ -271,59 +256,67 @@ export default {
       return this.game.players[this.playerKey]
     },
 
+    playerHp() {
+      return this.playerStatus.hp
+    },
+
     opponentStatus() {
       return this.game.players[this.opponentPlayerKey]
     },
 
-    isBattleEnded() {
-      return this.battle.state === BATTLE_STATE.ENDED
+    opponentHp() {
+      return this.opponentStatus.hp
+    },
+
+    isGameFinished() {
+      return this.playerHp <= 0 || this.opponentHp <= 0
     },
 
     canMove() {
       return (
-        !this.isBattleEnded &&
         !this.loading &&
+        !this.isGameFinished &&
         this.game.current_player === this.playerKey
       )
     }
   },
 
+  beforeMount() {
+    console.log('beforeMount')
+  },
+
   mounted() {
-    if (this.battle) {
-      this.$socket.emit('battle:start', this.battle.id, ({ status, game }) => {
-        console.log('battle:start', status, game)
+    console.log('mounted')
 
-        if (status) {
-          this.$socket.on('game:update', game => {
-            console.log('game:update', game)
-            this.game = game
+    const battle = this.findBattle(this.$route.params.battleId)
 
-            this.$nextTick(() => this.scrollToBottom())
+    if (battle) {
+      if (
+        !Object.keys(battle.players).some(
+          playerKey => battle.players[playerKey].id === null
+        )
+      ) {
+        this.battle = battle
 
-            this.loading = false
-          })
-
-          this.game = game
-          this.$nextTick(() => this.scrollToBottom(false))
-
-          // setTimeout(() => {
-          //   this.game = game
-          //   this.$nextTick(() => this.scrollToBottom(false))
-          // }, 5000)
-        }
-      })
+        this.$socket.emit('game:start', this.battle.id, this.onGameStart)
+      }
     }
   },
 
-  beforeMount() {
-    // if (this.isBattleEnded) {
-    //   this.$socket.emit('battle:leave', this.battle.id)
-    // }
+  beforeUnmount() {
+    console.log('beforeUnmount')
+
+    this.unwatch()
 
     this.$socket.off('game:update')
   },
 
   methods: {
+    ...mapActions({
+      removeBattle: 'battle/remove',
+      addNotification: 'notification/add'
+    }),
+
     attack() {
       if (!this.canMove) return
 
@@ -332,31 +325,88 @@ export default {
       this.$socket.emit('player:move', PLAYER_MOVE.ATTACK)
     },
 
-    scrollToBottom(smooth = true) {
-      try {
-        if (smooth) {
-          this.$refs.messages.scrollTo({
-            top: this.$refs.messages.scrollHeight,
-            behavior: 'smooth'
-          })
-        } else {
-          this.$refs.messages.scrollTo(0, this.$refs.messages.scrollHeight)
-        }
-        // eslint-disable-next-line no-empty
-      } catch (error) {}
-    }
+    onGameStart({ status, game }) {
+      console.log('game:start', status, game)
 
-    // leaveBattle() {
-    //   if (this.isBattleEnded) {
-    //     this.$socket.emit('battle:leave', this.battle.id)
-    //   }
-    //   this.$router.push(
-    //     {
-    //       name: 'home'
-    //     },
-    //     () => {}
-    //   )
-    // }
+      if (!status) {
+        return this.addNotification({
+          message: 'Failed to update the game',
+          type: NOTIFICATION_TYPE.ERROR
+        })
+      }
+
+      this.$socket.on('game:update', this.onGameUpdate)
+
+      this.game = game
+
+      this.$options.unwatch.playerHp = this.$watch(
+        'playerHp',
+        (value, oldValue) => {
+          console.log('watch:playerHp', value, oldValue)
+
+          if (value < oldValue) {
+            this.playerState.takingDamage = true
+            setTimeout(() => {
+              this.playerState.takingDamage = false
+            }, 400)
+          }
+        }
+      )
+
+      this.$options.unwatch.opponentHp = this.$watch(
+        'opponentHp',
+        (value, oldValue) => {
+          console.log('watch:opponentHp', value, oldValue)
+
+          if (value < oldValue) {
+            this.opponentState.takingDamage = true
+            setTimeout(() => {
+              this.opponentState.takingDamage = false
+            }, 400)
+          }
+        }
+      )
+
+      this.$options.unwatch.isGameFinished = this.$watch(
+        'isGameFinished',
+        (value, oldValue) => {
+          if (value & !oldValue) this.onGameFinished()
+        }
+      )
+
+      this.$nextTick(() => scrollToBottom(this.$refs.messages, false))
+    },
+
+    onGameUpdate(game) {
+      this.game = game
+
+      this.$nextTick(() => scrollToBottom(this.$refs.messages, true))
+
+      this.loading = false
+    },
+
+    onGameFinished() {
+      this.unwatch()
+
+      if (this.playerHp > this.opponentHp) {
+        this.game.messages.push('You win! got 3 exp.')
+      } else {
+        this.game.messages.push('You lose... got 1 exp.')
+      }
+
+      this.$socket.emit('game:finish', this.game.id)
+      // eslint-disable-next-line no-unused-vars
+      this.$socket.emit('battle:delete', this.battle.id, status => {})
+    },
+
+    unwatch() {
+      Object.keys(this.$options.unwatch).forEach(key => {
+        if (this.$options.unwatch[key]) {
+          this.$options.unwatch[key]()
+          this.$options.unwatch[key] = null
+        }
+      })
+    }
   }
 }
 </script>

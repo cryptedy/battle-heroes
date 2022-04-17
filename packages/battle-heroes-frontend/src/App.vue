@@ -39,6 +39,10 @@ export default {
     TheNotification
   },
 
+  unwatch: {
+    network: null
+  },
+
   data() {
     return {
       appTitle: appTitle
@@ -63,7 +67,7 @@ export default {
   async mounted() {
     this.$socket.connect()
 
-    this.unwatchNetwork = this.$store.watch(
+    this.$options.unwatch.network = this.$store.watch(
       (state, getters) => getters['network/isOnline'],
       (value, oldValue) => {
         if (value) {
@@ -88,7 +92,9 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
     window.removeEventListener('scroll', this.onWindowScroll)
 
-    this.unwatchNetwork()
+    if (this.$options.unwatch.network) {
+      this.$options.unwatch.network()
+    }
   },
 
   methods: {

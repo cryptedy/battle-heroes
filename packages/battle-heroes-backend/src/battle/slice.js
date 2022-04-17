@@ -37,14 +37,6 @@ module.exports = createSlice({
 
       state.entities[battleId].players[2].id = playerId
       state.entities[battleId].players[2].NFT_id = NFTId
-    },
-    leave: (state, { payload }) => {
-      console.log('battle/leave', payload)
-
-      const { battleId, playerNumber } = payload
-
-      state.entities[battleId].players[playerNumber].id = null
-      state.entities[battleId].players[playerNumber].NFT_id = null
     }
   }
 })

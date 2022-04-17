@@ -50,7 +50,7 @@ export default {
 
       this.$router.push(
         {
-          name: 'battle',
+          name: 'game',
           params: {
             battleId: battleId
           }

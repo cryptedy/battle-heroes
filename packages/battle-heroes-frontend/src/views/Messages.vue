@@ -28,9 +28,9 @@
 import store from '@/store'
 import { mapGetters } from 'vuex'
 import MessageList from '@/components/MessageList'
-import { getScrollbarState } from '@/utils/helpers'
 import { ADD_MESSAGE } from '@/store/mutation-types'
 import TheLayoutGame from '@/components/TheLayoutGame'
+import { getScrollbarState, scrollToBottom } from '@/utils/helpers'
 
 export default {
   name: 'Messages',
@@ -80,8 +80,8 @@ export default {
     this.unsubscribeNewMessage = store.subscribe((mutation, state) => {
       if (mutation.type === `message/${ADD_MESSAGE}`) {
         this.$nextTick(() => {
-          this.scrollToBottom()
-          this.setHasVerticalScrollbar()
+          scrollToBottom(this.$refs.messageList.$el, true)
+          this.checkVerticalScrollbar()
         })
       }
     })
@@ -99,8 +99,8 @@ export default {
     }
 
     this.$nextTick(() => {
-      this.scrollToBottom(false)
-      this.setHasVerticalScrollbar()
+      scrollToBottom(this.$refs.messageList.$el, false)
+      this.checkVerticalScrollbar()
     })
   },
 
@@ -109,7 +109,7 @@ export default {
   },
 
   methods: {
-    setHasVerticalScrollbar() {
+    checkVerticalScrollbar() {
       try {
         this.hasVerticalScrollbar = getScrollbarState(
           this.$refs.messageList.$el
@@ -126,23 +126,6 @@ export default {
       this.$socket.emit('message:create', this.newMessage)
 
       this.newMessage = ''
-    },
-
-    scrollToBottom(smooth = true) {
-      try {
-        if (smooth) {
-          this.$refs.messageList.$el.scrollTo({
-            top: this.$refs.messageList.$el.scrollHeight,
-            behavior: 'smooth'
-          })
-        } else {
-          this.$refs.messageList.$el.scrollTo(
-            0,
-            this.$refs.messageList.$el.scrollHeight
-          )
-        }
-        // eslint-disable-next-line no-empty
-      } catch (error) {}
     }
   }
 }

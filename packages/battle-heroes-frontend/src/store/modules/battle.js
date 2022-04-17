@@ -8,8 +8,7 @@ import {
 
 const initialState = () => ({
   entities: {},
-  ids: [],
-  status: null // TODO
+  ids: []
 })
 
 export const state = initialState()
@@ -22,13 +21,15 @@ export const getters = {
     if (!rootGetters['game/isLogin']) return null
     if (!rootGetters['game/playerBattle']) return null
 
-    return (
-      Object.keys(rootGetters['game/playerBattle'].players).find(
-        playerKey =>
-          rootGetters['game/playerBattle'].players[playerKey].id ===
-          rootGetters['game/player'].id
-      ) || null
+    const playerKey = Object.keys(
+      rootGetters['game/playerBattle'].players
+    ).find(
+      playerKey =>
+        rootGetters['game/playerBattle'].players[playerKey].id ===
+        rootGetters['game/player'].id
     )
+
+    return Number.parseInt(playerKey) || null
   },
   playerNFT: (state, getters, rootState, rootGetters) => {
     if (!getters.playerKey) return null
@@ -101,9 +102,5 @@ export const actions = {
     console.log('battle/remove', battleId)
 
     commit(REMOVE_BATTLE, { battleId })
-  },
-
-  matched(context, battleId) {
-    console.log('battle/matched', battleId)
   }
 }

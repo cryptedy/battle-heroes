@@ -3,8 +3,8 @@ const { findUser } = require('../user')
 const { createBattle } = require('../battle')
 const { createMessage } = require('../message')
 const { selectNFT } = require('../NFT/selectors')
-const { selectMessages } = require('../message/selectors')
-const { selectGame, selectBattleGame } = require('./selectors')
+const { selectMessages, selectMessage } = require('../message/selectors')
+const { selectGames, selectGame, selectBattleGame } = require('./selectors')
 const { addPlayer, updatePlayer } = require('../player/actions')
 const { createPlayer, updatePlayerStats } = require('../player')
 const { addMessage, removeMessage } = require('../message/actions')
@@ -140,20 +140,6 @@ const gameManager = (io, socket) => {
     return Number.parseInt(playerKey)
   }
 
-  // const getBattlePlayerId = (battle, playerId) => {
-  //   const playerKey = getBattlePlayerKey(battle, playerId)
-
-  //   if (playerKey) {
-  //     return battle.players[playerKey].id
-  //   }
-  // }
-
-  // const getBattlePlayer = (battle, playerId) => {
-  //   const battlePlayerId = getBattlePlayerId(battle, playerId)
-
-  //   return selectPlayer(battlePlayerId)
-  // }
-
   const getBattleOpponentPlayer = (battle, playerId) => {
     const playerKey = getBattlePlayerKey(battle, playerId)
 
@@ -218,12 +204,16 @@ const gameManager = (io, socket) => {
     }
   }
 
-  const onCreateBattle = NFTId => {
+  const onCreateBattle = (NFTId, callback) => {
     console.log('onCreateBattle', socket.id, NFTId)
 
     const player = findSocketPlayer(socket.id)
 
     if (player) {
+      if (selectPlayerBattle(player.id)) {
+        return callback({ status: false })
+      }
+
       const battle = createBattle(player.id, NFTId)
 
       addBattle(battle)
@@ -234,9 +224,11 @@ const gameManager = (io, socket) => {
       })
 
       io.emit('player:update', selectPlayer(player.id))
-      io.emit('battle:battle', battle)
+      io.emit('battle:battle', selectBattle(battle.id))
+
+      callback({ status: true })
     } else {
-      //
+      callback({ status: false })
     }
   }
 
@@ -320,12 +312,12 @@ const gameManager = (io, socket) => {
           payload: { state: BATTLE_STATE.READY }
         })
 
-        io.to(player.id).emit('battle:matched', battleId)
-        io.to(opponentPlayer.id).emit('battle:matched', battleId)
-
-        io.emit('battle:update', selectBattle(battleId))
+        io.emit('battle:update', selectBattle(battle.id))
         io.emit('player:update', selectPlayer(player.id))
         io.emit('player:update', selectPlayer(opponentPlayer.id))
+
+        io.to(player.id).emit('battle:matched', battle.id)
+        io.to(opponentPlayer.id).emit('battle:matched', battle.id)
       } else {
         //
       }
@@ -334,20 +326,24 @@ const gameManager = (io, socket) => {
     }
   }
 
-  const onLeaveBattle = () => {
-    console.log('onLeaveBattle', socket.id)
+  const onLeaveBattle = battleId => {
+    console.log('onLeaveBattle', battleId, socket.id)
   }
 
   const onRandomBattle = () => {
     console.log('onRandomBattle', socket.id)
   }
 
-  const onStartBattle = (battleId, callback) => {
-    console.log('onStartBattle', socket.id, battleId)
+  const onStartGame = (battleId, callback) => {
+    console.log('onStartGame', socket.id, battleId)
 
     const battle = selectBattle(battleId)
 
     if (battle) {
+      if (battle.state === BATTLE_STATE.ENDED) {
+        return callback({ status: false })
+      }
+
       const game = selectBattleGame(battle.id)
 
       if (game) {
@@ -376,6 +372,16 @@ const gameManager = (io, socket) => {
     }
   }
 
+  const onFinishGame = gameId => {
+    console.log('onFinishGame', socket.id, gameId)
+
+    const game = selectGame(gameId)
+
+    if (game) {
+      removeGame(gameId)
+    }
+  }
+
   const onPlayerMove = async move => {
     console.log('onPlayerMove', socket.id, move)
 
@@ -387,15 +393,11 @@ const gameManager = (io, socket) => {
       const battle = selectPlayerBattle(player.id)
 
       if (battle) {
-        // if (battle.state === BATTLE_STATE.ENDED) return
-
         const game = selectBattleGame(battle.id)
 
         if (game) {
           const playerKey = getBattlePlayerKey(battle, player.id)
           const playerNFT = selectNFT(battle.players[playerKey].NFT_id)
-
-          // if (playerKey !== game.current_player) return
 
           const opponentPlayer = getBattleOpponentPlayer(
             selectBattle(battle.id),
@@ -407,63 +409,79 @@ const gameManager = (io, socket) => {
             const opponentNFT = selectNFT(battle.players[opponentKey].NFT_id)
 
             if (move === PLAYER_MOVE.ATTACK) {
-              localMessages.push(`${playerNFT.name} attacks!`)
+              localMessages.push(`${player.name}'s ${playerNFT.name} attacks!`)
 
-              const damage = Math.floor(
-                (game.players[playerKey].attack * 100) /
-                  (100 + game.players[opponentKey].defense)
-              )
+              const rand = Math.floor(Math.random() * 100)
 
-              let hp = game.players[opponentKey].hp - damage
+              if (rand <= 10) {
+                localMessages.push('Miss!')
+              } else {
+                let damage = Math.floor(
+                  (game.players[playerKey].attack * 100) /
+                    (100 + game.players[opponentKey].defense)
+                )
 
-              localMessages.push(`${opponentNFT.name} take damage ${damage}`)
+                if (rand >= 95) {
+                  damage = Math.floor(damage * 1.5)
 
-              if (hp < 0) {
-                hp = 0
-
-                localMessages.push(`${opponentNFT.name} died!`)
-
-                updatePlayer({
-                  playerId: player.id,
-                  payload: { state: PLAYER_STATE.IDLE }
-                })
-
-                updatePlayer({
-                  playerId: opponentPlayer.id,
-                  payload: { state: PLAYER_STATE.IDLE }
-                })
-
-                updatePlayerStats(player.id, {
-                  exp: player.exp + 3,
-                  win: player.win + 1
-                }).then(() => {
-                  io.emit('player:update', selectPlayer(player.id))
-                })
-
-                updatePlayerStats(opponentPlayer.id, {
-                  exp: opponentPlayer.exp + 1,
-                  lose: opponentPlayer.lose + 1
-                }).then(() => {
-                  io.emit('player:update', selectPlayer(opponentPlayer.id))
-                })
-
-                updateBattle({
-                  battleId: battle.id,
-                  payload: { state: BATTLE_STATE.ENDED }
-                })
-
-                io.emit('player:update', selectPlayer(player.id))
-                io.emit('player:update', selectPlayer(opponentPlayer.id))
-                io.emit('battle:update', selectBattle(battle.id))
-              }
-
-              updateGamePlayer({
-                gameId: game.id,
-                playerKey: opponentKey,
-                payload: {
-                  hp: hp
+                  localMessages.push('Critical hit!!')
                 }
-              })
+
+                let hp = game.players[opponentKey].hp - damage
+
+                localMessages.push(
+                  `${opponentPlayer.name}'s ${opponentNFT.name} take damage ${damage}`
+                )
+
+                if (hp < 0) {
+                  hp = 0
+
+                  localMessages.push(
+                    `${opponentPlayer.name}'s ${opponentNFT.name} fainted...`
+                  )
+
+                  updatePlayer({
+                    playerId: player.id,
+                    payload: { state: PLAYER_STATE.IDLE }
+                  })
+
+                  updatePlayer({
+                    playerId: opponentPlayer.id,
+                    payload: { state: PLAYER_STATE.IDLE }
+                  })
+
+                  updatePlayerStats(player.id, {
+                    exp: player.exp + 3,
+                    win: player.win + 1
+                  }).then(() => {
+                    io.emit('player:update', selectPlayer(player.id))
+                  })
+
+                  updatePlayerStats(opponentPlayer.id, {
+                    exp: opponentPlayer.exp + 1,
+                    lose: opponentPlayer.lose + 1
+                  }).then(() => {
+                    io.emit('player:update', selectPlayer(opponentPlayer.id))
+                  })
+
+                  updateBattle({
+                    battleId: battle.id,
+                    payload: { state: BATTLE_STATE.ENDED }
+                  })
+
+                  io.emit('player:update', selectPlayer(player.id))
+                  io.emit('player:update', selectPlayer(opponentPlayer.id))
+                  io.emit('battle:update', selectBattle(battle.id))
+                }
+
+                updateGamePlayer({
+                  gameId: game.id,
+                  playerKey: opponentKey,
+                  payload: {
+                    hp: hp
+                  }
+                })
+              }
             }
           }
 
@@ -507,9 +525,13 @@ const gameManager = (io, socket) => {
   const onDeleteMessage = messageId => {
     console.log('onDeleteMessage', socket.id, messageId)
 
-    removeMessage(messageId)
+    const message = selectMessage(messageId)
 
-    io.emit('message:delete', messageId)
+    if (message) {
+      removeMessage(message.id)
+
+      io.emit('message:delete', message.id)
+    }
   }
 
   const onDisconnecting = () => {
@@ -538,17 +560,27 @@ const gameManager = (io, socket) => {
 
   socket.on('game:login', onLogin)
   socket.on('game:logout', onLogout)
+  socket.on('game:start', onStartGame)
+  socket.on('game:finish', onFinishGame)
   socket.on('battle:create', onCreateBattle)
   socket.on('battle:delete', onDeleteBattle)
   socket.on('battle:join', onJoinBattle)
   socket.on('battle:leave', onLeaveBattle)
   socket.on('battle:random', onRandomBattle)
-  socket.on('battle:start', onStartBattle)
   socket.on('player:move', onPlayerMove)
   socket.on('message:create', onCreateMessage)
   socket.on('message:delete', onDeleteMessage)
   socket.on('disconnecting', onDisconnecting)
   socket.on('disconnect', onDisconnect)
+
+  setInterval(() => {
+    selectBattles().forEach(battle => {
+      console.log('battle', battle)
+    })
+    selectGames().forEach(game => {
+      console.log('game', game)
+    })
+  }, 10000)
 }
 
 module.exports = {

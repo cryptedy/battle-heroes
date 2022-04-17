@@ -34,3 +34,20 @@ export function getScrollbarWidth() {
 
   return scrollbarWidth
 }
+
+export function scrollToBottom(el, smooth = false) {
+  try {
+    if (smooth) {
+      console.log('smooth')
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth'
+      })
+    } else {
+      el.scrollTo(0, el.scrollHeight)
+    }
+    // eslint-disable-next-line no-empty
+  } catch (error) {
+    console.log(error)
+  }
+}

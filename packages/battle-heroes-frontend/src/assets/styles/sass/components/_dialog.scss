@@ -9,7 +9,6 @@
   height: 100%;
   outline: none;
   color: color(primary);
-  // z-index: z-index(dialog);
 
   &-trigger {
     display: inline-block;
@@ -39,24 +38,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     height: 56px;
-
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
-
     padding-right: 16px;
     padding-left: 16px;
-    @include mediaQuery(md) {
-      padding-right: 24px;
-      padding-left: 24px;
-    }
-
     background-color: palette(grey, 200);
     border-bottom: 1px solid color(divider, dark);
     font-size: 18px;
 
     &-title {
+      @include mediaQuery(md) {
+        padding-left: 8px;
+      }
       font-weight: bold;
       color: color(primary, dark);
     }
@@ -65,9 +59,13 @@
       button {
         width: 32px;
         height: 32px;
+        border-radius: 4px;
         color: color(inactive-icon, dark);
         &:hover, &:active {
           color: color(active-icon, dark);
+        }
+        &:active {
+          background-color: palette(grey, 300);
         }
       }
     }
