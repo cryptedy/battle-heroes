@@ -21,8 +21,13 @@
     <template v-else>
       <div class="battle-status">
         <template v-if="isGameFinished">
-          <p v-if="playerStatus.hp > opponentStatus.hp">YOU WINI!</p>
-          <p v-else>YOU LOSE!</p>
+          <p
+            v-if="playerStatus.hp > opponentStatus.hp"
+            style="font-weight: bold; color: #4caf50"
+          >
+            YOU WINI!
+          </p>
+          <p v-else style="font-weight: bold; color: #f44336">YOU LOSE!</p>
         </template>
         <p>
           Turn {{ game.turn }}
