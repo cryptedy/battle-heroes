@@ -102,6 +102,8 @@ const gameManager = (io, socket) => {
   }
 
   const leavePlayerRoom = playerId => {
+    socket.leave(playerId)
+
     updatePlayer({
       playerId: playerId,
       payload: { socket_ids: getPlayerSocketIds(playerId) }
@@ -168,7 +170,7 @@ const gameManager = (io, socket) => {
         const newPlayer = await createPlayer(newUser)
 
         addPlayer(newPlayer)
-        joinPlayerRoom(player.id)
+        joinPlayerRoom(newPlayer.id)
 
         socket.broadcast.emit('player:player', selectPlayer(newPlayer.id))
       } catch (error) {
