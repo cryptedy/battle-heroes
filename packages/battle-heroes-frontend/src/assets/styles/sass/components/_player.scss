@@ -80,6 +80,10 @@
       font-size: 23px;
       margin-bottom: 4px;
       color: color(secondary, dark);
+
+      &.is-online {
+        color: palette(green, 500);
+      }
     }
 
     .player-stats-list {
