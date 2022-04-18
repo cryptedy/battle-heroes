@@ -9,7 +9,8 @@ import {
   faXmark,
   faMessage,
   faLayerGroup,
-  faArrowRightFromBracket
+  faArrowRightFromBracket,
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons'
 
 export default {
@@ -23,7 +24,8 @@ export default {
       faXmark,
       faMessage,
       faLayerGroup,
-      faArrowRightFromBracket
+      faArrowRightFromBracket,
+      faArrowLeft
     )
 
     app.component(FontAwesomeIcon.name, FontAwesomeIcon)

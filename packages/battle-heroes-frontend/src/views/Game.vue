@@ -3,7 +3,13 @@
     <template v-if="!battle">
       <p>The battle not found</p>
       <p>
-        <router-link :to="{ name: 'battles' }">BATTLE LIST</router-link>
+        <router-link
+          :to="{ name: 'battles' }"
+          style="font-weight: bold; color: #1565c0"
+        >
+          <FontAwesomeIcon icon="arrow-left" />
+          Back to battle list
+        </router-link>
       </p>
     </template>
 
@@ -21,12 +27,22 @@
         <p>
           Turn {{ game.turn }}
           <template v-if="!isGameFinished">
-            <span v-if="canMove">YOUR TURN</span>
-            <span v-else>WAIT FOR OPPONENT MOVE</span>
+            <p v-if="canMove" style="font-weight: bold; color: #4caf50">
+              It's Your Turn! Select move.
+            </p>
+            <p v-else style="color: rgba(255, 255, 255, 0.5)">
+              Wait for opponent move...
+            </p>
           </template>
         </p>
         <p v-if="isGameFinished">
-          <router-link :to="{ name: 'battles' }">LEAVE BATTLE</router-link>
+          <router-link
+            :to="{ name: 'battles' }"
+            style="font-weight: bold; color: #1565c0"
+          >
+            <FontAwesomeIcon icon="arrow-left" />
+            Back to battle list
+          </router-link>
         </p>
       </div>
 
@@ -35,10 +51,14 @@
           class="battle-ground-player"
           :class="{
             'is-current-turn': !canMove,
+            'is-game-over': isGameFinished,
             shake: opponentState.takingDamage
           }"
         >
-          <div class="battle-ground-player-name">
+          <div
+            class="battle-ground-player-name player-name"
+            :class="{ 'is-online': opponentPlayer.socket_ids.length > 0 }"
+          >
             {{ opponentPlayer.name }}
           </div>
 
@@ -58,8 +78,10 @@
               :max-hp="opponentStatus.max_hp"
               :hp="opponentStatus.hp"
             />
-            <div class="battle-health-bar">
-              HP => {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
+            <div class="battle-ground-status">
+              <p class="battle-ground-status-hp">
+                HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
+              </p>
             </div>
             <!-- <div class="battle-ground-nft-status">
               <ul>
@@ -86,10 +108,14 @@
           class="battle-ground-player"
           :class="{
             'is-current-turn': canMove,
+            'is-game-over': isGameFinished,
             shake: playerState.takingDamage
           }"
         >
-          <div class="battle-ground-player-name">
+          <div
+            class="battle-ground-player-name player-name"
+            :class="{ 'is-online': player.socket_ids.length > 0 }"
+          >
             {{ player.name }}
           </div>
 
@@ -101,8 +127,10 @@
               <img :src="playerNFT.image_url" alt="" width="512" height="512" />
             </div>
             <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
-            <div class="battle-health-bar">
-              HP => {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
+            <div class="battle-ground-status">
+              <p class="battle-ground-status-hp">
+                HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
+              </p>
             </div>
             <!-- <div class="battle-ground-nft-status">
               <ul>
@@ -136,12 +164,9 @@
 
       <div class="battle-controls">
         <button :disabled="!canMove" @click="attack">ATTACK</button>
-        -
-        <button :disabled="!canMove">SPELL</button>
-        -
-        <button :disabled="!canMove">DEFFENCE</button>
-        -
-        <button :disabled="!canMove">RUN</button>
+        <button :disabled="true">SPELL</button>
+        <button :disabled="true">DEFFENCE</button>
+        <button :disabled="true">RUN</button>
       </div>
     </template>
   </div>
