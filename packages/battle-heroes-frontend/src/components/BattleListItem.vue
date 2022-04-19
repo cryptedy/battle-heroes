@@ -10,10 +10,18 @@
     </div>
 
     <div class="battle-list-item-secondary">
-      <template v-if="!player2"> NO PLAYER 2 </template>
+      <template v-if="!player2">
+        <div style="width: 64px; height: 64px">
+          <img
+            src="@/assets/images/blank-NFT.png"
+            alt="NO PLAYER"
+            width="512"
+            height="512"
+          />
+        </div>
+        NO PLAYER
+      </template>
       <template v-else>
-        VS
-
         <div style="width: 64px; height: 64px">
           <img
             :src="NFT2.image_url"
@@ -22,9 +30,7 @@
             height="512"
           />
         </div>
-        {{ NFT2.name }}
-        -
-        {{ player2.name }}
+        {{ player2.name }}'s {{ NFT2.name }}
       </template>
     </div>
 
@@ -42,7 +48,7 @@
       </BaseButton>
 
       <BaseButton
-        v-if="!playerBattle && !isPlayerBattle"
+        v-if="!BATTLE_STATE.BATTLE && !isPlayerBattle"
         type="primary"
         @click="joinBattle"
       >

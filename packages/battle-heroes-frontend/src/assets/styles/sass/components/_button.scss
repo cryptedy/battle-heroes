@@ -33,8 +33,4 @@
     background-color: color(inactive-icon, light);
     color: color(disabled, light);
   }
-
-  & + & {
-    margin-left: 16px;
-  }
 }

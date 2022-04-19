@@ -20,35 +20,48 @@
 
     <template v-else>
       <div class="battle-status">
-        <template v-if="isGameFinished">
-          <p
-            v-if="playerStatus.hp > opponentStatus.hp"
-            style="font-weight: bold; color: #4caf50"
-          >
-            YOU WINI!
-          </p>
-          <p v-else style="font-weight: bold; color: #f44336">YOU LOSE!</p>
-        </template>
-        <p>
-          Turn {{ game.turn }}
-          <template v-if="!isGameFinished">
-            <p v-if="canMove" style="font-weight: bold; color: #4caf50">
-              It's Your Turn! Select move.
+        <div class="battle-status-primary">
+          <template v-if="isGameFinished">
+            <p
+              v-if="playerStatus.hp > opponentStatus.hp"
+              style="font-weight: bold; color: #4caf50"
+            >
+              YOU WINI!
             </p>
-            <p v-else style="color: rgba(255, 255, 255, 0.5)">
-              Wait for opponent move...
-            </p>
+            <p v-else style="font-weight: bold; color: #f44336">YOU LOSE!</p>
           </template>
-        </p>
-        <p v-if="isGameFinished">
-          <router-link
-            :to="{ name: 'battles' }"
-            style="font-weight: bold; color: #1565c0"
+          <p>
+            Turn {{ game.turn }}
+            <template v-if="!isGameFinished">
+              <p v-if="canMove" style="font-weight: bold; color: #4caf50">
+                It's Your Turn! Select move.
+              </p>
+              <p v-else style="color: rgba(255, 255, 255, 0.5)">
+                Wait for opponent move...
+              </p>
+            </template>
+          </p>
+          <p v-if="isGameFinished">
+            <router-link
+              :to="{ name: 'battles' }"
+              style="font-weight: bold; color: #1565c0"
+            >
+              <FontAwesomeIcon icon="arrow-left" />
+              Back to battle list
+            </router-link>
+          </p>
+        </div>
+        <div class="battle-status-actions">
+          <BaseButton type="danger" @click="abortGame"> ABORT </BaseButton>
+
+          <BaseButton
+            :type="soundPaused ? 'primary' : 'default'"
+            @click="toggleSound"
           >
-            <FontAwesomeIcon icon="arrow-left" />
-            Back to battle list
-          </router-link>
-        </p>
+            <FontAwesomeIcon v-if="soundPaused" icon="play" />
+            <FontAwesomeIcon v-else icon="pause" />
+          </BaseButton>
+        </div>
       </div>
 
       <div class="battle-ground">
@@ -178,6 +191,7 @@
 </template>
 
 <script>
+import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
 import HealthBar from '@/components/HealthBar'
 import { scrollToBottom } from '@/utils/helpers'
@@ -198,7 +212,7 @@ export default {
 
   // eslint-disable-next-line no-unused-vars
   beforeRouteLeave(to, from) {
-    if (this.game && !this.isGameFinished) {
+    if (!this.aborting && this.game && !this.isGameFinished) {
       window.confirm('You cannot leave this page during the battle.')
 
       return false
@@ -215,7 +229,10 @@ export default {
       },
       opponentState: {
         takingDamage: false
-      }
+      },
+      audio: new Audio(BGM),
+      soundPaused: true,
+      aborting: false
     }
   },
 
@@ -306,6 +323,10 @@ export default {
         this.game.current_player === this.playerKey
       )
     }
+  },
+
+  created() {
+    this.audio.currentTime = 0
   },
 
   beforeMount() {
@@ -424,6 +445,37 @@ export default {
       this.$socket.emit('game:finish', this.game.id)
       // eslint-disable-next-line no-unused-vars
       this.$socket.emit('battle:delete', this.battle.id, status => {})
+    },
+
+    abortGame() {
+      const answer = window.confirm('Abort the game?')
+
+      if (!answer) return false
+
+      this.aborting = true
+
+      this.$socket.emit('game:finish', this.game.id)
+      // eslint-disable-next-line no-unused-vars
+      this.$socket.emit('battle:delete', this.battle.id, status => {
+        if (status) {
+          this.$router.push(
+            {
+              name: 'battles'
+            },
+            () => {}
+          )
+        }
+      })
+    },
+
+    toggleSound() {
+      if (this.soundPaused) {
+        this.audio.play()
+        this.soundPaused = false
+      } else {
+        this.audio.pause()
+        this.soundPaused = true
+      }
     },
 
     unwatch() {
