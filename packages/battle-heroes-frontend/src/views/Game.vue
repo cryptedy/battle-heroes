@@ -63,11 +63,11 @@
 
         <div class="battle-status-actions">
           <BaseButton
-            :type="soundPaused ? 'primary' : 'default'"
+            :type="soundPaused ? 'default' : 'primary'"
             @click="toggleSound"
           >
-            <FontAwesomeIcon v-if="soundPaused" icon="volume-high" />
-            <FontAwesomeIcon v-else icon="volume-xmark" />
+            <FontAwesomeIcon v-if="soundPaused" icon="volume-xmark" />
+            <FontAwesomeIcon v-else icon="volume-high" />
           </BaseButton>
         </div>
       </div>

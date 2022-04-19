@@ -163,7 +163,7 @@ const getNFTsForContract = async (
 
         resolve(NFTs)
       } catch (error) {
-        reject()
+        reject(error)
       }
     }, 1000)
   })
