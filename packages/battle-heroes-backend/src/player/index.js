@@ -10,7 +10,13 @@ const getPlayers = async () => {
   const users = await getUsers()
 
   for (const user of users) {
-    const player = await createPlayer(user)
+    // eslint-disable-next-line no-unused-vars
+    const player = await new Promise((resolve, reject) => {
+      // wait 1 second for avoid rate limit
+      setTimeout(() => {
+        resolve(createPlayer(user))
+      }, 1000)
+    })
 
     players.push(player)
   }

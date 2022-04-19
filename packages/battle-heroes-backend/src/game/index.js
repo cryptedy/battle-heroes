@@ -292,6 +292,10 @@ const gameManager = (io, socket) => {
       const battle = selectBattle(battleId)
 
       if (battle) {
+        if (battle.state !== BATTLE_STATE.CREATED) {
+          throw new Error('Can not join the battle.')
+        }
+
         joinBattle({ battleId: battle.id, playerId: player.id, NFTId })
 
         const opponentPlayer = getBattleOpponentPlayer(

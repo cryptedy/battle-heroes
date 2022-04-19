@@ -20,6 +20,15 @@
 
     <template v-else>
       <div class="battle-status">
+        <div class="battle-status-actions">
+          <BaseButton
+            :type="isGameFinished ? 'primary' : 'danger'"
+            @click="abortGame"
+          >
+            <FontAwesomeIcon icon="arrow-left" />
+          </BaseButton>
+        </div>
+
         <div class="battle-status-primary">
           <template v-if="isGameFinished">
             <p
@@ -31,7 +40,7 @@
             <p v-else style="font-weight: bold; color: #f44336">YOU LOSE!</p>
           </template>
           <p>
-            Turn {{ game.turn }}
+            TURN {{ game.turn }}
             <template v-if="!isGameFinished">
               <p v-if="canMove" style="font-weight: bold; color: #4caf50">
                 It's Your Turn! Select move.
@@ -51,15 +60,14 @@
             </router-link>
           </p>
         </div>
-        <div class="battle-status-actions">
-          <BaseButton type="danger" @click="abortGame"> ABORT </BaseButton>
 
+        <div class="battle-status-actions">
           <BaseButton
             :type="soundPaused ? 'primary' : 'default'"
             @click="toggleSound"
           >
-            <FontAwesomeIcon v-if="soundPaused" icon="play" />
-            <FontAwesomeIcon v-else icon="pause" />
+            <FontAwesomeIcon v-if="soundPaused" icon="volume-high" />
+            <FontAwesomeIcon v-else icon="volume-xmark" />
           </BaseButton>
         </div>
       </div>
@@ -357,6 +365,8 @@ export default {
     this.unwatch()
 
     this.$socket.off('game:update')
+
+    this.audio.pause()
   },
 
   methods: {
@@ -448,9 +458,11 @@ export default {
     },
 
     abortGame() {
-      const answer = window.confirm('Abort the game?')
+      if (this.game && !this.isGameFinished) {
+        const answer = window.confirm('Abort the game?')
 
-      if (!answer) return false
+        if (!answer) return false
+      }
 
       this.aborting = true
 
