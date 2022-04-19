@@ -149,12 +149,23 @@ const getNFTsForContract = async (
   offset = 0,
   limit = 500
 ) => {
-  return Moralis.Web3API.account.getNFTsForContract({
-    chain: 'matic',
-    address: address,
-    token_address: getContractAddress(collectionId),
-    offset: offset,
-    limit: limit
+  return await new Promise((resolve, reject) => {
+    // wait 1 second for avoid rate limit
+    setTimeout(() => {
+      try {
+        const NFTs = Moralis.Web3API.account.getNFTsForContract({
+          chain: 'matic',
+          address,
+          token_address: getContractAddress(collectionId),
+          offset,
+          limit
+        })
+
+        resolve(NFTs)
+      } catch (error) {
+        reject()
+      }
+    }, 1000)
   })
 }
 
