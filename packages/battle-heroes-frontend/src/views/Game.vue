@@ -5,7 +5,7 @@
       <p>
         <router-link
           :to="{ name: 'battles' }"
-          style="font-weight: bold; color: #1565c0"
+          style="font-weight: bold; color: #2196f3"
         >
           <FontAwesomeIcon icon="arrow-left" />
           Back to battle list
@@ -42,18 +42,18 @@
           <p>
             TURN {{ game.turn }}
             <template v-if="!isGameFinished">
-              <p v-if="canMove" style="font-weight: bold; color: #4caf50">
-                It's Your Turn! Select move.
+              <p v-if="canMove" style="font-weight: bold; color: #2196f3">
+                Select your move!
               </p>
               <p v-else style="color: rgba(255, 255, 255, 0.5)">
-                Wait for opponent move...
+                Waiting for opponent...
               </p>
             </template>
           </p>
           <p v-if="isGameFinished">
             <router-link
               :to="{ name: 'battles' }"
-              style="font-weight: bold; color: #1565c0"
+              style="font-weight: bold; color: #2196f3"
             >
               <FontAwesomeIcon icon="arrow-left" />
               Back to battle list
@@ -77,7 +77,8 @@
           class="battle-ground-player"
           :class="{
             'is-current-turn': !canMove,
-            'is-game-over': isGameFinished,
+            'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+            'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp,
             shake: opponentState.takingDamage
           }"
         >
@@ -89,8 +90,17 @@
           </div>
 
           <div class="battle-ground-nft">
-            <div class="battle-ground-nft-name">
-              {{ opponentNFT.name }}
+            <div
+              class="battle-ground-nft-name"
+              :class="{
+                'is-current-turn': !canMove,
+                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
+              }"
+            >
+              <p>{{ opponentNFT.name }}</p>
+              <!-- <p>RANK {{ opponentNFT.rank }}</p>
+              <p>SCORE {{ opponentNFT.score }}</p> -->
             </div>
             <div class="battle-ground-nft-image">
               <img
@@ -104,19 +114,17 @@
               :max-hp="opponentStatus.max_hp"
               :hp="opponentStatus.hp"
             />
-            <div class="battle-ground-status">
-              <p class="battle-ground-status-hp">
-                HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
-              </p>
-            </div>
-            <!-- <div class="battle-ground-nft-status">
+            <div class="battle-ground-nft-status">
               <ul>
-                <li>Attack => {{ opponentStatus.attack }}</li>
-                <li>Defense => {{ opponentStatus.defense }}</li>
-                <li>Speed => {{ opponentStatus.speed }}</li>
+                <li>
+                  HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
+                </li>
+                <li>ATTACK {{ opponentStatus.attack }}</li>
+                <li>DEFENSE {{ opponentStatus.defense }}</li>
+                <li>SPEED {{ opponentStatus.speed }}</li>
               </ul>
             </div>
-            <div class="battle-ground-nft-attributes">
+            <!-- <div class="battle-ground-nft-attributes">
               <ul>
                 <li
                   v-for="opponentNFTAttribute in opponentNFT.attributes"
@@ -134,7 +142,8 @@
           class="battle-ground-player"
           :class="{
             'is-current-turn': canMove,
-            'is-game-over': isGameFinished,
+            'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+            'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp,
             shake: playerState.takingDamage
           }"
         >
@@ -146,17 +155,29 @@
           </div>
 
           <div class="battle-ground-nft">
-            <div class="battle-ground-nft-name">
-              {{ playerNFT.name }}
+            <div
+              class="battle-ground-nft-name"
+              :class="{
+                'is-current-turn': canMove,
+                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
+              }"
+            >
+              <p>{{ playerNFT.name }}</p>
+              <!-- <p>RANK {{ playerNFT.rank }}</p>
+              <p>SCORE {{ playerNFT.score }}</p> -->
             </div>
             <div class="battle-ground-nft-image">
               <img :src="playerNFT.image_url" alt="" width="512" height="512" />
             </div>
             <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
-            <div class="battle-ground-status">
-              <p class="battle-ground-status-hp">
-                HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
-              </p>
+            <div class="battle-ground-nft-status">
+              <ul>
+                <li>HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}</li>
+                <li>ATTACK {{ playerStatus.attack }}</li>
+                <li>DEFENSE {{ playerStatus.defense }}</li>
+                <li>SPEED {{ playerStatus.speed }}</li>
+              </ul>
             </div>
             <!-- <div class="battle-ground-nft-status">
               <ul>

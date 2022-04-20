@@ -56,16 +56,29 @@ const createStatus = () => {
 }
 
 const createGame = battleId => {
-  const message = 'Battle start!'
+  const message = 'START BATTLE!'
+
+  const status1 = createStatus()
+  const status2 = createStatus()
+
+  let currentPlayer = 1
+
+  if (status1.speed === status2.speed) {
+    currentPlayer = Math.floor(Math.random() * 2) + 1
+  } else if (status1.speed > status2.speed) {
+    currentPlayer = 1
+  } else {
+    currentPlayer = 2
+  }
 
   return {
     id: uuidv4(),
     battle_id: battleId,
     turn: 1,
-    current_player: 1,
+    current_player: currentPlayer,
     players: {
-      1: { ...createStatus() },
-      2: { ...createStatus() }
+      1: { ...status1 },
+      2: { ...status2 }
     },
     messages: [message]
   }
@@ -359,6 +372,7 @@ const gameManager = (io, socket) => {
         })
       } else {
         const newGame = createGame(battle.id)
+
         addGame(newGame)
 
         updateBattle({
@@ -436,7 +450,7 @@ const gameManager = (io, socket) => {
                 let hp = game.players[opponentKey].hp - damage
 
                 localMessages.push(
-                  `${opponentPlayer.name}'s ${opponentNFT.name} take damage ${damage}`
+                  `${opponentPlayer.name}'s ${opponentNFT.name} takes damage ${damage}`
                 )
 
                 if (hp < 0) {
