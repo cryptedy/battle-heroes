@@ -77,14 +77,18 @@
           class="battle-ground-player"
           :class="{
             'is-current-turn': !canMove,
-            'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-            'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp,
+            'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+            'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp,
             shake: opponentState.takingDamage
           }"
         >
           <div
             class="battle-ground-player-name player-name"
-            :class="{ 'is-online': opponentPlayer.socket_ids.length > 0 }"
+            :class="{
+              'is-online': opponentPlayer.socket_ids.length > 0,
+              'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+              'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
+            }"
           >
             {{ opponentPlayer.name }}
           </div>
@@ -94,15 +98,21 @@
               class="battle-ground-nft-name"
               :class="{
                 'is-current-turn': !canMove,
-                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
+                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
               }"
             >
               <p>{{ opponentNFT.name }}</p>
               <!-- <p>RANK {{ opponentNFT.rank }}</p>
               <p>SCORE {{ opponentNFT.score }}</p> -->
             </div>
-            <div class="battle-ground-nft-image">
+            <div
+              class="battle-ground-nft-image"
+              :class="{
+                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
+              }"
+            >
               <img
                 :src="opponentNFT.image_url"
                 alt=""
@@ -114,7 +124,13 @@
               :max-hp="opponentStatus.max_hp"
               :hp="opponentStatus.hp"
             />
-            <div class="battle-ground-nft-status">
+            <div
+              class="battle-ground-nft-status"
+              :class="{
+                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
+              }"
+            >
               <ul>
                 <li>
                   HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
@@ -142,14 +158,18 @@
           class="battle-ground-player"
           :class="{
             'is-current-turn': canMove,
-            'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-            'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp,
+            'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+            'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp,
             shake: playerState.takingDamage
           }"
         >
           <div
             class="battle-ground-player-name player-name"
-            :class="{ 'is-online': player.socket_ids.length > 0 }"
+            :class="{
+              'is-online': player.socket_ids.length > 0,
+              'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+              'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
+            }"
           >
             {{ player.name }}
           </div>
@@ -159,19 +179,31 @@
               class="battle-ground-nft-name"
               :class="{
                 'is-current-turn': canMove,
-                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
+                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
               }"
             >
               <p>{{ playerNFT.name }}</p>
               <!-- <p>RANK {{ playerNFT.rank }}</p>
               <p>SCORE {{ playerNFT.score }}</p> -->
             </div>
-            <div class="battle-ground-nft-image">
+            <div
+              class="battle-ground-nft-image"
+              :class="{
+                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
+              }"
+            >
               <img :src="playerNFT.image_url" alt="" width="512" height="512" />
             </div>
             <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
-            <div class="battle-ground-nft-status">
+            <div
+              class="battle-ground-nft-status"
+              :class="{
+                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
+                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
+              }"
+            >
               <ul>
                 <li>HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}</li>
                 <li>ATTACK {{ playerStatus.attack }}</li>

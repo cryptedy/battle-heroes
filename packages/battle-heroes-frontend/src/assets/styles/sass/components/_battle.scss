@@ -93,6 +93,15 @@
       &-image {
         margin-top: 4px;
         margin-bottom: 4px;
+
+        &.is-win {
+          //
+        }
+
+        &.is-lose {
+          opacity: 0.4;;
+        }
+
         > img {
           width: 100%;
           height: 100%;
@@ -107,6 +116,24 @@
       &-status {
         margin-top: 4px;
         font-size: 14px;
+
+        &.is-win {
+          color: palette(green, 500);
+        }
+
+        &.is-lose {
+          color: palette(red, 500);
+        }
+      }
+    }
+
+    .player-name {
+      &.is-win {
+        color: palette(green, 500);
+      }
+
+      &.is-lose {
+        color: palette(red, 500);
       }
     }
   }
