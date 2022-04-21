@@ -150,7 +150,7 @@ const getNFTsForContract = async (
   limit = 500
 ) => {
   return await new Promise((resolve, reject) => {
-    // wait 5 second for avoid rate limit
+    // wait 2 second for avoid rate limit
     setTimeout(() => {
       try {
         const NFTs = Moralis.Web3API.account.getNFTsForContract({
@@ -165,7 +165,7 @@ const getNFTsForContract = async (
       } catch (error) {
         reject(error)
       }
-    }, 5000)
+    }, 2000)
   })
 }
 
