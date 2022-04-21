@@ -1,6 +1,4 @@
 import axios from 'axios'
-import store from '@/store'
-import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   // eslint-disable-next-line no-unused-vars
@@ -14,23 +12,7 @@ export default {
 
     axios.interceptors.response.use(
       response => response,
-      error => {
-        const message = `axios response error: ${error.message}`
-
-        store.dispatch('app/setError', message)
-
-        store.dispatch(
-          'notification/add',
-          {
-            message,
-            type: NOTIFICATION_TYPE.ERROR,
-            timeout: 0
-          },
-          { root: true }
-        )
-
-        return Promise.reject(error)
-      }
+      error => Promise.reject(error)
     )
   }
 }

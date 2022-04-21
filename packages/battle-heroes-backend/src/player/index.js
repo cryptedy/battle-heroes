@@ -12,6 +12,8 @@ const getPlayers = async () => {
   for (const user of users) {
     const player = await createPlayer(user)
 
+    console.log('createPlayer', player.id)
+
     players.push(player)
   }
 

@@ -15,7 +15,7 @@ export default {
   props: {
     message: {
       type: String,
-      default: 'an error occurred.'
+      default: 'an error occurred'
     }
   }
 }

@@ -4,7 +4,7 @@ const { createBattle } = require('../battle')
 const { createMessage } = require('../message')
 const { selectNFT } = require('../NFT/selectors')
 const { selectMessages, selectMessage } = require('../message/selectors')
-const { selectGames, selectGame, selectBattleGame } = require('./selectors')
+const { selectGame, selectBattleGame } = require('./selectors')
 const { addPlayer, updatePlayer } = require('../player/actions')
 const { createPlayer, updatePlayerStats } = require('../player')
 const { addMessage, removeMessage } = require('../message/actions')
@@ -592,15 +592,6 @@ const gameManager = (io, socket) => {
   socket.on('message:delete', onDeleteMessage)
   socket.on('disconnecting', onDisconnecting)
   socket.on('disconnect', onDisconnect)
-
-  setInterval(() => {
-    selectBattles().forEach(battle => {
-      console.log('battle', battle)
-    })
-    selectGames().forEach(game => {
-      console.log('game', game)
-    })
-  }, 10000)
 }
 
 module.exports = {
