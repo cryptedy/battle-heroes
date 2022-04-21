@@ -1,19 +1,26 @@
 import { socket } from '@/plugins'
 import {
   SET_SOCKET_CONNECTED,
-  SET_SOCKET_RECONNECTING
+  SET_SOCKET_CONNECTING,
+  SET_SOCKET_ERROR,
+  SET_SOCKET_CONNECT_ERROR
 } from '../mutation-types'
+import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 const initialState = () => ({
   connected: false,
-  reconnecting: false
+  connecting: false,
+  connectError: '',
+  error: ''
 })
 
 export const state = initialState()
 
 export const getters = {
   isConnected: state => state.connected,
-  isReconnecting: state => state.reconnecting
+  isConnecting: state => state.connecting,
+  connectError: state => state.connectError,
+  error: state => state.error
 }
 
 export const mutations = {
@@ -21,45 +28,103 @@ export const mutations = {
     state.connected = connected
   },
 
-  [SET_SOCKET_RECONNECTING](state, { reconnecting }) {
-    state.reconnecting = reconnecting
+  [SET_SOCKET_CONNECTING](state, { connecting }) {
+    state.connecting = connecting
+  },
+
+  [SET_SOCKET_CONNECT_ERROR](state, { error }) {
+    state.connectError = error
+  },
+
+  [SET_SOCKET_ERROR](state, { error }) {
+    state.error = error
   }
 }
 
 export const actions = {
-  async onConnect({ commit }) {
-    console.log('onConnect')
+  async connect({ commit }) {
+    console.log('socket/connect')
+
+    commit(SET_SOCKET_ERROR, { error: '' })
+    commit(SET_SOCKET_CONNECT_ERROR, { error: '' })
+    commit(SET_SOCKET_CONNECTING, { connecting: true })
+
+    socket.connect()
+  },
+
+  // eslint-disable-next-line no-unused-vars
+  async disconnect(context) {
+    console.log('socket/connect')
+
+    socket.disconnect()
+  },
+
+  async onConnect({ commit, dispatch }) {
+    console.log('socket/onConnect')
 
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
+    commit(SET_SOCKET_CONNECTING, { connecting: false })
+    commit(SET_SOCKET_CONNECT_ERROR, { error: '' })
+    commit(SET_SOCKET_ERROR, { error: '' })
+
+    dispatch(
+      'notification/add',
+      {
+        message: 'socket connected',
+        type: NOTIFICATION_TYPE.SUCCESS
+      },
+      { root: true }
+    )
   },
 
-  async onDisconnect({ commit }, reason) {
-    console.log('onDisconnect', reason)
-
-    if (reason === 'io server disconnect') {
-      socket.connect()
-    }
+  async onDisconnect({ commit, dispatch }, reason) {
+    console.log('socket/onDisconnect', reason)
 
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
+    commit(SET_SOCKET_CONNECTING, { connecting: false })
+
+    dispatch(
+      'notification/add',
+      {
+        message: `socket disconnect: ${reason}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      },
+      { root: true }
+    )
   },
 
-  async onConnectError(context, error) {
-    console.log('onConnectError', error)
+  async onConnectError({ commit, dispatch }, error) {
+    console.log('socket/onConnectError', error)
+
+    commit(SET_SOCKET_CONNECT_ERROR, { error: error.message })
+    commit(SET_SOCKET_CONNECTING, { connecting: false })
+
+    dispatch(
+      'notification/add',
+      {
+        message: `socket connect error: ${error.message}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      },
+      { root: true }
+    )
   },
 
-  async onError(context, error) {
-    console.log('onError', error)
-  },
+  async onError({ commit, dispatch }, error) {
+    console.log('socket/onError', error)
 
-  async onReconnecting({ commit }) {
-    console.log('onReconnecting')
+    commit(SET_SOCKET_ERROR, { error: error.message })
+    commit(SET_SOCKET_CONNECTING, { connecting: false })
 
-    commit(SET_SOCKET_RECONNECTING, { reconnecting: true })
-  },
-
-  async onReconnect({ commit }) {
-    console.log('onReconnect')
-
-    commit(SET_SOCKET_RECONNECTING, { reconnecting: false })
+    dispatch(
+      'notification/add',
+      {
+        message: `socket error: ${error.message}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      },
+      { root: true }
+    )
   }
 }

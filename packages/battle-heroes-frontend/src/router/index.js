@@ -1,5 +1,6 @@
 import store from '@/store'
 import routes from './routes'
+import { NOTIFICATION_TYPE } from '@/utils/constants'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const globalMiddleware = ['auth-check']
@@ -21,7 +22,19 @@ router.afterEach(afterEach)
 export default router
 
 async function onError(error) {
-  console.log(error)
+  const message = `router error: ${error.message}`
+
+  store.dispatch('app/setError', message)
+
+  store.dispatch(
+    'notification/add',
+    {
+      message,
+      type: NOTIFICATION_TYPE.ERROR,
+      timeout: 0
+    },
+    { root: true }
+  )
 }
 
 async function beforeEach(to, from, next) {

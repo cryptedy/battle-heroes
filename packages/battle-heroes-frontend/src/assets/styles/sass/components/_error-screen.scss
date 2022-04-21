@@ -1,0 +1,16 @@
+.error-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 16px;
+
+  &-message {
+    font-size: 22px;
+  }
+
+  &-content {
+    margin-top: 16px;
+  }
+}

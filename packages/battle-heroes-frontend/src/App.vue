@@ -1,17 +1,31 @@
 <template>
-  <SplashScreen
-    v-if="isSocketReconnecting"
-    message="Reconnecting to server..."
-  />
+  <ErrorScreen v-if="appError" :message="appError">
+    <BaseButton type="primary" @click="reload"> RELOAD </BaseButton>
+  </ErrorScreen>
+
+  <ErrorScreen v-else-if="socketError" :message="socketError">
+    <BaseButton type="primary" @click="connectSocket"> RETRY </BaseButton>
+  </ErrorScreen>
+
+  <ErrorScreen v-else-if="socketConnectError" :message="socketConnectError">
+    <BaseButton type="primary" @click="connectSocket"> RETRY </BaseButton>
+  </ErrorScreen>
 
   <SplashScreen
-    v-else-if="!isSocketConnected"
+    v-else-if="isSocketConnecting"
     message="Connecting to server..."
   />
 
   <SplashScreen v-else-if="isAppLoading">
     <RandomNFT />
   </SplashScreen>
+
+  <ErrorScreen
+    v-else-if="!isSocketConnected"
+    message="Could not connect server."
+  >
+    <BaseButton type="primary" @click="connectSocket"> RETRY </BaseButton>
+  </ErrorScreen>
 
   <router-view v-else />
 
@@ -23,6 +37,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import RandomNFT from '@/components/RandomNFT'
+import ErrorScreen from '@/components/ErrorScreen'
 import SplashScreen from '@/components/SplashScreen'
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 import TheNotification from '@/components/TheNotification'
@@ -35,6 +50,7 @@ export default {
 
   components: {
     RandomNFT,
+    ErrorScreen,
     SplashScreen,
     TheNotification
   },
@@ -51,10 +67,13 @@ export default {
 
   computed: {
     ...mapGetters({
+      appError: 'app/error',
+      socketError: 'socket/error',
       isAppLoading: 'app/isLoading',
       notifications: 'notification/all',
       isSocketConnected: 'socket/isConnected',
-      isSocketReconnecting: 'socket/isReconnecting'
+      isSocketConnecting: 'socket/isConnecting',
+      socketConnectError: 'socket/connectError'
     })
   },
 
@@ -65,7 +84,7 @@ export default {
   },
 
   async mounted() {
-    this.$socket.connect()
+    this.connectSocket()
 
     this.$options.unwatch.network = this.$store.watch(
       (state, getters) => getters['network/isOnline'],
@@ -86,7 +105,7 @@ export default {
   },
 
   beforeUnmount() {
-    this.$socket.disconnect()
+    this.disconnectSocket()
 
     window.removeEventListener('load', this.onWindowLoad)
     window.removeEventListener('resize', this.onWindowResize)
@@ -102,8 +121,14 @@ export default {
       setScrollbar: 'scrollbar/set',
       setWindowSize: 'window/setSize',
       addNotification: 'notification/add',
-      setWindowOffset: 'window/setOffset'
+      setWindowOffset: 'window/setOffset',
+      connectSocket: 'socket/connect',
+      disconnectSocket: 'socket/disconnect'
     }),
+
+    reload() {
+      location.reload()
+    },
 
     onWindowLoad() {
       this.setScrollbar({
