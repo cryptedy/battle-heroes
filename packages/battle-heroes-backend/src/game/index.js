@@ -3,11 +3,11 @@ const { findUser } = require('../user')
 const { createBattle } = require('../battle')
 const { createMessage } = require('../message')
 const { selectNFT } = require('../NFT/selectors')
-const { selectMessages, selectMessage } = require('../message/selectors')
 const { selectGame, selectBattleGame } = require('./selectors')
 const { addPlayer, updatePlayer } = require('../player/actions')
 const { createPlayer, updatePlayerStats } = require('../player')
 const { addMessage, removeMessage } = require('../message/actions')
+const { selectMessages, selectMessage } = require('../message/selectors')
 const {
   addGame,
   removeGame,

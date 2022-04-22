@@ -75,9 +75,9 @@ export const actions = {
     commit(SET_SOCKET_CONNECTING, { connecting: false })
 
     if (reason === 'ping timeout') {
-      socket.connect()
+      dispatch('connect')
     } else if (reason === 'transport close') {
-      socket.connect()
+      dispatch('connect')
     } else {
       dispatch(
         'notification/add',

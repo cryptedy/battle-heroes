@@ -3,7 +3,7 @@ import axios from 'axios'
 export default {
   // eslint-disable-next-line no-unused-vars
   install(app, options) {
-    axios.defaults.timeout = 10000
+    axios.defaults.timeout = 15000
 
     axios.interceptors.request.use(
       config => config,
