@@ -59,22 +59,13 @@ export const actions = {
     socket.disconnect()
   },
 
-  async onConnect({ commit, dispatch }) {
+  async onConnect({ commit }) {
     console.log('socket/onConnect')
 
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
     commit(SET_SOCKET_CONNECTING, { connecting: false })
     commit(SET_SOCKET_CONNECT_ERROR, { error: '' })
     commit(SET_SOCKET_ERROR, { error: '' })
-
-    dispatch(
-      'notification/add',
-      {
-        message: 'socket connected',
-        type: NOTIFICATION_TYPE.SUCCESS
-      },
-      { root: true }
-    )
   },
 
   async onDisconnect({ commit, dispatch }, reason) {
@@ -83,15 +74,21 @@ export const actions = {
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
     commit(SET_SOCKET_CONNECTING, { connecting: false })
 
-    dispatch(
-      'notification/add',
-      {
-        message: `socket disconnect: ${reason}`,
-        type: NOTIFICATION_TYPE.ERROR,
-        timeout: 0
-      },
-      { root: true }
-    )
+    if (reason === 'ping timeout') {
+      socket.connect()
+    } else if (reason === 'transport close') {
+      socket.connect()
+    } else {
+      dispatch(
+        'notification/add',
+        {
+          message: `socket disconnect: ${reason}`,
+          type: NOTIFICATION_TYPE.ERROR,
+          timeout: 0
+        },
+        { root: true }
+      )
+    }
   },
 
   async onConnectError({ commit, dispatch }, error) {

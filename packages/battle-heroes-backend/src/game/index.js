@@ -570,13 +570,13 @@ const gameManager = (io, socket) => {
     console.log('onDisconnect', socket.id)
   }
 
-  io.of('/').adapter.on('create-room', room => {
-    console.log('create-room', room)
-  })
+  // io.of('/').adapter.on('create-room', room => {
+  //   console.log('create-room', room)
+  // })
 
-  io.of('/').adapter.on('join-room', (room, socketId) => {
-    console.log('join-room', room, socketId)
-  })
+  // io.of('/').adapter.on('join-room', (room, socketId) => {
+  //   console.log('join-room', room, socketId)
+  // })
 
   socket.on('game:login', onLogin)
   socket.on('game:logout', onLogout)

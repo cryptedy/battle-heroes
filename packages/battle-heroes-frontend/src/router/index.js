@@ -22,9 +22,9 @@ router.afterEach(afterEach)
 export default router
 
 async function onError(error) {
-  const message = `router error: ${error.message}`
+  const message = error.message
 
-  store.dispatch('app/setError', message)
+  store.dispatch('app/setError', error.message)
 
   store.dispatch(
     'notification/add',

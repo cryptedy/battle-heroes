@@ -1,17 +1,16 @@
-const express = require('express')
+const api = require('./api')
 const cors = require('cors')
-const { createServer } = require('http')
+const express = require('express')
+const { getNFTs } = require('./NFT')
 const { Server } = require('socket.io')
 const Moralis = require('moralis/node')
-const api = require('./api')
-const { getNFTs } = require('./NFT')
+const { createServer } = require('http')
 const { gameManager } = require('./game')
 const { getPlayers } = require('./player')
 const { setNFTs } = require('./NFT/actions')
 const { setPlayers } = require('./player/actions')
+const { selectPlayers } = require('./player/selectors')
 const { FRONTEND_URL, PORT } = require('./utils/constants')
-
-let isReady = false
 
 Moralis.start({
   serverUrl: process.env.MORALIS_SERVER_URL,
@@ -21,27 +20,6 @@ Moralis.start({
 const corsOptions = {
   origin: new URL(FRONTEND_URL).origin
 }
-
-// DEBUG
-// const store = require('./store')
-// const { selectPlayers } = require('./player/selectors')
-// const { selectBattles } = require('./battle/selectors')
-// const { selectGames } = require('./game/selectors')
-// setInterval(() => {
-//   const state = store.getState()
-//   console.log(`Players ${state.player.ids.length}`)
-//   console.log(`Battles ${state.battle.ids.length}`)
-//   console.log(selectPlayers())
-//   console.log(selectBattles())
-//   console.log(selectGames())
-//   selectBattles().forEach(battle => {
-//     console.log('battle', battle)
-//   })
-//   selectGames().forEach(game => {
-//     console.log('game', game)
-//   })
-//   console.log(state.battle)
-// }, 5000)
 
 const main = async () => {
   try {
@@ -54,11 +32,14 @@ const main = async () => {
   }
 
   const app = express()
+  const server = createServer(app)
+
+  const isServerReady = () => server.listening && selectPlayers().length > 0
 
   app.use(cors(corsOptions))
   app.use(express.json())
   app.use((req, res, next) => {
-    if (!isReady) {
+    if (!isServerReady()) {
       res.status(503)
     } else {
       next()
@@ -67,14 +48,12 @@ const main = async () => {
 
   app.use(api)
 
-  const server = createServer(app)
-
   const io = new Server(server, {
     cors: corsOptions
   })
 
   io.use((socket, next) => {
-    if (!isReady) {
+    if (!isServerReady()) {
       next(new Error('The server is under maintenance'))
     } else {
       next()
@@ -92,11 +71,8 @@ const main = async () => {
       socket.emit('error', { message, stack })
     })
 
-    process.on('unhandledRejection', (reason, p) => {
-      const message = reason
-      const stack = p
-
-      socket.emit('error', { message, stack })
+    process.on('unhandledRejection', (reason, promise) => {
+      socket.emit('error', { message: reason, stack: promise })
     })
 
     gameManager(io, socket)
@@ -109,8 +85,6 @@ const main = async () => {
       const players = await getPlayers()
 
       setPlayers(players)
-
-      isReady = true
     } catch (error) {
       console.log(error)
 
