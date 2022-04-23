@@ -1,12 +1,19 @@
 import store from '@/store'
+import { socket } from '@/plugins/socket'
 
 export default async (to, from, next) => {
-  if (!store.getters['socket/isConnected']) {
-    store.dispatch('socket/connect')
+  if (!socket.connected) {
+    socket.connect()
   }
 
   if (!store.getters['game/isLogin']) {
-    await store.dispatch('game/login')
+    try {
+      await store.dispatch('game/login')
+    } catch (error) {
+      console.log(error)
+
+      store.dispatch('game/logout')
+    }
   }
 
   next()

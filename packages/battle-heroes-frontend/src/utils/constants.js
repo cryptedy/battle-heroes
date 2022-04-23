@@ -10,13 +10,15 @@ export const BACKEND_URL = process.env.VUE_APP_BACKEND_URL
 export const API_URL = `${BACKEND_URL}/api`
 export const HTTP_TIMEOUT = 20000
 export const SOCKET_TIMEOUT = 20000
-export const DATETIME_FORMAT = 'MM-DD HH:mm:ss'
+export const LOGIN_TIMEOUT = 60000
+export const NOTIFICATION_TIMEOUT = 3000
 export const NOTIFICATION_TYPE = Object.freeze({
   INFORMATION: 'INFORMATION',
   WARNING: 'WARNING',
   SUCCESS: 'SUCCESS',
   ERROR: 'ERROR'
 })
+export const DATETIME_FORMAT = 'MM-DD HH:mm:ss'
 
 export default Object.freeze({
   ...constants,

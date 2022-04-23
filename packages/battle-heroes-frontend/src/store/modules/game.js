@@ -1,4 +1,5 @@
 import { socket } from '@/plugins/socket'
+import { LOGIN_TIMEOUT } from '@/utils/constants'
 
 const initialState = () => ({})
 
@@ -27,26 +28,31 @@ export const getters = {
 }
 
 export const actions = {
+  // eslint-disable-next-line no-unused-vars
   login({ dispatch, rootGetters }) {
     console.log('game/login', rootGetters['auth/user'])
 
     return new Promise((resolve, reject) => {
-      socket.emit(
-        'game:login',
-        rootGetters['auth/user'],
-        ({ status, players, battles, messages }) => {
-          if (!status) {
-            return reject(status)
+      socket
+        .timeout(LOGIN_TIMEOUT)
+        .emit('game:login', rootGetters['auth/user'], (error, response) => {
+          if (error) {
+            return reject(error)
+          } else {
+            const { status, players, battles, messages } = response
+
+            if (!status) {
+              return reject(status)
+            }
+
+            dispatch('addEventListeners')
+            dispatch('player/set', players, { root: true })
+            dispatch('battle/set', battles, { root: true })
+            dispatch('message/set', messages, { root: true })
+
+            resolve(status)
           }
-
-          dispatch('addEventListeners')
-          dispatch('message/set', messages, { root: true })
-          dispatch('battle/set', battles, { root: true })
-          dispatch('player/set', players, { root: true })
-
-          resolve(status)
-        }
-      )
+        })
     })
   },
 

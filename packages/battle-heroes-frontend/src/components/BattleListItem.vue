@@ -47,12 +47,8 @@
         DELETE
       </BaseButton>
 
-      <BaseButton
-        v-if="!BATTLE_STATE.BATTLE && !isPlayerBattle"
-        type="primary"
-        @click="joinBattle"
-      >
-        BATTLE!
+      <BaseButton v-if="canJoinBattle" type="primary" @click="joinBattle">
+        BATTLE
       </BaseButton>
     </div>
   </BaseListItem>
@@ -110,6 +106,18 @@ export default {
 
     NFT2() {
       return this.findNFT(this.battle.players[2].NFT_id)
+    },
+
+    canJoinBattle() {
+      return (
+        !this.hasPlayerBattle &&
+        !this.isPlayerBattle &&
+        this.battle.state === BATTLE_STATE.CREATED
+      )
+    },
+
+    hasPlayerBattle() {
+      return this.playerBattle !== null
     },
 
     isPlayerBattle() {

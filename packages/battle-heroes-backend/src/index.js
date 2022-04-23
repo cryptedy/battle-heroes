@@ -70,11 +70,11 @@ const main = async () => {
 
       io.to(socket.id).emit
 
-      socket.emit('error', { message, stack })
+      socket.emit('server:error', { message, stack })
     })
 
     process.on('unhandledRejection', (reason, promise) => {
-      socket.emit('error', { message: reason, stack: promise })
+      socket.emit('server:error', { message: reason, stack: promise })
     })
 
     gameManager(io, socket)

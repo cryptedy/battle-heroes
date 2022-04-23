@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { NOTIFICATION_TYPE } from '@/utils/constants'
+import { NOTIFICATION_TYPE, NOTIFICATION_TIMEOUT } from '@/utils/constants'
 import { ADD_NOTIFICATION, REMOVE_NOTIFICATION } from '../mutation-types'
 
 const createNotification = notification =>
@@ -8,7 +8,7 @@ const createNotification = notification =>
       id: uuidv4(),
       message: '',
       type: NOTIFICATION_TYPE.INFORMATION,
-      timeout: 6000
+      timeout: NOTIFICATION_TIMEOUT
     },
     notification
   )

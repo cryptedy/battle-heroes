@@ -10,7 +10,7 @@ module.exports = createSlice({
   initialState,
   reducers: {
     add: (state, { payload: game }) => {
-      console.log('game/add', game)
+      console.log('game/add', game.id)
 
       state.entities[game.id] = game
       state.ids.push(game.id)

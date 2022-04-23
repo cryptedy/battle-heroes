@@ -8,15 +8,19 @@
   </ErrorScreen>
 
   <SplashScreen
-    v-else-if="isSocketConnecting"
-    message="Reconnecting to the server..."
+    v-else-if="attemptingGameLogin || reconnectingSocket"
+    :message="
+      attemptingGameLogin
+        ? 'Login to the server...'
+        : 'Reconnecting to the server...'
+    "
   >
     <RandomNFT />
   </SplashScreen>
 
   <ErrorScreen
-    v-else-if="!isSocketConnected"
-    message="Disconnected to the server."
+    v-else-if="!$socket.connected"
+    message="Disconnected to the server"
   >
     <BaseButton type="primary" @click="retry"> RETRY </BaseButton>
   </ErrorScreen>
@@ -64,16 +68,21 @@ export default {
     TheBottomNav
   },
 
+  data() {
+    return {
+      attemptingGameLogin: false,
+      reconnectingSocket: false,
+      socketConnectError: '',
+      socketError: ''
+    }
+  },
+
   computed: {
     ...mapGetters({
       player: 'game/player',
       isGameLogin: 'game/isLogin',
-      socketError: 'socket/error',
       playerBattle: 'game/playerBattle',
-      notifications: 'notification/all',
-      isSocketConnected: 'socket/isConnected',
-      socketConnectError: 'socket/connectError',
-      isSocketConnecting: 'socket/isConnecting'
+      notifications: 'notification/all'
     }),
 
     isGameView() {
@@ -97,8 +106,98 @@ export default {
   mounted() {
     console.log('TheLayoutGame:mounted')
 
-    this.$socket.on('battle:matched', battleId => {
-      console.log('battle:matched', battleId)
+    this.$socket.on('connect', () => this.onSocketConnect())
+    this.$socket.on('disconnect', reason => this.onSocketDisconnect(reason))
+    this.$socket.on('connect_error', error => this.onSocketConnectError(error))
+    this.$socket.io.on('error', error => this.onSocketError(error))
+    this.$socket.on('server:error', error => this.onServerError(error))
+    this.$socket.on('game:error', error => this.onGameError(error))
+    this.$socket.on('battle:matched', battleId =>
+      this.onBattleMatched(battleId)
+    )
+  },
+
+  beforeUnmount() {
+    console.log('TheLayoutGame:beforeUnmount')
+
+    this.$socket.off('connect')
+    this.$socket.off('disconnect')
+    this.$socket.off('connect_error')
+    this.$socket.io.off('error')
+    this.$socket.off('server:error')
+    this.$socket.off('game:error')
+    this.$socket.off('battle:matched')
+  },
+
+  methods: {
+    ...mapActions({
+      loginGame: 'game/login',
+      logoutGame: 'game/logout',
+      addNotification: 'notification/add'
+    }),
+
+    onSocketConnect() {
+      console.log('onSocketConnect')
+
+      this.reconnectingSocket = false
+      this.socketConnectError = ''
+      this.socketError = ''
+
+      this.reloginGame()
+    },
+
+    onSocketDisconnect(reason) {
+      console.log('onSocketDisconnect')
+
+      this.logoutGame()
+
+      if (reason === 'ping timeout' || reason === 'transport close') {
+        this.reconnectSocket()
+      } else {
+        this.addNotification({
+          message: `socket disconnect: ${reason}`,
+          type: NOTIFICATION_TYPE.ERROR,
+          timeout: 0
+        })
+      }
+    },
+
+    onSocketConnectError(error) {
+      console.log('onSocketConnectError', error)
+
+      this.reconnectingSocket = false
+      this.socketConnectError = error.message
+    },
+
+    onSocketError(error) {
+      console.log('onSocketError', error)
+
+      this.reconnectingSocket = false
+      this.socketError = error.message
+    },
+
+    onServerError(error) {
+      console.log('onServerError', error)
+
+      this.addNotification({
+        message: `${error.message} - ${error.stack}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      })
+    },
+
+    onGameError(error) {
+      console.log('onGameError', error)
+
+      this.addNotification({
+        message: `${error.message} - ${error.stack}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      })
+    },
+
+    onBattleMatched(battleId) {
+      console.log('onBattleMatched', battleId)
 
       // TODO: user confirmation
 
@@ -116,22 +215,46 @@ export default {
         },
         () => {}
       )
-    })
-  },
+    },
 
-  beforeUnmount() {
-    this.$socket.off('battle:matched')
-  },
+    async reloginGame() {
+      console.log('reloginGame')
 
-  methods: {
-    ...mapActions({
-      loginGame: 'game/login',
-      connectSocket: 'socket/connect',
-      addNotification: 'notification/add'
-    }),
+      this.attemptingGameLogin = true
+
+      try {
+        await this.loginGame()
+      } catch (error) {
+        this.addNotification({
+          message: error.message,
+          type: NOTIFICATION_TYPE.ERROR,
+          timeout: 0
+        })
+      }
+
+      this.attemptingGameLogin = false
+    },
+
+    reconnectSocket() {
+      console.log('reconnectSocket')
+
+      if (this.reconnectingSocket) return
+
+      this.reconnectingSocket = true
+      this.socketConnectError = ''
+      this.socketError = ''
+
+      this.$socket.connect()
+    },
 
     retry() {
-      location.reload()
+      console.log('retry')
+
+      if (!this.$socket.connected) {
+        this.reconnectSocket()
+      } else if (!this.isGameLogin) {
+        this.reloginGame()
+      }
     }
   }
 }

@@ -10,7 +10,7 @@ module.exports = createSlice({
   initialState,
   reducers: {
     set: (state, { payload: players }) => {
-      console.log('player/set', players)
+      console.log('player/set', players.length)
 
       const entities = {}
 
@@ -24,7 +24,7 @@ module.exports = createSlice({
       state.ids = players.map(player => player.id)
     },
     add: (state, { payload: player }) => {
-      console.log('player/add', player)
+      console.log('player/add', player.id)
 
       state.entities[player.id] = player
       state.ids.push(player.id)

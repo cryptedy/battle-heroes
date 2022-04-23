@@ -88,7 +88,7 @@ const gameManager = (io, socket) => {
   const errorHandler = error => {
     const { message, stack } = error
 
-    socket.emit('error', { message, stack })
+    socket.emit('game:error', { message, stack })
   }
 
   const getRooms = () => io.of('/').adapter.rooms
