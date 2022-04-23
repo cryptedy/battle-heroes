@@ -302,6 +302,12 @@ const gameManager = (io, socket) => {
     const player = findSocketPlayer(socket.id)
 
     if (player) {
+      const playerBattle = selectPlayerBattle(player.id)
+
+      if (playerBattle) {
+        throw new Error('The player already has a battle')
+      }
+
       const battle = selectBattle(battleId)
 
       if (battle) {

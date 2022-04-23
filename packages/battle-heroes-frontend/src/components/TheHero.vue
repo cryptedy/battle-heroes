@@ -29,7 +29,6 @@
 
 <script>
 import axios from 'axios'
-import { mapGetters, mapActions } from 'vuex'
 import { API_URL } from '@/utils/constants'
 import LoginButton from '@/components/LoginButton'
 
@@ -40,11 +39,13 @@ export default {
     LoginButton
   },
 
-  computed: {
-    ...mapGetters({
-      players: 'player/all'
-    }),
+  data() {
+    return {
+      players: []
+    }
+  },
 
+  computed: {
     onlinePlayers() {
       return this.players.filter(player => player.socket_ids.length > 0)
     }
@@ -54,33 +55,12 @@ export default {
     await this.getPlayers()
   },
 
-  async mounted() {
-    this.$socket.on('player:players', players => this.setPlayers(players))
-    this.$socket.on('player:player', player => this.addPlayers(player))
-    this.$socket.on('player:update', player => this.updatePlayers(player))
-  },
-
-  async beforeUnmount() {
-    this.$socket.off('player:players')
-    this.$socket.off('player:player')
-    this.$socket.off('player:update')
-
-    await this.resetPlayers()
-  },
-
   methods: {
-    ...mapActions({
-      addPlayers: 'player/add',
-      setPlayers: 'player/set',
-      updatePlayers: 'player/update',
-      resetPlayers: 'player/reset'
-    }),
-
     async getPlayers() {
       try {
         const { data: players } = await axios.get(`${API_URL}/players`)
 
-        this.setPlayers(players)
+        this.players = players
       } catch (error) {
         console.log(error)
       }

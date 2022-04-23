@@ -1,13 +1,13 @@
 <template>
   <div class="splash-screen">
-    <div v-if="$slots.default" class="splash-screen-content">
-      <slot />
-    </div>
-
     <p class="splash-screen-message">
       <BaseSpinner />
       {{ message }}
     </p>
+
+    <div v-if="$slots.default" class="splash-screen-content">
+      <slot />
+    </div>
   </div>
 </template>
 

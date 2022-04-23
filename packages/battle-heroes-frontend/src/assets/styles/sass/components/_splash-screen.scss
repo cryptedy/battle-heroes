@@ -6,11 +6,12 @@
   height: 100%;
   padding: 16px;
 
-  &-content {
-    //
-  }
-
   &-message {
     font-size: 22px;
+  }
+
+  &-content {
+    margin-top: 16px;
+    text-align: center;
   }
 }

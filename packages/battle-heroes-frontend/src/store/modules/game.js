@@ -4,6 +4,8 @@ const initialState = () => ({})
 
 export const state = initialState()
 
+export const mutations = {}
+
 export const getters = {
   player: (state, getters, rootState, rootGetters) => {
     if (!rootGetters['auth/isLogin']) return null
@@ -32,16 +34,15 @@ export const actions = {
       socket.emit(
         'game:login',
         rootGetters['auth/user'],
-        async ({ status, players, battles, messages }) => {
+        ({ status, players, battles, messages }) => {
           if (!status) {
             return reject(status)
           }
 
           dispatch('addEventListeners')
-
-          await dispatch('player/set', players, { root: true })
-          await dispatch('battle/set', battles, { root: true })
-          await dispatch('message/set', messages, { root: true })
+          dispatch('message/set', messages, { root: true })
+          dispatch('battle/set', battles, { root: true })
+          dispatch('player/set', players, { root: true })
 
           resolve(status)
         }
@@ -49,17 +50,16 @@ export const actions = {
     })
   },
 
-  async logout({ dispatch }) {
+  logout({ dispatch }) {
     console.log('game/logout')
 
     dispatch('removeEventListeners')
-
-    await dispatch('player/reset', null, { root: true })
-    await dispatch('battle/reset', null, { root: true })
-    await dispatch('message/reset', null, { root: true })
+    dispatch('player/reset', null, { root: true })
+    dispatch('battle/reset', null, { root: true })
+    dispatch('message/reset', null, { root: true })
 
     return new Promise(resolve => {
-      socket.emit('game:logout', async () => {
+      socket.emit('game:logout', () => {
         // ignore logout errors
         resolve(true)
       })

@@ -25,25 +25,25 @@ export default [
   {
     path: '/home',
     name: 'home',
-    meta: { middleware: ['auth', 'game', 'battle'] },
+    meta: { middleware: ['auth', 'game'] },
     component: view('Home')
   },
   {
     path: '/players',
     name: 'players',
-    meta: { middleware: ['auth', 'game', 'battle'] },
+    meta: { middleware: ['auth', 'game'] },
     component: view('Players')
   },
   {
     path: '/messages',
     name: 'messages',
-    meta: { middleware: ['auth', 'game', 'battle'] },
+    meta: { middleware: ['auth', 'game'] },
     component: view('Messages')
   },
   {
     path: '/battles',
     name: 'battles',
-    meta: { middleware: ['auth', 'game', 'battle'] },
+    meta: { middleware: ['auth', 'game'] },
     component: view('Battles')
   },
   {
@@ -55,7 +55,7 @@ export default [
   {
     path: '/settings',
     name: 'settings',
-    meta: { middleware: ['auth', 'game', 'battle'] },
+    meta: { middleware: ['auth', 'game'] },
     redirect: { name: 'settings.account' },
     component: view('settings/Index'),
     children: [

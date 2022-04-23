@@ -1,24 +1,27 @@
 <template>
-  <div class="battle">
-    <template v-if="!battle">
-      <p>The battle not found</p>
+  <TheLayoutGame>
+    <ErrorScreen v-if="!battle" message="The battle not found">
       <p>
-        <router-link
-          :to="{ name: 'battles' }"
-          style="font-weight: bold; color: #2196f3"
-        >
-          <FontAwesomeIcon icon="arrow-left" />
-          Back to battle list
-        </router-link>
+        The battle has already finished or the opponent player has ended the
+        battle
       </p>
-    </template>
+      <p style="margin-top: 16px">
+        <BaseButton type="primary" @click="leaveGame">
+          <FontAwesomeIcon icon="arrow-left" />
+          BACK
+        </BaseButton>
+      </p>
+    </ErrorScreen>
 
-    <template v-else-if="!game">
-      <p>GAME LOADING...</p>
-      <p>{{ player1.name }} VS {{ player2.name }}</p>
-    </template>
+    <SplashScreen v-else-if="!game" message="Loading game...">
+      <div style="text-align: center">
+        <p>{{ player1.name }}'s {{ NFT1.name }}</p>
+        <p>VS</p>
+        <p>{{ player2.name }}'s {{ NFT2.name }}</p>
+      </div>
+    </SplashScreen>
 
-    <template v-else>
+    <div v-else class="battle">
       <div class="battle-status">
         <div class="battle-status-actions">
           <BaseButton
@@ -247,8 +250,8 @@
         <button :disabled="true">DEFFENCE</button>
         <button :disabled="true">RUN</button>
       </div>
-    </template>
-  </div>
+    </div>
+  </TheLayoutGame>
 </template>
 
 <script>
@@ -256,13 +259,19 @@ import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
 import HealthBar from '@/components/HealthBar'
 import { scrollToBottom } from '@/utils/helpers'
+import ErrorScreen from '@/components/ErrorScreen'
+import SplashScreen from '@/components/SplashScreen'
+import TheLayoutGame from '@/components/TheLayoutGame'
 import { PLAYER_MOVE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   name: 'Game',
 
   components: {
-    HealthBar
+    HealthBar,
+    ErrorScreen,
+    SplashScreen,
+    TheLayoutGame
   },
 
   unwatch: {
@@ -387,15 +396,13 @@ export default {
   },
 
   created() {
+    console.log('Game:created')
+
     this.audio.currentTime = 0
   },
 
   beforeMount() {
-    console.log('beforeMount')
-  },
-
-  mounted() {
-    console.log('mounted')
+    console.log('Game:beforeMount')
 
     const battle = this.findBattle(this.$route.params.battleId)
 
@@ -412,8 +419,12 @@ export default {
     }
   },
 
+  mounted() {
+    console.log('Game:mounted')
+  },
+
   beforeUnmount() {
-    console.log('beforeUnmount')
+    console.log('Game:beforeUnmount')
 
     this.unwatch()
 
@@ -510,6 +521,15 @@ export default {
       this.$socket.emit('battle:delete', this.battle.id, status => {})
     },
 
+    leaveGame() {
+      this.$router.push(
+        {
+          name: 'battles'
+        },
+        () => {}
+      )
+    },
+
     abortGame() {
       if (this.game && !this.isGameFinished) {
         const answer = window.confirm('Abort the game?')
@@ -519,18 +539,17 @@ export default {
 
       this.aborting = true
 
-      this.$socket.emit('game:finish', this.game.id)
-      // eslint-disable-next-line no-unused-vars
-      this.$socket.emit('battle:delete', this.battle.id, status => {
-        if (status) {
-          this.$router.push(
-            {
-              name: 'battles'
-            },
-            () => {}
-          )
-        }
-      })
+      if (this.game) {
+        this.$socket.emit('game:finish', this.game.id)
+      }
+
+      if (this.battle) {
+        this.$socket.emit('battle:delete', this.battle.id, status => {
+          if (status) {
+            this.leaveGame()
+          }
+        })
+      }
     },
 
     toggleSound() {

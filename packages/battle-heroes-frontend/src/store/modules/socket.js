@@ -2,8 +2,8 @@ import { socket } from '@/plugins'
 import {
   SET_SOCKET_CONNECTED,
   SET_SOCKET_CONNECTING,
-  SET_SOCKET_ERROR,
-  SET_SOCKET_CONNECT_ERROR
+  SET_SOCKET_CONNECT_ERROR,
+  SET_SOCKET_ERROR
 } from '../mutation-types'
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 
@@ -11,6 +11,7 @@ const initialState = () => ({
   connected: false,
   connecting: false,
   connectError: '',
+  disconnectReason: '',
   error: ''
 })
 
@@ -42,7 +43,7 @@ export const mutations = {
 }
 
 export const actions = {
-  async connect({ commit }) {
+  connect({ commit }) {
     console.log('socket/connect')
 
     commit(SET_SOCKET_ERROR, { error: '' })
@@ -53,13 +54,13 @@ export const actions = {
   },
 
   // eslint-disable-next-line no-unused-vars
-  async disconnect(context) {
+  disconnect(context) {
     console.log('socket/connect')
 
     socket.disconnect()
   },
 
-  async onConnect({ commit }) {
+  onConnect({ commit }) {
     console.log('socket/onConnect')
 
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
@@ -68,30 +69,26 @@ export const actions = {
     commit(SET_SOCKET_ERROR, { error: '' })
   },
 
-  async onDisconnect({ commit, dispatch }, reason) {
+  onDisconnect({ commit, dispatch }, reason) {
     console.log('socket/onDisconnect', reason)
 
     commit(SET_SOCKET_CONNECTED, { connected: socket.connected })
     commit(SET_SOCKET_CONNECTING, { connecting: false })
 
-    if (reason === 'ping timeout') {
-      dispatch('connect')
-    } else if (reason === 'transport close') {
-      dispatch('connect')
-    } else {
-      dispatch(
-        'notification/add',
-        {
-          message: `socket disconnect: ${reason}`,
-          type: NOTIFICATION_TYPE.ERROR,
-          timeout: 0
-        },
-        { root: true }
-      )
-    }
+    dispatch(
+      'notification/add',
+      {
+        message: `socket disconnect: ${reason}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      },
+      { root: true }
+    )
+
+    dispatch('game/logout', null, { root: true })
   },
 
-  async onConnectError({ commit, dispatch }, error) {
+  onConnectError({ commit, dispatch }, error) {
     console.log('socket/onConnectError', error)
 
     commit(SET_SOCKET_CONNECT_ERROR, { error: error.message })
@@ -108,7 +105,7 @@ export const actions = {
     )
   },
 
-  async onError({ commit, dispatch }, error) {
+  onError({ commit, dispatch }, error) {
     console.log('socket/onError', error)
 
     commit(SET_SOCKET_ERROR, { error: error.message })

@@ -40,7 +40,9 @@ const main = async () => {
   app.use(express.json())
   app.use((req, res, next) => {
     if (!isServerReady()) {
-      res.status(503)
+      res.status(503).json({
+        message: 'The server is under maintenance'
+      })
     } else {
       next()
     }

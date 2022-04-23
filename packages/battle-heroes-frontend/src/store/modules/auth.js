@@ -53,7 +53,7 @@ export const actions = {
     }
   },
 
-  async loginWithToken({ commit }) {
+  loginWithToken({ commit }) {
     console.log('auth/loginWithToken')
 
     try {

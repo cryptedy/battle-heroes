@@ -17,13 +17,13 @@ export const mutations = {
 }
 
 export const actions = {
-  async onOnline({ commit }) {
+  onOnline({ commit }) {
     console.log('network/onOnline')
 
     commit(SET_NETWORK_CONNECTED, { connected: true })
   },
 
-  async onOffline({ commit }) {
+  onOffline({ commit }) {
     console.log('network/onOffline')
 
     commit(SET_NETWORK_CONNECTED, { connected: false })

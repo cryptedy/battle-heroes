@@ -44,25 +44,25 @@ export const mutations = {
 }
 
 export const actions = {
-  async reset({ commit }) {
+  reset({ commit }) {
     console.log('player/reset')
 
     commit(RESET_PLAYERS)
   },
 
-  async set({ commit }, players) {
+  set({ commit }, players) {
     console.log('player/set', players)
 
     commit(SET_PLAYERS, { players })
   },
 
-  async add({ commit }, player) {
+  add({ commit }, player) {
     console.log('player/add', player)
 
     commit(ADD_PLAYER, { player })
   },
 
-  async update({ commit }, player) {
+  update({ commit }, player) {
     console.log('player/update', player)
 
     commit(UPDATE_PLAYER, { player })

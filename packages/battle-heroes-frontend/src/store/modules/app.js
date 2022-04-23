@@ -35,20 +35,20 @@ export const mutations = {
 }
 
 export const actions = {
-  async setLoading({ commit }, loading) {
+  setLoading({ commit }, loading) {
     console.log('app/setLoading', loading)
 
     commit(SET_APP_LOADING, { loading })
   },
 
-  async setLoaded({ commit }, loaded) {
+  setLoaded({ commit }, loaded) {
     console.log('app/setLoaded', loaded)
 
     commit(SET_APP_LOADED, { loaded })
     commit(SET_APP_ERROR, { error: '' })
   },
 
-  async setError({ commit }, error) {
+  setError({ commit }, error) {
     console.log('app/setError', error)
 
     commit(SET_APP_ERROR, { error })

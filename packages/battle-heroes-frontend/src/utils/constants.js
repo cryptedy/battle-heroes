@@ -8,6 +8,8 @@ export const BATTLE_STATE = constants.BATTLE_STATE
 
 export const BACKEND_URL = process.env.VUE_APP_BACKEND_URL
 export const API_URL = `${BACKEND_URL}/api`
+export const HTTP_TIMEOUT = 20000
+export const SOCKET_TIMEOUT = 20000
 export const DATETIME_FORMAT = 'MM-DD HH:mm:ss'
 export const NOTIFICATION_TYPE = Object.freeze({
   INFORMATION: 'INFORMATION',
@@ -20,6 +22,8 @@ export default Object.freeze({
   ...constants,
   BACKEND_URL,
   API_URL,
+  HTTP_TIMEOUT,
+  SOCKET_TIMEOUT,
   DATETIME_FORMAT,
   NOTIFICATION_TYPE
 })

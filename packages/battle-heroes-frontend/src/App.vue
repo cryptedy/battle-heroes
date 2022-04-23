@@ -3,29 +3,9 @@
     <BaseButton type="primary" @click="reload"> RELOAD </BaseButton>
   </ErrorScreen>
 
-  <ErrorScreen v-else-if="socketError" :message="socketError">
-    <BaseButton type="primary" @click="connectSocket"> RETRY </BaseButton>
-  </ErrorScreen>
-
-  <ErrorScreen v-else-if="socketConnectError" :message="socketConnectError">
-    <BaseButton type="primary" @click="connectSocket"> RETRY </BaseButton>
-  </ErrorScreen>
-
-  <SplashScreen
-    v-else-if="isSocketConnecting"
-    message="Connecting to server..."
-  />
-
   <SplashScreen v-else-if="isAppLoading">
     <RandomNFT />
   </SplashScreen>
-
-  <ErrorScreen
-    v-else-if="!isSocketConnected"
-    message="Could not connect server."
-  >
-    <BaseButton type="primary" @click="connectSocket"> RETRY </BaseButton>
-  </ErrorScreen>
 
   <router-view v-else />
 
@@ -68,12 +48,8 @@ export default {
   computed: {
     ...mapGetters({
       appError: 'app/error',
-      socketError: 'socket/error',
       isAppLoading: 'app/isLoading',
-      notifications: 'notification/all',
-      isSocketConnected: 'socket/isConnected',
-      isSocketConnecting: 'socket/isConnecting',
-      socketConnectError: 'socket/connectError'
+      notifications: 'notification/all'
     })
   },
 
@@ -84,8 +60,6 @@ export default {
   },
 
   async mounted() {
-    this.connectSocket()
-
     this.$options.unwatch.network = this.$store.watch(
       (state, getters) => getters['network/isOnline'],
       (value, oldValue) => {
@@ -96,7 +70,7 @@ export default {
           })
         } else if (oldValue) {
           this.addNotification({
-            message: 'FOOLINE!',
+            message: 'OFFLINE!',
             type: NOTIFICATION_TYPE.ERROR
           })
         }
@@ -105,8 +79,6 @@ export default {
   },
 
   beforeUnmount() {
-    this.disconnectSocket()
-
     window.removeEventListener('load', this.onWindowLoad)
     window.removeEventListener('resize', this.onWindowResize)
     window.removeEventListener('scroll', this.onWindowScroll)
@@ -121,9 +93,7 @@ export default {
       setScrollbar: 'scrollbar/set',
       setWindowSize: 'window/setSize',
       addNotification: 'notification/add',
-      setWindowOffset: 'window/setOffset',
-      connectSocket: 'socket/connect',
-      disconnectSocket: 'socket/disconnect'
+      setWindowOffset: 'window/setOffset'
     }),
 
     reload() {

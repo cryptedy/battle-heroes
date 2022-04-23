@@ -106,14 +106,18 @@ export default {
     onSelectNFT(NFT) {
       this.dialogShown = false
 
-      this.$socket.emit('battle:create', NFT.id, status => {
-        console.log('battle:create')
-        console.log(status)
+      this.$socket.emit('battle:create', NFT.id, ({ status }) => {
+        console.log('battle:create', status)
 
         if (status) {
           this.addNotification({
-            message: 'Battle created!',
+            message: 'Battle created',
             type: NOTIFICATION_TYPE.SUCCESS
+          })
+        } else {
+          this.addNotification({
+            message: 'Failed to create game',
+            type: NOTIFICATION_TYPE.ERROR
           })
         }
       })

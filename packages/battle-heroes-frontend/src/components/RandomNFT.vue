@@ -44,11 +44,18 @@
 <script>
 import { mapGetters } from 'vuex'
 
+const getRandomArbitrary = (min, max) => {
+  return Math.floor(Math.random() * (max - min) + min)
+}
+
 export default {
   name: 'RandomNFT',
 
+  intervalId: null,
+
   data() {
     return {
+      min: 1,
       imageLoaded: false
     }
   },
@@ -62,11 +69,23 @@ export default {
     randomNFT() {
       if (!this.NFTsCount > 0) return
 
-      const min = Math.ceil(1)
+      const min = this.min
       const max = Math.floor(this.NFTsCount)
       const id = Math.floor(Math.random() * (max - min) + min)
 
       return this.NFTs.find(NFT => NFT.id === id)
+    }
+  },
+
+  mounted() {
+    this.$options.intervalId = setInterval(() => {
+      this.min = getRandomArbitrary(1, this.NFTsCount)
+    }, 10000)
+  },
+
+  beforeUnmount() {
+    if (this.$options.intervalId) {
+      clearInterval(this.$options.intervalId)
     }
   },
 
