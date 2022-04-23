@@ -14,12 +14,12 @@
         <div style="width: 64px; height: 64px">
           <img
             src="@/assets/images/blank-NFT.png"
-            alt="NO PLAYER"
+            alt="OPPONENT WANTED"
             width="512"
             height="512"
           />
         </div>
-        NO PLAYER
+        OPPONENT WANTED
       </template>
       <template v-else>
         <div style="width: 64px; height: 64px">
@@ -37,7 +37,7 @@
     <div class="battle-list-item-actions">
       <BaseDialog
         :open="dialogShown"
-        title="Select NFTs"
+        title="Select a NFT to use in battle"
         @close="onCloseDialog"
       >
         <SelectNFTs :player="player" @select="onSelectNFT" />

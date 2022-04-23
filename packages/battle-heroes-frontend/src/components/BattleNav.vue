@@ -14,13 +14,13 @@
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
-    <BaseButton
+    <!-- <BaseButton
       v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"
       type="primary"
       @click="randomBattle"
     >
       RANDOM BATTLE
-    </BaseButton>
+    </BaseButton> -->
 
     <BaseButton
       v-if="!playerBattle && player.state === PLAYER_STATE.IDLE"

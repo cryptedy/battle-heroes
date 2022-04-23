@@ -166,6 +166,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       color: palette(grey, 0);
+      user-select: none;
       &:disabled {
         border: 1px solid palette(grey, 800);
         background-color: palette(grey, 800);

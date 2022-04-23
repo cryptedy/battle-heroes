@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import PlayerState from '@/components/PlayerState'
 import PlayerStats from '@/components/PlayerStats'
 import PlayerAvatar from '@/components/PlayerAvatar'
@@ -60,6 +61,16 @@ export default {
     player: {
       type: Object,
       required: true
+    }
+  },
+
+  computed: {
+    ...mapGetters({
+      gamePlayer: 'game/player'
+    }),
+
+    isPlayer() {
+      return this.gamePlayer.id === this.player.id
     }
   }
 }

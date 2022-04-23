@@ -54,13 +54,21 @@
           </dl>
         </li>
       </ul>
+
+      <BattleCreateButton :nft="nft" />
     </div>
   </BaseDialog>
 </template>
 
 <script>
+import BattleCreateButton from '@/components/BattleCreateButton'
+
 export default {
   name: 'BaseNFT',
+
+  components: {
+    BattleCreateButton
+  },
 
   props: {
     nft: {
