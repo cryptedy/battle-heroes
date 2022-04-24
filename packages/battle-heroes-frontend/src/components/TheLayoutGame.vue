@@ -194,15 +194,17 @@ export default {
         type: NOTIFICATION_TYPE.SUCCESS
       })
 
-      this.$router.push(
-        {
-          name: 'game',
-          params: {
-            battleId: battleId
-          }
-        },
-        () => {}
-      )
+      if (!this.isGameView) {
+        this.$router.push(
+          {
+            name: 'game',
+            params: {
+              battleId: battleId
+            }
+          },
+          () => {}
+        )
+      }
     },
 
     async reloginGame() {

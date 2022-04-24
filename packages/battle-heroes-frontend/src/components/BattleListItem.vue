@@ -48,7 +48,7 @@
       </BaseButton>
 
       <BaseButton v-if="canJoinBattle" type="primary" @click="joinBattle">
-        BATTLE
+        JOIN BATTLE
       </BaseButton>
     </div>
   </BaseListItem>

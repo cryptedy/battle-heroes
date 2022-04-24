@@ -13,6 +13,25 @@
       </p>
     </ErrorScreen>
 
+    <div v-else-if="isBattleCreated">
+      <p>The battle not started</p>
+      <p>{{ player1.name }}'s {{ NFT1.name }}</p>
+
+      <template v-if="canJoinBattle">
+        <BaseDialog
+          :open="dialogShown"
+          title="Select a NFT to use in battle"
+          @close="onCloseDialog"
+        >
+          <SelectNFTs :player="player" @select="onSelectNFT" />
+        </BaseDialog>
+
+        <BaseButton v-if="canJoinBattle" type="primary" @click="joinBattle">
+          JOIN BATTLE
+        </BaseButton>
+      </template>
+    </div>
+
     <SplashScreen v-else-if="!game" message="Loading game...">
       <div style="text-align: center">
         <p>{{ player1.name }}'s {{ NFT1.name }}</p>
@@ -24,16 +43,24 @@
     <div v-else class="battle">
       <div class="battle-status">
         <div class="battle-status-actions">
-          <BaseButton
-            :type="isGameFinished ? 'primary' : 'danger'"
-            @click="abortGame"
-          >
+          <BaseButton v-if="canLeave" type="primary" @click="leaveGame">
+            <FontAwesomeIcon icon="arrow-left" />
+          </BaseButton>
+
+          <BaseButton v-else type="danger" @click="abortGame">
             <FontAwesomeIcon icon="arrow-left" />
           </BaseButton>
         </div>
 
         <div class="battle-status-primary">
-          <template v-if="isGameFinished">
+          <p>=== TURN {{ game.turn }} ===</p>
+
+          <template v-if="aborted">
+            <p style="font-weight: bold; color: #4caf50">YOU WINI!</p>
+            <p>Opponent player aborted the battle.</p>
+          </template>
+
+          <template v-else-if="isGameFinished">
             <p
               v-if="playerStatus.hp > opponentStatus.hp"
               style="font-weight: bold; color: #4caf50"
@@ -41,19 +68,6 @@
               YOU WINI!
             </p>
             <p v-else style="font-weight: bold; color: #f44336">YOU LOSE!</p>
-          </template>
-          <p>
-            TURN {{ game.turn }}
-            <template v-if="!isGameFinished">
-              <p v-if="canMove" style="font-weight: bold; color: #2196f3">
-                Select your move!
-              </p>
-              <p v-else style="color: rgba(255, 255, 255, 0.5)">
-                Waiting for opponent...
-              </p>
-            </template>
-          </p>
-          <p v-if="isGameFinished">
             <router-link
               :to="{ name: 'battles' }"
               style="font-weight: bold; color: #2196f3"
@@ -61,7 +75,16 @@
               <FontAwesomeIcon icon="arrow-left" />
               Back to battle list
             </router-link>
-          </p>
+          </template>
+
+          <template v-else>
+            <p v-if="canMove" style="font-weight: bold; color: #2196f3">
+              Select your move!
+            </p>
+            <p v-else style="color: rgba(255, 255, 255, 0.5)">
+              Waiting for opponent...
+            </p>
+          </template>
         </div>
 
         <div class="battle-status-actions">
@@ -259,16 +282,18 @@ import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
 import HealthBar from '@/components/HealthBar'
 import { scrollToBottom } from '@/utils/helpers'
+import SelectNFTs from '@/components/SelectNFTs'
 import ErrorScreen from '@/components/ErrorScreen'
 import SplashScreen from '@/components/SplashScreen'
 import TheLayoutGame from '@/components/TheLayoutGame'
-import { PLAYER_MOVE, NOTIFICATION_TYPE } from '@/utils/constants'
+import { PLAYER_MOVE, BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   name: 'Game',
 
   components: {
     HealthBar,
+    SelectNFTs,
     ErrorScreen,
     SplashScreen,
     TheLayoutGame
@@ -282,7 +307,7 @@ export default {
 
   // eslint-disable-next-line no-unused-vars
   beforeRouteLeave(to, from) {
-    if (!this.aborting && this.game && !this.isGameFinished) {
+    if (this.game && !this.aborting && !this.canLeave) {
       window.confirm('You cannot leave this page during the battle.')
 
       return false
@@ -291,18 +316,25 @@ export default {
 
   data() {
     return {
+      dialogShown: false,
+
       loading: false,
-      battle: null,
+
+      battleCache: null,
+
       game: null,
+      aborting: false,
+      aborted: false,
+
       playerState: {
         takingDamage: false
       },
       opponentState: {
         takingDamage: false
       },
+
       audio: new Audio(BGM),
-      soundPaused: true,
-      aborting: false
+      soundPaused: true
     }
   },
 
@@ -311,8 +343,52 @@ export default {
       findNFT: 'NFT/find',
       player: 'game/player',
       findBattle: 'battle/find',
-      findPlayer: 'player/find'
+      findPlayer: 'player/find',
+      playerBattle: 'game/playerBattle'
     }),
+
+    battle() {
+      return this.findBattle(this.$route.params.battleId) || this.battleCache
+    },
+
+    hasPlayerBattle() {
+      return this.playerBattle !== null
+    },
+
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
+    },
+
+    isBattleCreated() {
+      return this.battle.state === BATTLE_STATE.CREATED
+    },
+
+    isBattleReady() {
+      return this.battle.state === BATTLE_STATE.READY
+    },
+
+    isBattleStarted() {
+      return this.battle.state === BATTLE_STATE.STARTED
+    },
+
+    isBattleEnded() {
+      return this.battle.state === BATTLE_STATE.ENDED
+    },
+
+    battlePlayersJoined() {
+      return !Object.keys(this.battle.players).some(
+        playerKey => this.battle.players[playerKey].id === null
+      )
+    },
+
+    canJoinBattle() {
+      return (
+        !this.hasPlayerBattle &&
+        !this.isPlayerBattle &&
+        this.isBattleCreated &&
+        !this.battlePlayersJoined
+      )
+    },
 
     player1() {
       return this.findPlayer(this.battle.players[1].id)
@@ -386,9 +462,14 @@ export default {
       return this.playerHp <= 0 || this.opponentHp <= 0
     },
 
+    canLeave() {
+      return !(!this.aborted && !this.isGameFinished)
+    },
+
     canMove() {
       return (
         !this.loading &&
+        !this.aborted &&
         !this.isGameFinished &&
         this.game.current_player === this.playerKey
       )
@@ -398,37 +479,31 @@ export default {
   created() {
     console.log('Game:created')
 
+    this.$socket.on('battle:matched', battleId =>
+      this.onBattleMatched(battleId)
+    )
+    this.$socket.on('game:aborted', gameId => this.onGameAborted(gameId))
+
     this.audio.currentTime = 0
   },
 
   beforeMount() {
     console.log('Game:beforeMount')
-
-    const battle = this.findBattle(this.$route.params.battleId)
-
-    if (battle) {
-      if (
-        !Object.keys(battle.players).some(
-          playerKey => battle.players[playerKey].id === null
-        )
-      ) {
-        this.battle = battle
-
-        this.$socket.emit('game:start', this.battle.id, this.onGameStart)
-      }
-    }
   },
 
   mounted() {
     console.log('Game:mounted')
+
+    if (this.battle && (this.isBattleReady || this.isBattleStarted)) {
+      this.$socket.emit('game:start', this.battle.id, this.onGameStart)
+    }
   },
 
   beforeUnmount() {
     console.log('Game:beforeUnmount')
 
     this.unwatch()
-
-    this.$socket.off('game:update')
+    this.removeEventListener()
 
     this.audio.pause()
   },
@@ -440,6 +515,8 @@ export default {
     }),
 
     attack() {
+      console.log('attack')
+
       if (!this.canMove) return
 
       this.loading = true
@@ -447,19 +524,152 @@ export default {
       this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
     },
 
+    leaveGame() {
+      console.log('leaveGame')
+
+      return this.$router.push(
+        {
+          name: 'battles'
+        },
+        () => {}
+      )
+    },
+
+    abortGame() {
+      console.log('abortGame')
+
+      if (!this.canLeave) {
+        const answer = window.confirm('Abort the game and you lose.')
+
+        if (!answer) return false
+      }
+
+      this.aborting = true
+
+      if (this.game) {
+        // eslint-disable-next-line no-unused-vars
+        this.$socket.emit('game:abort', this.game.id, ({ status }) => {
+          this.leaveGame().then(() => {
+            this.aborting = false
+          })
+        })
+      }
+    },
+
     onGameStart({ status, game }) {
-      console.log('game:start', status, game)
+      console.log('onGameUpdate', status, game)
 
       if (!status) {
         return this.addNotification({
           message: 'Failed to update the game',
-          type: NOTIFICATION_TYPE.ERROR
+          type: NOTIFICATION_TYPE.ERROR,
+          timeout: 0
         })
       }
 
-      this.$socket.on('game:update', this.onGameUpdate)
+      this.battleCache = this.battle
 
       this.game = game
+
+      this.watch()
+
+      this.$socket.on('game:update', this.onGameUpdate)
+
+      this.$nextTick(() => scrollToBottom(this.$refs.messages, false))
+    },
+
+    onGameUpdate(game) {
+      console.log('onGameUpdate', game)
+
+      this.game = game
+
+      this.$nextTick(() => scrollToBottom(this.$refs.messages, true))
+
+      this.loading = false
+    },
+
+    onGameFinished() {
+      console.log('onGameFinished')
+
+      this.unwatch()
+      this.removeEventListener()
+
+      if (this.playerHp > this.opponentHp) {
+        this.game.messages.push('=== You win! got 3 exp ===')
+      } else {
+        this.game.messages.push('=== You lose... got 1 exp ===')
+      }
+
+      this.$socket.emit('game:finish', this.game.id)
+    },
+
+    onGameAborted(gameId) {
+      console.log('onGameAborted', gameId)
+
+      if (gameId === this.game.id) {
+        this.aborted = true
+
+        this.game.messages.push('=== Opponent player aborted the game ===')
+        this.game.messages.push('=== You win! got 3 exp ===')
+
+        this.addNotification({
+          message: 'Opponent player aborted the game',
+          type: NOTIFICATION_TYPE.ERROR,
+          timeout: 0
+        })
+      }
+    },
+
+    onBattleMatched(battleId) {
+      console.log('onBattleMatched', battleId, this.battle.id)
+
+      if (battleId === this.battle.id) {
+        this.$socket.emit('game:start', this.battle.id, this.onGameStart)
+      } else {
+        this.$router.push(
+          {
+            name: 'game',
+            params: {
+              battleId: battleId
+            }
+          },
+          () => {}
+        )
+      }
+    },
+
+    joinBattle() {
+      this.dialogShown = true
+    },
+
+    onCloseDialog() {
+      this.dialogShown = false
+    },
+
+    onSelectNFT(NFT) {
+      this.$socket.emit('battle:join', this.battle.id, NFT.id)
+
+      this.dialogShown = false
+    },
+
+    toggleSound() {
+      if (this.soundPaused) {
+        this.audio.play()
+        this.soundPaused = false
+      } else {
+        this.audio.pause()
+        this.soundPaused = true
+      }
+    },
+
+    removeEventListener() {
+      this.$socket.off('game:update')
+      this.$socket.off('game:aborted')
+      this.$socket.off('battle:matched')
+    },
+
+    watch() {
+      if (!this.game) return
 
       this.$options.unwatch.playerHp = this.$watch(
         'playerHp',
@@ -495,71 +705,6 @@ export default {
           if (value & !oldValue) this.onGameFinished()
         }
       )
-
-      this.$nextTick(() => scrollToBottom(this.$refs.messages, false))
-    },
-
-    onGameUpdate(game) {
-      this.game = game
-
-      this.$nextTick(() => scrollToBottom(this.$refs.messages, true))
-
-      this.loading = false
-    },
-
-    onGameFinished() {
-      this.unwatch()
-
-      if (this.playerHp > this.opponentHp) {
-        this.game.messages.push('You win! got 3 exp.')
-      } else {
-        this.game.messages.push('You lose... got 1 exp.')
-      }
-
-      this.$socket.emit('game:finish', this.game.id)
-      // eslint-disable-next-line no-unused-vars
-      this.$socket.emit('battle:delete', this.battle.id, status => {})
-    },
-
-    leaveGame() {
-      this.$router.push(
-        {
-          name: 'battles'
-        },
-        () => {}
-      )
-    },
-
-    abortGame() {
-      if (this.game && !this.isGameFinished) {
-        const answer = window.confirm('Abort the game?')
-
-        if (!answer) return false
-      }
-
-      this.aborting = true
-
-      if (this.game) {
-        this.$socket.emit('game:finish', this.game.id)
-      }
-
-      if (this.battle) {
-        this.$socket.emit('battle:delete', this.battle.id, status => {
-          if (status) {
-            this.leaveGame()
-          }
-        })
-      }
-    },
-
-    toggleSound() {
-      if (this.soundPaused) {
-        this.audio.play()
-        this.soundPaused = false
-      } else {
-        this.audio.pause()
-        this.soundPaused = true
-      }
     },
 
     unwatch() {

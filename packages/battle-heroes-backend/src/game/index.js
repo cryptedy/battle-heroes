@@ -3,6 +3,7 @@ const { findUser } = require('../user')
 const { createBattle } = require('../battle')
 const { createMessage } = require('../message')
 const { selectNFT } = require('../NFT/selectors')
+const { postDiscord } = require('../utils/discord')
 const { selectGame, selectBattleGame } = require('./selectors')
 const { addPlayer, updatePlayer } = require('../player/actions')
 const { createPlayer, updatePlayerStats } = require('../player')
@@ -23,7 +24,8 @@ const {
 const {
   PLAYER_STATE,
   PLAYER_MOVE,
-  BATTLE_STATE
+  BATTLE_STATE,
+  DISCORD_POST_TYPE
 } = require('../utils/constants')
 const {
   selectBattles,
@@ -157,7 +159,7 @@ class GameManager {
   }
 
   startGame(battleId, callback) {
-    console.log('start', this.socket.id, battleId)
+    console.log('startGame', this.socket.id, battleId)
 
     const battle = selectBattle(battleId)
 
@@ -196,12 +198,68 @@ class GameManager {
   }
 
   finishGame(gameId) {
-    console.log('finish', this.socket.id, gameId)
+    console.log('finishGame', this.socket.id, gameId)
 
     const game = selectGame(gameId)
 
     if (game) {
       removeGame(gameId)
+
+      const battle = selectBattle(game.battle_id)
+
+      if (battle) {
+        this.deleteBattle(battle.id, () => {})
+      }
+    }
+  }
+
+  abortGame(gameId, callback) {
+    console.log('abortGame', this.socket.id, gameId)
+
+    const game = selectGame(gameId)
+
+    if (game) {
+      removeGame(gameId)
+
+      const battle = selectBattle(game.battle_id)
+
+      if (battle) {
+        const battleCache = battle
+
+        this.deleteBattle(battle.id, ({ status }) => {
+          if (status) {
+            const player = this.findSocketPlayer(this.socket.id)
+
+            if (player) {
+              updatePlayerStats(player.id, {
+                lose: player.lose + 1
+              }).then(() => {
+                this.io.emit('player:update', selectPlayer(player.id))
+              })
+
+              const opponentPlayer = this.getBattleOpponentPlayer(
+                battleCache,
+                player.id
+              )
+
+              if (opponentPlayer) {
+                updatePlayerStats(opponentPlayer.id, {
+                  exp: opponentPlayer.exp + 3,
+                  win: opponentPlayer.win + 1
+                }).then(() => {
+                  this.io.emit('player:update', selectPlayer(opponentPlayer.id))
+                })
+
+                this.io.to(opponentPlayer.id).emit('game:aborted', game.id)
+              }
+            }
+          }
+        })
+      }
+
+      callback({ status: true })
+    } else {
+      callback({ status: false })
     }
   }
 
@@ -249,7 +307,7 @@ class GameManager {
       const rand = Math.floor(Math.random() * 100)
 
       if (rand <= 10) {
-        localMessages.push('Miss!')
+        localMessages.push('=== MISS!! ===')
       } else {
         let damage = Math.floor(
           (game.players[playerKey].attack * 100) /
@@ -259,7 +317,7 @@ class GameManager {
         if (rand >= 95) {
           damage = Math.floor(damage * 1.5)
 
-          localMessages.push('Critical hit!!')
+          localMessages.push('=== CRITICAL HIT!! ===')
         }
 
         let hp = game.players[opponentKey].hp - damage
@@ -307,6 +365,16 @@ class GameManager {
           this.io.emit('player:update', selectPlayer(player.id))
           this.io.emit('player:update', selectPlayer(opponentPlayer.id))
           this.io.emit('battle:update', selectBattle(battle.id))
+
+          postDiscord({
+            type: DISCORD_POST_TYPE.BATTLE_ENDED,
+            payload: {
+              player1: selectPlayer(player.id),
+              player2: selectPlayer(opponentPlayer.id),
+              battle: selectBattle(battle.id),
+              game: selectGame(game.id)
+            }
+          })
         }
 
         updateGamePlayer({
@@ -360,6 +428,14 @@ class GameManager {
 
       this.io.emit('player:update', selectPlayer(player.id))
       this.io.emit('battle:battle', selectBattle(battle.id))
+
+      postDiscord({
+        type: DISCORD_POST_TYPE.BATTLE_CREATED,
+        payload: {
+          player: selectPlayer(player.id),
+          battle: selectBattle(battle.id)
+        }
+      })
 
       callback({ status: true })
     } else {
@@ -467,6 +543,15 @@ class GameManager {
 
     this.io.to(player.id).emit('battle:matched', battle.id)
     this.io.to(opponentPlayer.id).emit('battle:matched', battle.id)
+
+    postDiscord({
+      type: DISCORD_POST_TYPE.BATTLE_MATCHED,
+      payload: {
+        player1: selectPlayer(player.id),
+        player2: selectPlayer(opponentPlayer.id),
+        battle: selectBattle(battle.id)
+      }
+    })
   }
 
   leaveBattle(battleId) {
@@ -662,6 +747,13 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    'game:abort': (...args) => {
+      try {
+        this.abortGame(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
     'game:move': (...args) => {
       try {
         this.moveGame(...args)
@@ -755,6 +847,7 @@ class GameManager {
     this.socket.on('game:logout', this.eventListeners['game:logout'])
     this.socket.on('game:start', this.eventListeners['game:start'])
     this.socket.on('game:finish', this.eventListeners['game:finish'])
+    this.socket.on('game:abort', this.eventListeners['game:abort'])
     this.socket.on('game:move', this.eventListeners['game:move'])
     this.socket.on('battle:create', this.eventListeners['battle:create'])
     this.socket.on('battle:delete', this.eventListeners['battle:delete'])
@@ -778,6 +871,7 @@ class GameManager {
     this.socket.off('game:logout', this.eventListeners['game:logout'])
     this.socket.off('game:start', this.eventListeners['game:start'])
     this.socket.off('game:finish', this.eventListeners['game:finish'])
+    this.socket.off('game:abort', this.eventListeners['game:abort'])
     this.socket.off('game:move', this.eventListeners['game:move'])
     this.socket.off('battle:create', this.eventListeners['battle:create'])
     this.socket.off('battle:delete', this.eventListeners['battle:delete'])

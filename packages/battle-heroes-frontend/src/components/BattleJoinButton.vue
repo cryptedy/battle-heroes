@@ -8,9 +8,7 @@
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
-    <BaseButton v-if="canJoinBattle" type="primary" @click="joinBattle">
-      BATTLE
-    </BaseButton>
+    <BaseButton type="primary" @click="joinBattle"> JOIN BATTLE </BaseButton>
   </div>
 </template>
 

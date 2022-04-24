@@ -66,7 +66,7 @@ export const actions = {
 
     return new Promise(resolve => {
       socket.emit('game:logout', () => {
-        // ignore logout errors
+        // ignore logout error
         resolve(true)
       })
     })
