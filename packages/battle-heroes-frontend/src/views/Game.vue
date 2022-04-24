@@ -444,7 +444,7 @@ export default {
 
       this.loading = true
 
-      this.$socket.emit('player:move', PLAYER_MOVE.ATTACK)
+      this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
     },
 
     onGameStart({ status, game }) {

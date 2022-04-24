@@ -110,7 +110,6 @@ export default {
     this.$socket.on('disconnect', reason => this.onSocketDisconnect(reason))
     this.$socket.on('connect_error', error => this.onSocketConnectError(error))
     this.$socket.io.on('error', error => this.onSocketError(error))
-    this.$socket.on('server:error', error => this.onServerError(error))
     this.$socket.on('game:error', error => this.onGameError(error))
     this.$socket.on('battle:matched', battleId =>
       this.onBattleMatched(battleId)
@@ -124,7 +123,6 @@ export default {
     this.$socket.off('disconnect')
     this.$socket.off('connect_error')
     this.$socket.io.off('error')
-    this.$socket.off('server:error')
     this.$socket.off('game:error')
     this.$socket.off('battle:matched')
   },
@@ -176,21 +174,11 @@ export default {
       this.socketError = error.message
     },
 
-    onServerError(error) {
-      console.log('onServerError', error)
-
-      this.addNotification({
-        message: `${error.message} - ${error.stack}`,
-        type: NOTIFICATION_TYPE.ERROR,
-        timeout: 0
-      })
-    },
-
     onGameError(error) {
       console.log('onGameError', error)
 
       this.addNotification({
-        message: `${error.message} - ${error.stack}`,
+        message: error.message,
         type: NOTIFICATION_TYPE.ERROR,
         timeout: 0
       })

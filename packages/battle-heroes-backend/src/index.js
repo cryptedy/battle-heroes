@@ -5,7 +5,7 @@ const { getNFTs } = require('./NFT')
 const { Server } = require('socket.io')
 const Moralis = require('moralis/node')
 const { createServer } = require('http')
-const { gameManager } = require('./game')
+const { GameManager } = require('./game')
 const { getPlayers } = require('./player')
 const { setNFTs } = require('./NFT/actions')
 const { setPlayers } = require('./player/actions')
@@ -22,15 +22,6 @@ const corsOptions = {
 }
 
 const main = async () => {
-  try {
-    const NFTs = await getNFTs()
-    setNFTs(NFTs)
-  } catch (error) {
-    console.log(error)
-
-    process.exit(1)
-  }
-
   const app = express()
   const server = createServer(app)
 
@@ -65,34 +56,49 @@ const main = async () => {
   io.on('connection', async socket => {
     console.log('onConnection', socket.id)
 
-    process.on('uncaughtException', error => {
-      const { message, stack } = error
+    const gameManager = new GameManager(io, socket)
 
-      io.to(socket.id).emit
+    gameManager.listen(error => {
+      if (error) throw new Error(error)
 
-      socket.emit('server:error', { message, stack })
+      console.log(`Game manager listen for ${socket.id}`)
     })
-
-    process.on('unhandledRejection', (reason, promise) => {
-      socket.emit('server:error', { message: reason, stack: promise })
-    })
-
-    gameManager(io, socket)
   })
 
-  server.listen(PORT, async () => {
-    console.log(`Listening on ${server.address().port}`)
+  server.listen(PORT, async error => {
+    if (error) throw new Error(error)
+
+    console.log(`Server listening on ${server.address().port}`)
+
+    try {
+      const NFTs = await getNFTs()
+      setNFTs(NFTs)
+    } catch (error) {
+      console.log(error)
+
+      process.exit(1)
+    }
 
     try {
       const players = await getPlayers()
 
       setPlayers(players)
     } catch (error) {
-      console.log(error)
+      console.eror(error)
 
       process.exit(1)
     }
   })
 }
 
-main()
+process.on('uncaughtException', error => console.error(error))
+
+process.on('unhandledRejection', (reason, promise) =>
+  console.error(reason, promise)
+)
+
+try {
+  main()
+} catch (error) {
+  console.error(error)
+}
