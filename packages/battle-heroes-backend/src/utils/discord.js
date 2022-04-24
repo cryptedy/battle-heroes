@@ -25,7 +25,7 @@ const createBattleCreatedData = (player, battle) => {
     // content: `${player.name} created a new battle`,
     embeds: [
       {
-        title: `${NFT.name} created a new battle`,
+        title: `${player.name} created a new battle`,
         description: `${player.name}'s stats`,
         url: `${FRONTEND_URL}/battles/${battle.id}`,
         color: 5025360,
@@ -71,7 +71,7 @@ const createBattleMatchedData = (player1, player2, battle) => {
         title: `${player1.name} challenged ${player2.name}`,
         description: `${player1.name}'s stats`,
         url: `${FRONTEND_URL}/battles/${battle.id}`,
-        color: 5025360,
+        color: 16750592,
         author: {
           name: player1.name,
           url: `${FRONTEND_URL}/players/${player2.id}`,
@@ -122,7 +122,7 @@ const createBattleEndedData = (player1, player2, battle, game) => {
       {
         title: `${winnerPlayer.name} beats ${loserPlayer.name}`,
         description: 'battle result',
-        color: 5025360,
+        color: 2201331,
         image: {
           url: winnerNFT.image_url
         },
@@ -132,12 +132,12 @@ const createBattleEndedData = (player1, player2, battle, game) => {
         fields: [
           {
             name: '😊 WIN',
-            value: winnerNFT.name,
+            value: winnerPlayer.name,
             inline: true
           },
           {
             name: '😭 LOSE',
-            value: loserNFT.name,
+            value: loserPlayer.name,
             inline: true
           },
           {

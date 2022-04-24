@@ -32,6 +32,17 @@
       </template>
     </div>
 
+    <div
+      v-else-if="!game && !isPlayerBattle && (isBattleReady || isBattleStarted)"
+    >
+      <p>The battle has already started or ended by other players</p>
+      <div style="text-align: center">
+        <p>{{ player1.name }}'s {{ NFT1.name }}</p>
+        <p>VS</p>
+        <p>{{ player2.name }}'s {{ NFT2.name }}</p>
+      </div>
+    </div>
+
     <SplashScreen v-else-if="!game" message="Loading game...">
       <div style="text-align: center">
         <p>{{ player1.name }}'s {{ NFT1.name }}</p>
