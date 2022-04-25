@@ -567,12 +567,17 @@ export default {
       }
     },
 
-    onGameStart({ status, game }) {
-      console.log('onGameUpdate', status, game)
+    onGameStart({ status, message, game }) {
+      console.log('onGameUpdate', status, message, game)
 
-      if (!status) {
-        return this.addNotification({
-          message: 'Failed to update the game',
+      if (status) {
+        this.addNotification({
+          message,
+          type: NOTIFICATION_TYPE.SUCCESS
+        })
+      } else {
+        this.addNotification({
+          message,
           type: NOTIFICATION_TYPE.ERROR,
           timeout: 0
         })

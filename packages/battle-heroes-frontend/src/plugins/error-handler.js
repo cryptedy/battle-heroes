@@ -6,7 +6,7 @@ export default {
   install(app, options) {
     app.config.errorHandler = (error, vm, info) => {
       store.dispatch('notification/add', {
-        message: `${error.message} ${info}`,
+        message: `${error.message}: ${info}`,
         type: NOTIFICATION_TYPE.ERROR,
         timeout: 0
       })

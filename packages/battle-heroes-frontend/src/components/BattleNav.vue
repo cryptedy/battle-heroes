@@ -106,18 +106,19 @@ export default {
     onSelectNFT(NFT) {
       this.dialogShown = false
 
-      this.$socket.emit('battle:create', NFT.id, ({ status }) => {
+      this.$socket.emit('battle:create', NFT.id, ({ status, message }) => {
         console.log('battle:create', status)
 
         if (status) {
           this.addNotification({
-            message: 'Battle created',
+            message,
             type: NOTIFICATION_TYPE.SUCCESS
           })
         } else {
           this.addNotification({
-            message: 'Failed to create game',
-            type: NOTIFICATION_TYPE.ERROR
+            message,
+            type: NOTIFICATION_TYPE.ERROR,
+            timeout: 0
           })
         }
       })
@@ -132,14 +133,24 @@ export default {
     },
 
     deleteBattle() {
-      this.$socket.emit('battle:delete', this.playerBattle.id, status => {
-        if (status) {
-          this.addNotification({
-            message: 'Battle deleted!',
-            type: NOTIFICATION_TYPE.SUCCESS
-          })
+      this.$socket.emit(
+        'battle:delete',
+        this.playerBattle.id,
+        ({ status, message }) => {
+          if (status) {
+            this.addNotification({
+              message,
+              type: NOTIFICATION_TYPE.SUCCESS
+            })
+          } else {
+            this.addNotification({
+              message,
+              type: NOTIFICATION_TYPE.ERROR,
+              timeout: 0
+            })
+          }
         }
-      })
+      )
     }
   }
 }

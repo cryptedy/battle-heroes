@@ -178,7 +178,7 @@ export default {
       console.log('onGameError', error)
 
       this.addNotification({
-        message: error.message,
+        message: `${error.message}: ${error.stack}`,
         type: NOTIFICATION_TYPE.ERROR,
         timeout: 0
       })
@@ -190,7 +190,7 @@ export default {
       // TODO: user confirmation
 
       this.addNotification({
-        message: 'Battle matched!',
+        message: 'Battle matched',
         type: NOTIFICATION_TYPE.SUCCESS
       })
 
@@ -216,7 +216,7 @@ export default {
         await this.loginGame()
       } catch (error) {
         this.addNotification({
-          message: error.message,
+          message: `${error.message}: ${error.stack}`,
           type: NOTIFICATION_TYPE.ERROR,
           timeout: 0
         })

@@ -76,18 +76,19 @@ export default {
     },
 
     emitCreateBattle(NFT) {
-      this.$socket.emit('battle:create', NFT.id, ({ status }) => {
+      this.$socket.emit('battle:create', NFT.id, ({ status, message }) => {
         console.log('battle:create', status)
 
         if (status) {
           this.addNotification({
-            message: 'Battle created',
+            message,
             type: NOTIFICATION_TYPE.SUCCESS
           })
         } else {
           this.addNotification({
-            message: 'Failed to create battle',
-            type: NOTIFICATION_TYPE.ERROR
+            message,
+            type: NOTIFICATION_TYPE.ERROR,
+            timeout: 0
           })
         }
       })

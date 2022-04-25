@@ -22,14 +22,12 @@ router.afterEach(afterEach)
 export default router
 
 async function onError(error) {
-  const message = error.message
-
   store.dispatch('app/setError', error.message)
 
   store.dispatch(
     'notification/add',
     {
-      message,
+      message: `${error.message}: ${error.stack}`,
       type: NOTIFICATION_TYPE.ERROR,
       timeout: 0
     },

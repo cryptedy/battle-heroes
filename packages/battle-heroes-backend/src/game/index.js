@@ -126,7 +126,10 @@ class GameManager {
 
         this.socket.broadcast.emit('player:player', selectPlayer(newPlayer.id))
       } catch (error) {
-        throw new Error(error)
+        return callback({
+          status: false,
+          message: `Failed to Login: ${error.message}`
+        })
       }
     }
 
@@ -136,6 +139,7 @@ class GameManager {
 
     callback({
       status: true,
+      message: 'Successfully logged in',
       players,
       battles,
       messages
@@ -152,9 +156,15 @@ class GameManager {
 
       this.io.emit('player:update', selectPlayer(player.id))
 
-      callback({ status: true })
+      callback({
+        status: true,
+        message: 'Successfully logged out'
+      })
     } else {
-      callback({ status: false })
+      callback({
+        status: false,
+        message: 'Failed to logout'
+      })
     }
   }
 
@@ -163,36 +173,42 @@ class GameManager {
 
     const battle = selectBattle(battleId)
 
-    if (battle) {
-      if (battle.state === BATTLE_STATE.ENDED) {
-        return callback({ status: false })
-      }
+    if (!battle) {
+      return callback({
+        status: false,
+        message: 'Failed to start a game: The battle not found'
+      })
+    }
 
-      const game = selectBattleGame(battle.id)
+    if (battle.state === BATTLE_STATE.ENDED) {
+      return callback({
+        status: false,
+        message: 'Failed to start a game: The battle has already ended'
+      })
+    }
 
-      if (game) {
-        callback({
-          status: true,
-          game
-        })
-      } else {
-        const newGame = createGame(battle.id)
+    const game = selectBattleGame(battle.id)
 
-        addGame(newGame)
-
-        updateBattle({
-          battleId: battle.id,
-          payload: { state: BATTLE_STATE.STARTED }
-        })
-
-        callback({
-          status: true,
-          game: newGame
-        })
-      }
-    } else {
+    if (game) {
       callback({
-        status: false
+        status: true,
+        message: 'Start game',
+        game
+      })
+    } else {
+      const newGame = createGame(battle.id)
+
+      addGame(newGame)
+
+      updateBattle({
+        battleId: battle.id,
+        payload: { state: BATTLE_STATE.STARTED }
+      })
+
+      callback({
+        status: true,
+        message: 'Start game',
+        game: newGame
       })
     }
   }
@@ -233,9 +249,15 @@ class GameManager {
             if (player) {
               updatePlayerStats(player.id, {
                 lose: player.lose + 1
-              }).then(() => {
-                this.io.emit('player:update', selectPlayer(player.id))
               })
+                .then(() => {
+                  this.io.emit('player:update', selectPlayer(player.id))
+                })
+                .catch(error => {
+                  throw new Error(
+                    `Failed to update player stats: ${error.message}: ${error.stack}`
+                  )
+                })
 
               const opponentPlayer = this.getBattleOpponentPlayer(
                 battleCache,
@@ -246,20 +268,37 @@ class GameManager {
                 updatePlayerStats(opponentPlayer.id, {
                   exp: opponentPlayer.exp + 3,
                   win: opponentPlayer.win + 1
-                }).then(() => {
-                  this.io.emit('player:update', selectPlayer(opponentPlayer.id))
                 })
+                  .then(() => {
+                    this.io.emit(
+                      'player:update',
+                      selectPlayer(opponentPlayer.id)
+                    )
+                  })
+                  .catch(error => {
+                    throw new Error(
+                      `Failed to update player stats: ${error.message}: ${error.stack}`
+                    )
+                  })
 
                 this.io.to(opponentPlayer.id).emit('game:aborted', game.id)
               }
             }
+          } else {
+            // ignore error
           }
         })
       }
 
-      callback({ status: true })
+      callback({
+        status: true,
+        message: 'The game aborted'
+      })
     } else {
-      callback({ status: false })
+      callback({
+        status: false,
+        message: 'Failed to abort the game'
+      })
     }
   }
 
@@ -271,19 +310,19 @@ class GameManager {
     const player = this.findSocketPlayer(this.socket.id)
 
     if (!player) {
-      throw new Error('Player not found')
+      throw new Error('Failed to move: The player not found')
     }
 
     const battle = selectPlayerBattle(player.id)
 
     if (!battle) {
-      throw new Error('Battle not found')
+      throw new Error('Failed to move: The battle not found')
     }
 
     const game = selectBattleGame(battle.id)
 
     if (!game) {
-      throw new Error('Game not found')
+      throw new Error('Failed to move: The game not found')
     }
 
     const playerKey = this.getBattlePlayerKey(battle, player.id)
@@ -295,7 +334,7 @@ class GameManager {
     )
 
     if (!opponentPlayer) {
-      throw new Error('Opponent player not found')
+      throw new Error('Failed to move: The opponent player not found')
     }
 
     const opponentKey = this.getBattlePlayerKey(battle, opponentPlayer.id)
@@ -346,16 +385,32 @@ class GameManager {
           updatePlayerStats(player.id, {
             exp: player.exp + 3,
             win: player.win + 1
-          }).then(() => {
-            this.io.emit('player:update', selectPlayer(player.id))
           })
+            .then(() => {
+              this.io.emit('player:update', selectPlayer(player.id))
+            })
+            .catch(error => {
+              throw new Error(
+                `Failed to update player stats: ${error.message}: ${error.stack}`
+              )
+            })
 
           updatePlayerStats(opponentPlayer.id, {
             exp: opponentPlayer.exp + 1,
             lose: opponentPlayer.lose + 1
-          }).then(() => {
-            this.io.emit('player:update', selectPlayer(opponentPlayer.id))
           })
+            .then(() => {
+              this.io.emit('player:update', selectPlayer(opponentPlayer.id))
+            })
+            .catch(error => {
+              const { messages, stack } = error
+
+              // send to ooponent player
+              this.io.to(opponentPlayer.id).emit('game:error', {
+                message: `Failed to update player status: ${messages}`,
+                stack: stack
+              })
+            })
 
           updateBattle({
             battleId: battle.id,
@@ -380,9 +435,7 @@ class GameManager {
         updateGamePlayer({
           gameId: game.id,
           playerKey: opponentKey,
-          payload: {
-            hp: hp
-          }
+          payload: { hp: hp }
         })
       }
     }
@@ -412,35 +465,52 @@ class GameManager {
 
     const player = this.findSocketPlayer(this.socket.id)
 
-    if (player) {
-      if (selectPlayerBattle(player.id)) {
-        return callback({ status: false })
-      }
-
-      const battle = createBattle(player.id, NFTId)
-
-      addBattle(battle)
-
-      updatePlayer({
-        playerId: player.id,
-        payload: { state: PLAYER_STATE.STANDBY }
+    if (!player) {
+      return callback({
+        status: false,
+        message: 'Failed to create a battle: The player not found'
       })
-
-      this.io.emit('player:update', selectPlayer(player.id))
-      this.io.emit('battle:battle', selectBattle(battle.id))
-
-      postDiscord({
-        type: DISCORD_POST_TYPE.BATTLE_CREATED,
-        payload: {
-          player: selectPlayer(player.id),
-          battle: selectBattle(battle.id)
-        }
-      })
-
-      callback({ status: true })
-    } else {
-      callback({ status: false })
     }
+
+    if (!player.nft_ids.includes(NFTId)) {
+      return callback({
+        status: false,
+        message: 'Failed to create a battle: The player must be own the NFT'
+      })
+    }
+
+    if (selectPlayerBattle(player.id)) {
+      return callback({
+        status: false,
+        message:
+          'Failed to create a game: The player already has the another battle'
+      })
+    }
+
+    const battle = createBattle(player.id, NFTId)
+
+    addBattle(battle)
+
+    updatePlayer({
+      playerId: player.id,
+      payload: { state: PLAYER_STATE.STANDBY }
+    })
+
+    this.io.emit('player:update', selectPlayer(player.id))
+    this.io.emit('battle:battle', selectBattle(battle.id))
+
+    postDiscord({
+      type: DISCORD_POST_TYPE.BATTLE_CREATED,
+      payload: {
+        player: selectPlayer(player.id),
+        battle: selectBattle(battle.id)
+      }
+    })
+
+    callback({
+      status: true,
+      message: 'The battle created'
+    })
   }
 
   deleteBattle(battleId, callback) {
@@ -449,7 +519,10 @@ class GameManager {
     const battle = selectBattle(battleId)
 
     if (!battle) {
-      return callback({ status: false })
+      return callback({
+        status: false,
+        message: 'Failed delete the battle: The battle not found'
+      })
     }
 
     const game = selectBattleGame(battleId)
@@ -485,7 +558,10 @@ class GameManager {
 
     this.io.emit('battle:delete', battleId)
 
-    callback({ status: true })
+    callback({
+      status: true,
+      message: 'The battle deleted'
+    })
   }
 
   joinBattle(battleId, NFTId) {
@@ -494,13 +570,21 @@ class GameManager {
     const player = this.findSocketPlayer(this.socket.id)
 
     if (!player) {
-      throw new Error('Player not found')
+      throw new Error('Failed to join the battle: The player not found')
+    }
+
+    if (!player.nft_ids.includes(NFTId)) {
+      throw new Error(
+        'Failed to join the battle: The player does not own the NFT'
+      )
     }
 
     const playerBattle = selectPlayerBattle(player.id)
 
     if (playerBattle) {
-      throw new Error(`The ${player.name} already has a battle`)
+      throw new Error(
+        'Failed to join the battle: The player already has the another battle'
+      )
     }
 
     const battle = selectBattle(battleId)
@@ -511,7 +595,7 @@ class GameManager {
 
     if (battle.state !== BATTLE_STATE.CREATED) {
       throw new Error(
-        `Counl not join the battle. The battle state is ${battle.state}`
+        `Failed to join the battle: The battle state is "${battle.state.toLowerCase()}"`
       )
     }
 
@@ -568,7 +652,7 @@ class GameManager {
     const player = this.findSocketPlayer(this.socket.id)
 
     if (!player) {
-      throw new Error('Player not found')
+      throw new Error('Failed to create a amessage: The player not found')
     }
 
     const message = createMessage(text, player)
@@ -584,7 +668,7 @@ class GameManager {
     const message = selectMessage(messageId)
 
     if (!message) {
-      throw new Error('Message not found')
+      throw new Error('Failed to delete a amessage: The message not found')
     }
 
     removeMessage(message.id)
@@ -617,22 +701,6 @@ class GameManager {
 
   roomJoined(room, socketId) {
     console.log('roomJoined', room, socketId, this.socket.id)
-  }
-
-  errorHandler(error) {
-    console.log('errorHandler', error)
-
-    const player = this.findSocketPlayer(this.socket.id)
-
-    if (player) {
-      const { message, stack } = error
-
-      this.io
-        .to(player.id)
-        .emit('game:error', { message: `${message}: ${stack}` })
-    } else {
-      throw new Error(error)
-    }
   }
 
   getRooms() {
@@ -895,6 +963,20 @@ class GameManager {
     console.log('removeAllEventListeners', this.socket.id)
 
     this.socket.removeAllListeners()
+  }
+
+  errorHandler(error) {
+    console.log('errorHandler', error)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (player) {
+      const { message, stack } = error
+
+      this.io.to(player.id).emit('game:error', { message, stack })
+    } else {
+      throw new Error(error)
+    }
   }
 }
 

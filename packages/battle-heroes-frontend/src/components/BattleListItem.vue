@@ -4,9 +4,8 @@
       <div style="width: 64px; height: 64px">
         <img :src="NFT1.image_url" :alt="NFT1.name" width="512" height="512" />
       </div>
-      {{ NFT1.name }}
-      -
-      {{ player1.name }}
+      <p>{{ player1.name }}</p>
+      <p>{{ NFT1.name }}</p>
     </div>
 
     <div class="battle-list-item-secondary">
@@ -19,7 +18,7 @@
             height="512"
           />
         </div>
-        OPPONENT WANTED
+        <p>OPPONENT WANTED</p>
       </template>
       <template v-else>
         <div style="width: 64px; height: 64px">
@@ -30,7 +29,8 @@
             height="512"
           />
         </div>
-        {{ player2.name }}'s {{ NFT2.name }}
+        <p>{{ player2.name }}</p>
+        <p>{{ NFT2.name }}</p>
       </template>
     </div>
 
@@ -148,14 +148,24 @@ export default {
     },
 
     deleteBattle() {
-      this.$socket.emit('battle:delete', this.playerBattle.id, status => {
-        if (status) {
-          this.addNotification({
-            message: 'Battle deleted!',
-            type: NOTIFICATION_TYPE.SUCCESS
-          })
+      this.$socket.emit(
+        'battle:delete',
+        this.playerBattle.id,
+        ({ status, message }) => {
+          if (status) {
+            this.addNotification({
+              message,
+              type: NOTIFICATION_TYPE.SUCCESS
+            })
+          } else {
+            this.addNotification({
+              message,
+              type: NOTIFICATION_TYPE.ERROR,
+              timeout: 0
+            })
+          }
         }
-      })
+      )
     }
   }
 }

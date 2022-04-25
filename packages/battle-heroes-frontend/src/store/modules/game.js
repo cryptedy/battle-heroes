@@ -39,10 +39,10 @@ export const actions = {
           if (error) {
             return reject(error)
           } else {
-            const { status, players, battles, messages } = response
+            const { status, message, players, battles, messages } = response
 
             if (!status) {
-              return reject(status)
+              return reject(message)
             }
 
             dispatch('addEventListeners')
@@ -50,7 +50,7 @@ export const actions = {
             dispatch('battle/set', battles, { root: true })
             dispatch('message/set', messages, { root: true })
 
-            resolve(status)
+            resolve(message)
           }
         })
     })
