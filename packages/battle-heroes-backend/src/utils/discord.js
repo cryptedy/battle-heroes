@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { selectPlayer, selectNFT } = require('../NFT/selectors')
+const { selectNFT } = require('../NFT/selectors')
 
 const {
   FRONTEND_URL,
@@ -138,7 +138,7 @@ const createBattleEndedData = (winnerPlayer, loserPlayer, battle, game) => {
           },
           {
             name: 'TURN',
-            value: game.turn,
+            value: game.turn + 1,
             inline: true
           }
         ]

@@ -1,5 +1,5 @@
 const collectionRecucer = require('./collection/slice').reducer
-const NFTRecucer = require('./NFT/slice').reducer
+const NFTReducer = require('./NFT/slice').reducer
 const playerReducer = require('./player/slice').reducer
 const messageReducer = require('./message/slice').reducer
 const battleReducer = require('./battle/slice').reducer
@@ -8,7 +8,7 @@ const { createStore, combineReducers } = require('redux')
 
 const reducer = combineReducers({
   collection: collectionRecucer,
-  NFT: NFTRecucer,
+  NFT: NFTReducer,
   player: playerReducer,
   message: messageReducer,
   battle: battleReducer,
