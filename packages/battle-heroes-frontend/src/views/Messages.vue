@@ -71,7 +71,7 @@ export default {
   watch: {
     // eslint-disable-next-line no-unused-vars
     windowHeight(value, oldValue) {
-      this.setHasVerticalScrollbar()
+      this.checkVerticalScrollbar()
     }
   },
 

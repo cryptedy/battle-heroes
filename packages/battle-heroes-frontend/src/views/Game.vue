@@ -89,6 +89,12 @@
           </template>
 
           <template v-else>
+            <p
+              v-if="!opponentPlayer.socket_ids.length > 0"
+              style="color: rgba(255, 255, 255, 0.5)"
+            >
+              Opponent player is OFFLINE
+            </p>
             <p v-if="canMove" style="font-weight: bold; color: #2196f3">
               Select your move!
             </p>
@@ -550,7 +556,8 @@ export default {
       console.log('abortGame')
 
       if (!this.canLeave) {
-        const answer = window.confirm('Abort the game and you lose.')
+        // const answer = window.confirm('Abort the game and you lose.')
+        const answer = window.confirm('Abort the game?')
 
         if (!answer) return false
       }

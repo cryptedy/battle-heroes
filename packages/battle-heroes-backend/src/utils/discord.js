@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { selectNFT } = require('../NFT/selectors')
+const { selectPlayer, selectNFT } = require('../NFT/selectors')
 
 const {
   FRONTEND_URL,
@@ -26,12 +26,12 @@ const createBattleCreatedData = (player, battle) => {
     embeds: [
       {
         title: `${player.name} created a new battle`,
-        description: `${player.name}'s stats`,
+        description: player.name,
         url: `${FRONTEND_URL}/battles/${battle.id}`,
         color: 5025360,
         author: {
           name: player.name,
-          url: `${FRONTEND_URL}/players/${player.id}`,
+          // url: `${FRONTEND_URL}/players/${player.id}`,
           icon_url: player.avatar_url
         },
         image: {
@@ -69,12 +69,12 @@ const createBattleMatchedData = (player1, player2, battle) => {
     embeds: [
       {
         title: `${player1.name} challenged ${player2.name}`,
-        description: `${player1.name}'s stats`,
+        description: player1.name,
         url: `${FRONTEND_URL}/battles/${battle.id}`,
         color: 16750592,
         author: {
           name: player1.name,
-          url: `${FRONTEND_URL}/players/${player2.id}`,
+          // url: `${FRONTEND_URL}/players/${player1.id}`,
           icon_url: player1.avatar_url
         },
         image: {
@@ -105,12 +105,9 @@ const createBattleMatchedData = (player1, player2, battle) => {
   }
 }
 
-const createBattleEndedData = (player1, player2, battle, game) => {
-  const winnerPlayerKey = game.players[1].hp > game.players[2].hp ? 1 : 2
+const createBattleEndedData = (winnerPlayer, loserPlayer, battle, game) => {
+  const winnerPlayerKey = battle.players[1].id === winnerPlayer.id ? 1 : 2
   const loserPlayerKey = winnerPlayerKey === 1 ? 2 : 1
-
-  const winnerPlayer = winnerPlayerKey === 1 ? player1 : player2
-  const loserPlayer = winnerPlayer.id === player1.id ? player2 : player1
 
   const winnerNFT = selectNFT(battle.players[winnerPlayerKey].NFT_id)
   const loserNFT = selectNFT(battle.players[loserPlayerKey].NFT_id)
@@ -120,8 +117,7 @@ const createBattleEndedData = (player1, player2, battle, game) => {
     // content: `${winnerPlayer.name} beats ${loserPlayer.name}`,
     embeds: [
       {
-        title: `${winnerPlayer.name} beats ${loserPlayer.name}`,
-        description: 'battle result',
+        title: `${winnerPlayer.name} beat ${loserPlayer.name}`,
         color: 2201331,
         image: {
           url: winnerNFT.image_url
@@ -167,9 +163,9 @@ const postDiscord = ({ type, payload }) => {
 
     return post(data)
   } else if (type === DISCORD_POST_TYPE.BATTLE_ENDED) {
-    const { player1, player2, battle, game } = payload
+    const { winnerPlayer, loserPlayer, battle, game } = payload
 
-    const data = createBattleEndedData(player1, player2, battle, game)
+    const data = createBattleEndedData(winnerPlayer, loserPlayer, battle, game)
 
     return post(data)
   } else {

@@ -247,17 +247,17 @@ class GameManager {
             const player = this.findSocketPlayer(this.socket.id)
 
             if (player) {
-              updatePlayerStats(player.id, {
-                lose: player.lose + 1
-              })
-                .then(() => {
-                  this.io.emit('player:update', selectPlayer(player.id))
-                })
-                .catch(error => {
-                  throw new Error(
-                    `Failed to update player stats: ${error.message}: ${error.stack}`
-                  )
-                })
+              // updatePlayerStats(player.id, {
+              //   lose: player.lose + 1
+              // })
+              //   .then(() => {
+              //     this.io.emit('player:update', selectPlayer(player.id))
+              //   })
+              //   .catch(error => {
+              //     throw new Error(
+              //       `Failed to update player stats: ${error.message}: ${error.stack}`
+              //     )
+              //   })
 
               const opponentPlayer = this.getBattleOpponentPlayer(
                 battleCache,
@@ -265,21 +265,21 @@ class GameManager {
               )
 
               if (opponentPlayer) {
-                updatePlayerStats(opponentPlayer.id, {
-                  exp: opponentPlayer.exp + 3,
-                  win: opponentPlayer.win + 1
-                })
-                  .then(() => {
-                    this.io.emit(
-                      'player:update',
-                      selectPlayer(opponentPlayer.id)
-                    )
-                  })
-                  .catch(error => {
-                    throw new Error(
-                      `Failed to update player stats: ${error.message}: ${error.stack}`
-                    )
-                  })
+                // updatePlayerStats(opponentPlayer.id, {
+                //   exp: opponentPlayer.exp + 3,
+                //   win: opponentPlayer.win + 1
+                // })
+                //   .then(() => {
+                //     this.io.emit(
+                //       'player:update',
+                //       selectPlayer(opponentPlayer.id)
+                //     )
+                //   })
+                //   .catch(error => {
+                //     throw new Error(
+                //       `Failed to update player stats: ${error.message}: ${error.stack}`
+                //     )
+                //   })
 
                 this.io.to(opponentPlayer.id).emit('game:aborted', game.id)
               }
@@ -424,8 +424,8 @@ class GameManager {
           postDiscord({
             type: DISCORD_POST_TYPE.BATTLE_ENDED,
             payload: {
-              player1: selectPlayer(player.id),
-              player2: selectPlayer(opponentPlayer.id),
+              winnerPlayer: selectPlayer(player.id),
+              loserPlayer: selectPlayer(opponentPlayer.id),
               battle: selectBattle(battle.id),
               game: selectGame(game.id)
             }
