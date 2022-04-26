@@ -79,9 +79,9 @@ const createGame = battleId => {
   const fisrtPlayer = currentPlayer
   const secondPlayer = fisrtPlayer === 1 ? 2 : 1
 
-  const secondPlayerMaxHp = Math.floor(status[secondPlayer].hp * 1)
-  const secondPlayerAttack = Math.floor(status[secondPlayer].attack * 1)
-  const secondPlayerDefence = Math.floor(status[secondPlayer].defense * 1)
+  const secondPlayerMaxHp = Math.floor(status[secondPlayer].hp * 1.05)
+  const secondPlayerAttack = Math.floor(status[secondPlayer].attack * 1.05)
+  const secondPlayerDefence = Math.floor(status[secondPlayer].defense * 1.05)
 
   status[secondPlayer].max_hp = secondPlayerMaxHp
   status[secondPlayer].hp = secondPlayerMaxHp
