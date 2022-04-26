@@ -1,19 +1,11 @@
 <template>
-  <TheLayoutGame>
-    <div class="view-settings">
-      <router-view />
-    </div>
-  </TheLayoutGame>
+  <div class="view-settings">
+    <router-view />
+  </div>
 </template>
 
 <script>
-import TheLayoutGame from '@/components/TheLayoutGame'
-
 export default {
-  name: 'Settings',
-
-  components: {
-    TheLayoutGame
-  }
+  name: 'Settings'
 }
 </script>

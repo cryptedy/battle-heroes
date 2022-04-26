@@ -17,9 +17,15 @@ export const getters = {
   all: state => state.ids.map(id => state.entities[id]),
   find: state => id => state.entities[id],
   count: state => state.ids.length,
+  byPlayer: (state, getters) => player =>
+    getters.all.find(battle =>
+      Object.keys(battle.players).some(
+        playerKey => battle.players[playerKey].id === player.id
+      )
+    ),
   playerKey: (state, getters, rootState, rootGetters) => {
-    if (!rootGetters['game/isLogin']) return null
-    if (!rootGetters['game/playerBattle']) return null
+    if (!rootGetters['game/isLogin']) return
+    if (!rootGetters['game/playerBattle']) return
 
     const playerKey = Object.keys(
       rootGetters['game/playerBattle'].players
@@ -29,15 +35,15 @@ export const getters = {
         rootGetters['game/player'].id
     )
 
-    return Number.parseInt(playerKey) || null
+    if (Number.parseInt(playerKey) !== isNaN) {
+      return Number.parseInt(playerKey)
+    }
   },
   playerNFT: (state, getters, rootState, rootGetters) => {
-    if (!getters.playerKey) return null
+    if (!getters.playerKey) return
 
-    return (
-      rootGetters['NFT/find'](
-        rootGetters['game/playerBattle'].players[getters.playerKey].NFT_id
-      ) || null
+    return rootGetters['NFT/find'](
+      rootGetters['game/playerBattle'].players[getters.playerKey].NFT_id
     )
   }
 }

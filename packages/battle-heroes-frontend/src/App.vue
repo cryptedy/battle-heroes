@@ -1,4 +1,8 @@
 <template>
+  <div id="teleport"></div>
+
+  <TheNotification />
+
   <ErrorScreen v-if="appError" :message="appError">
     <BaseButton type="primary" @click="reload"> RELOAD </BaseButton>
   </ErrorScreen>
@@ -7,17 +11,19 @@
     <RandomNFT />
   </SplashScreen>
 
-  <router-view v-else />
-
-  <div id="teleport"></div>
-
-  <TheNotification />
+  <component :is="layout" v-else>
+    <router-view />
+  </component>
 </template>
 
 <script>
+import { shallowRef } from 'vue'
+import WebLayout from '@/layouts/WebLayout'
+import GameLayout from '@/layouts/GameLayout'
 import { mapGetters, mapActions } from 'vuex'
 import RandomNFT from '@/components/RandomNFT'
 import ErrorScreen from '@/components/ErrorScreen'
+import DefaultLayout from '@/layouts/DefaultLayout'
 import SplashScreen from '@/components/SplashScreen'
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 import TheNotification from '@/components/TheNotification'
@@ -41,7 +47,8 @@ export default {
 
   data() {
     return {
-      appTitle: appTitle
+      appTitle: appTitle,
+      layout: shallowRef(DefaultLayout)
     }
   },
 
@@ -51,6 +58,28 @@ export default {
       isAppLoading: 'app/isLoading',
       notifications: 'notification/all'
     })
+  },
+
+  watch: {
+    $route: {
+      // eslint-disable-next-line no-unused-vars
+      async handler(value, oldValue) {
+        try {
+          if (value.meta.layout === 'web') {
+            this.layout = shallowRef(WebLayout)
+          } else if (value.meta.layout === 'game') {
+            this.layout = shallowRef(GameLayout)
+          } else {
+            this.layout = shallowRef(DefaultLayout)
+          }
+        } catch (error) {
+          console.log(error)
+
+          this.layout = shallowRef(DefaultLayout)
+        }
+      },
+      immediate: true
+    }
   },
 
   created() {

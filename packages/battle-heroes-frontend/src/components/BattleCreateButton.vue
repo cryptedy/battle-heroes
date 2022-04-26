@@ -1,5 +1,5 @@
 <template>
-  <div v-if="canCreateBattle" style="margin-top: 16px">
+  <div v-if="canCreateBattle">
     <BaseDialog
       :open="dialogShown"
       title="Select a NFT to use in battle"
@@ -8,9 +8,7 @@
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
-    <BaseButton type="primary" @click="createBattle">
-      CREATE BATTLE
-    </BaseButton>
+    <BaseButton type="primary" @click="handleCreateBattle"> CREATE </BaseButton>
   </div>
 </template>
 
@@ -64,18 +62,18 @@ export default {
     onSelectNFT(NFT) {
       this.dialogShown = false
 
-      this.emitCreateBattle(NFT)
+      this.createBattle(NFT)
     },
 
-    createBattle() {
+    handleCreateBattle() {
       if (Object.keys(this.nft).length > 0) {
-        this.emitCreateBattle(this.nft)
+        this.createBattle(this.nft)
       } else {
         this.dialogShown = true
       }
     },
 
-    emitCreateBattle(NFT) {
+    createBattle(NFT) {
       this.$socket.emit('battle:create', NFT.id, ({ status, message }) => {
         console.log('battle:create', status)
 

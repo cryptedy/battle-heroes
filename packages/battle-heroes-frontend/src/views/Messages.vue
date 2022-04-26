@@ -1,27 +1,25 @@
 <template>
-  <TheLayoutGame>
-    <div class="view-messages">
-      <MessageList
-        ref="messageList"
-        :messages="messages"
-        v-bind="$attrs"
-        :style="messageListStyleObject"
-      />
+  <div class="view-messages">
+    <MessageList
+      ref="messageList"
+      :messages="messages"
+      v-bind="$attrs"
+      :style="messageListStyleObject"
+    />
 
-      <transition name="message-form">
-        <div v-if="messageFormShown" class="message-form">
-          <form @submit.prevent="sendMessage">
-            <input
-              ref="input"
-              v-model="newMessage"
-              placeholder="Send message"
-              type="text"
-            />
-          </form>
-        </div>
-      </transition>
-    </div>
-  </TheLayoutGame>
+    <transition name="message-form">
+      <div v-if="messageFormShown" class="message-form">
+        <form @submit.prevent="sendMessage">
+          <input
+            ref="input"
+            v-model="newMessage"
+            placeholder="Send message"
+            type="text"
+          />
+        </form>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -29,15 +27,13 @@ import store from '@/store'
 import { mapGetters } from 'vuex'
 import MessageList from '@/components/MessageList'
 import { ADD_MESSAGE } from '@/store/mutation-types'
-import TheLayoutGame from '@/components/TheLayoutGame'
 import { getScrollbarState, scrollToBottom } from '@/utils/helpers'
 
 export default {
   name: 'Messages',
 
   components: {
-    MessageList,
-    TheLayoutGame
+    MessageList
   },
 
   data() {

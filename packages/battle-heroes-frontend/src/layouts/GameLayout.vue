@@ -58,7 +58,7 @@ import TheBottomNav from '@/components/TheBottomNav'
 import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
-  name: 'TheLayoutGame',
+  name: 'GameLayout',
 
   components: {
     TheAppBar,
@@ -91,7 +91,7 @@ export default {
   },
 
   beforeMount() {
-    console.log('TheLayoutGame:beforeMount')
+    console.log('GameLayout:beforeMount')
 
     if (this.playerBattle && this.playerBattle.state !== BATTLE_STATE.CREATED) {
       this.$router.push({
@@ -104,7 +104,7 @@ export default {
   },
 
   mounted() {
-    console.log('TheLayoutGame:mounted')
+    console.log('GameLayout:mounted')
 
     this.$socket.on('connect', () => this.onSocketConnect())
     this.$socket.on('disconnect', reason => this.onSocketDisconnect(reason))
@@ -117,7 +117,7 @@ export default {
   },
 
   beforeUnmount() {
-    console.log('TheLayoutGame:beforeUnmount')
+    console.log('GameLayout:beforeUnmount')
 
     this.$socket.off('connect')
     this.$socket.off('disconnect')
@@ -194,7 +194,13 @@ export default {
         type: NOTIFICATION_TYPE.SUCCESS
       })
 
-      if (!this.isGameView) {
+      if (this.isGameView) {
+        if (this.$route.params.battleId === battleId) {
+          this.$router.go({ path: this.$router.currentRoute.path, force: true })
+        } else {
+          this.$router.go({ path: `/battles/${battleId}`, force: true })
+        }
+      } else {
         this.$router.push(
           {
             name: 'game',

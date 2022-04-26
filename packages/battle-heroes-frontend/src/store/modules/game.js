@@ -9,20 +9,18 @@ export const mutations = {}
 
 export const getters = {
   player: (state, getters, rootState, rootGetters) => {
-    if (!rootGetters['auth/isLogin']) return null
+    if (!rootGetters['auth/isLogin']) return
 
-    return rootGetters['player/find'](rootGetters['auth/user'].id) || null
+    return rootGetters['player/find'](rootGetters['auth/user'].id)
   },
-  isLogin: (state, getters) => getters.player !== null,
+  isLogin: (state, getters) => getters.player !== undefined,
   playerBattle: (state, getters, rootState, rootGetters) => {
-    if (!getters.isLogin) return null
+    if (!getters.isLogin) return
 
-    return (
-      rootGetters['battle/all'].find(
-        battle =>
-          battle.players[1].id === getters.player.id ||
-          battle.players[2].id === getters.player.id
-      ) || null
+    return rootGetters['battle/all'].find(
+      battle =>
+        battle.players[1].id === getters.player.id ||
+        battle.players[2].id === getters.player.id
     )
   }
 }

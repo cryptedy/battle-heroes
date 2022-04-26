@@ -38,40 +38,55 @@ const {
   selectUserPlayer
 } = require('../player/selectors')
 
-const getRandomArbitrary = (min, max) => {
-  return Math.floor(Math.random() * (max - min) + min)
-}
+const getRandomValue = (min, max) =>
+  Math.floor(Math.random() * (max - min) + min)
 
 const createStatus = () => {
-  const maxHp = getRandomArbitrary(90, 110)
-  const attack = getRandomArbitrary(15, 25)
-  const defense = getRandomArbitrary(15, 25)
-  const speed = getRandomArbitrary(15, 25)
+  const maxHp = getRandomValue(90, 110)
+  const attack = getRandomValue(15, 25)
+  const defense = getRandomValue(15, 25)
+  const speed = getRandomValue(15, 25)
 
   return {
     max_hp: maxHp,
     hp: maxHp,
     attack: attack,
     defense: defense,
-    speed: speed
+    speed: speed,
+    criticalRate: 0.05,
+    missRate: 0.1
   }
 }
 
 const createGame = battleId => {
   const message = 'START BATTLE!'
 
-  const status1 = createStatus()
-  const status2 = createStatus()
+  const status = {
+    1: createStatus(),
+    2: createStatus()
+  }
 
   let currentPlayer = 1
 
-  if (status1.speed === status2.speed) {
-    currentPlayer = Math.floor(Math.random() * 2) + 1
-  } else if (status1.speed > status2.speed) {
+  if (status[1].speed === status[2].speed) {
+    currentPlayer = Math.floor(getRandomValue(1, 2))
+  } else if (status[1].speed > status[2].speed) {
     currentPlayer = 1
   } else {
     currentPlayer = 2
   }
+
+  const fisrtPlayer = currentPlayer
+  const secondPlayer = fisrtPlayer === 1 ? 2 : 1
+
+  const secondPlayerMaxHp = Math.floor(status[secondPlayer].hp * 1.1)
+  const secondPlayerAttack = Math.floor(status[secondPlayer].attack * 1.1)
+  const secondPlayerDefence = Math.floor(status[secondPlayer].defense * 1.1)
+
+  status[secondPlayer].max_hp = secondPlayerMaxHp
+  status[secondPlayer].hp = secondPlayerMaxHp
+  status[secondPlayer].attack = secondPlayerAttack
+  status[secondPlayer].defense = secondPlayerDefence
 
   return {
     id: uuidv4(),
@@ -79,8 +94,8 @@ const createGame = battleId => {
     turn: 1,
     current_player: currentPlayer,
     players: {
-      1: { ...status1 },
-      2: { ...status2 }
+      1: { ...status[1] },
+      2: { ...status[2] }
     },
     messages: [message]
   }
@@ -106,6 +121,13 @@ class GameManager {
 
   async login(user, callback) {
     console.log('login', this.socket.id, user)
+
+    if (!user) {
+      return callback({
+        status: false,
+        message: 'Failed to Login: The user not found'
+      })
+    }
 
     const player = selectUserPlayer(user.id)
 
@@ -337,37 +359,47 @@ class GameManager {
       throw new Error('Failed to move: The opponent player not found')
     }
 
-    const opponentKey = this.getBattlePlayerKey(battle, opponentPlayer.id)
-    const opponentNFT = selectNFT(battle.players[opponentKey].NFT_id)
+    const opponentPlayerKey = this.getBattlePlayerKey(battle, opponentPlayer.id)
+    const opponentNFT = selectNFT(battle.players[opponentPlayerKey].NFT_id)
 
     if (move === PLAYER_MOVE.ATTACK) {
+      const nextOpponentStatus = {}
+
       localMessages.push(`${player.name}'s ${playerNFT.name} attacks!`)
 
-      const rand = Math.floor(Math.random() * 100)
-
-      if (rand <= 10) {
+      if (Math.random() < game.players[playerKey].missRate) {
         localMessages.push('=== MISS!! ===')
       } else {
         let damage = Math.floor(
           (game.players[playerKey].attack * 100) /
-            (100 + game.players[opponentKey].defense)
+            (100 + game.players[opponentPlayerKey].defense)
         )
 
-        if (rand >= 95) {
+        if (Math.random() < game.players[playerKey].criticalRate) {
           damage = Math.floor(damage * 1.5)
 
           localMessages.push('=== CRITICAL HIT!! ===')
         }
 
-        let hp = game.players[opponentKey].hp - damage
+        const opponentMaxHp = game.players[opponentPlayerKey].max_hp
+
+        const oldOpponentHp = game.players[opponentPlayerKey].hp
+        const oldOpponentHpRate = oldOpponentHp / opponentMaxHp
+
+        let newOpponentHp = oldOpponentHp - damage
+        const newOpponentHpRate = newOpponentHp / opponentMaxHp
 
         localMessages.push(
           `${opponentPlayer.name}'s ${opponentNFT.name} takes damage ${damage}`
         )
 
-        if (hp < 0) {
-          hp = 0
+        if (newOpponentHp < 0) {
+          newOpponentHp = 0
+        }
 
+        nextOpponentStatus.hp = newOpponentHp
+
+        if (newOpponentHp === 0) {
           localMessages.push(
             `${opponentPlayer.name}'s ${opponentNFT.name} fainted...`
           )
@@ -430,12 +462,16 @@ class GameManager {
               game: selectGame(game.id)
             }
           })
+        } else {
+          if (oldOpponentHpRate >= 0.2 && newOpponentHpRate < 0.2) {
+            nextOpponentStatus.criticalRate = 1.5
+          }
         }
 
         updateGamePlayer({
           gameId: game.id,
-          playerKey: opponentKey,
-          payload: { hp: hp }
+          playerKey: opponentPlayerKey,
+          payload: nextOpponentStatus
         })
       }
     }

@@ -8,7 +8,7 @@
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
-    <BaseButton type="primary" @click="joinBattle"> JOIN BATTLE </BaseButton>
+    <BaseButton type="primary" @click="joinBattle"> JOIN </BaseButton>
   </div>
 </template>
 
@@ -46,20 +46,16 @@ export default {
       playerBattle: 'game/playerBattle'
     }),
 
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
+    },
+
     canJoinBattle() {
       return (
-        !this.hasPlayerBattle &&
+        !this.playerBattle &&
         !this.isPlayerBattle &&
         this.battle.state === BATTLE_STATE.CREATED
       )
-    },
-
-    hasPlayerBattle() {
-      return this.playerBattle !== null
-    },
-
-    isPlayerBattle() {
-      return this.playerBattle && this.playerBattle.id === this.battle.id
     }
   },
 

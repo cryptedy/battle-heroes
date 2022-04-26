@@ -110,11 +110,9 @@
           </span>
         </li>
         <li class="app-bar-content-list-item">
-          <PlayerState :player="player" />
-
           <div
             v-if="playerNFT"
-            style="margin-left: 16px; width: 32px; height: 32px"
+            style="margin-right: 12px; width: 32px; height: 32px"
           >
             <img
               style="width: 100%; height: auto; border-radius: 2px"
@@ -124,6 +122,10 @@
               height="512"
             />
           </div>
+
+          <BattleCreateButton />
+
+          <BattleDeleteButton />
         </li>
       </ul>
     </div>
@@ -133,16 +135,18 @@
 <script>
 import { mapGetters } from 'vuex'
 import AccountMenu from '@/components/AccountMenu'
-import PlayerState from '@/components/PlayerState'
 import PlayerAvatar from '@/components/PlayerAvatar'
+import BattleCreateButton from '@/components/BattleCreateButton'
+import BattleDeleteButton from '@/components/BattleDeleteButton'
 
 export default {
   name: 'TheAppBar',
 
   components: {
     AccountMenu,
-    PlayerState,
-    PlayerAvatar
+    PlayerAvatar,
+    BattleCreateButton,
+    BattleDeleteButton
   },
 
   computed: {

@@ -1,17 +1,14 @@
 <template>
-  <TheLayoutGame>
-    <div class="view-battles">
-      <BattleCreateButton />
+  <div class="view-battles">
+    <BattleCreateButton />
 
-      <BattleList :battles="battles" />
-    </div>
-  </TheLayoutGame>
+    <BattleList :battles="battles" />
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import BattleList from '@/components/BattleList'
-import TheLayoutGame from '@/components/TheLayoutGame'
 import BattleCreateButton from '@/components/BattleCreateButton'
 
 export default {
@@ -19,7 +16,6 @@ export default {
 
   components: {
     BattleList,
-    TheLayoutGame,
     BattleCreateButton
   },
 

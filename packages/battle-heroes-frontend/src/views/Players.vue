@@ -1,22 +1,18 @@
 <template>
-  <TheLayoutGame>
-    <div class="view-players">
-      <PlayerList :players="sortedPlayers" />
-    </div>
-  </TheLayoutGame>
+  <div class="view-players">
+    <PlayerList :players="sortedPlayers" />
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import PlayerList from '@/components/PlayerList'
-import TheLayoutGame from '@/components/TheLayoutGame'
 
 export default {
   name: 'Players',
 
   components: {
-    PlayerList,
-    TheLayoutGame
+    PlayerList
   },
 
   computed: {
@@ -25,9 +21,15 @@ export default {
     }),
 
     sortedPlayers() {
-      const players = this.players
+      let sortedPlayers = this.players
 
-      return players.sort((a, b) => b.socket_ids.length - a.socket_ids.length)
+      sortedPlayers = sortedPlayers.sort((a, b) => b.exp - a.exp)
+
+      sortedPlayers = sortedPlayers.sort(
+        (a, b) => b.socket_ids.length - a.socket_ids.length
+      )
+
+      return sortedPlayers
     }
   }
 }

@@ -1,19 +1,15 @@
 <template>
-  <TheLayoutWeb>
-    <TheHero />
-  </TheLayoutWeb>
+  <TheHero />
 </template>
 
 <script>
 import TheHero from '@/components/TheHero'
-import TheLayoutWeb from '@/components/TheLayoutWeb'
 
 export default {
   name: 'Index',
 
   components: {
-    TheHero,
-    TheLayoutWeb
+    TheHero
   }
 }
 </script>

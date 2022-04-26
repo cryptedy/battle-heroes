@@ -1,19 +1,15 @@
 <template>
-  <TheLayoutWeb>
-    <LoginButton />
-  </TheLayoutWeb>
+  <LoginButton />
 </template>
 
 <script>
 import LoginButton from '@/components/LoginButton'
-import TheLayoutWeb from '@/components/TheLayoutWeb'
 
 export default {
   name: 'Index',
 
   components: {
-    LoginButton,
-    TheLayoutWeb
+    LoginButton
   }
 }
 </script>

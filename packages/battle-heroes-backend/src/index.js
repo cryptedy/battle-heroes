@@ -8,9 +8,7 @@ const { createServer } = require('http')
 const { GameManager } = require('./game')
 const { getPlayers } = require('./player')
 const { setNFTs } = require('./NFT/actions')
-const { selectNFTs } = require('./NFT/selectors')
 const { setPlayers } = require('./player/actions')
-const { selectPlayers } = require('./player/selectors')
 const { FRONTEND_URL, PORT } = require('./utils/constants')
 
 Moralis.start({
@@ -23,11 +21,12 @@ const corsOptions = {
 }
 
 const main = async () => {
+  let isReady = false
+
   const app = express()
   const server = createServer(app)
 
-  const isServerReady = () =>
-    server.listening && selectNFTs().length > 0 && selectPlayers().length > 0
+  const isServerReady = () => server.listening && isReady
 
   app.use(cors(corsOptions))
   app.use(express.json())
@@ -90,6 +89,8 @@ const main = async () => {
 
       process.exit(1)
     }
+
+    isReady = true
   })
 }
 

@@ -21,7 +21,7 @@ import TheFooter from '@/components/TheFooter'
 import TheHeader from '@/components/TheHeader'
 
 export default {
-  name: 'TheLayoutWeb',
+  name: 'WebLayout',
 
   components: {
     TheFooter,

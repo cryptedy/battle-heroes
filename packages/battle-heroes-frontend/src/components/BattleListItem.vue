@@ -43,12 +43,12 @@
         <SelectNFTs :player="player" @select="onSelectNFT" />
       </BaseDialog>
 
-      <BaseButton v-if="isPlayerBattle" type="danger" @click="deleteBattle">
+      <BaseButton v-if="canDeleteBattle" type="danger" @click="deleteBattle">
         DELETE
       </BaseButton>
 
       <BaseButton v-if="canJoinBattle" type="primary" @click="joinBattle">
-        JOIN BATTLE
+        JOIN
       </BaseButton>
     </div>
   </BaseListItem>
@@ -108,20 +108,20 @@ export default {
       return this.findNFT(this.battle.players[2].NFT_id)
     },
 
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
+    },
+
     canJoinBattle() {
       return (
-        !this.hasPlayerBattle &&
+        !this.playerBattle &&
         !this.isPlayerBattle &&
         this.battle.state === BATTLE_STATE.CREATED
       )
     },
 
-    hasPlayerBattle() {
-      return this.playerBattle !== null
-    },
-
-    isPlayerBattle() {
-      return this.playerBattle && this.playerBattle.id === this.battle.id
+    canDeleteBattle() {
+      return this.isPlayerBattle
     }
   },
 

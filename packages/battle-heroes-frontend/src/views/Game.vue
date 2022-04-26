@@ -1,23 +1,25 @@
 <template>
-  <TheLayoutGame>
-    <ErrorScreen v-if="!battle" message="The battle not found">
-      <p>
-        The battle has already finished or the opponent player has ended the
-        battle
-      </p>
-      <p style="margin-top: 16px">
-        <BaseButton type="primary" @click="leaveGame">
-          <FontAwesomeIcon icon="arrow-left" />
-          BACK
-        </BaseButton>
-      </p>
-    </ErrorScreen>
+  <ErrorScreen v-if="!battle" message="The battle not found">
+    <p>The battle has already finished or aborted</p>
+    <p style="margin-top: 16px">
+      <BaseButton type="primary" @click="leaveGame">
+        <FontAwesomeIcon icon="arrow-left" />
+        BACK
+      </BaseButton>
+    </p>
+  </ErrorScreen>
 
-    <div v-else-if="isBattleCreated">
-      <p>The battle not started</p>
+  <template v-else>
+    <template v-if="isBattleCreated">
+      <p>The battle just created</p>
       <p>{{ player1.name }}'s {{ NFT1.name }}</p>
+      <div>
+        <img :src="NFT1.image_url" :alt="NFT1.name" width="64" height="64" />
+      </div>
 
-      <template v-if="canJoinBattle">
+      <template v-if="isPlayerBattle"> Waiting for join opponent... </template>
+
+      <template v-else-if="canJoinBattle">
         <BaseDialog
           :open="dialogShown"
           title="Select a NFT to use in battle"
@@ -26,164 +28,187 @@
           <SelectNFTs :player="player" @select="onSelectNFT" />
         </BaseDialog>
 
-        <BaseButton v-if="canJoinBattle" type="primary" @click="joinBattle">
-          JOIN BATTLE
-        </BaseButton>
+        <BaseButton type="primary" @click="joinBattle"> JOIN </BaseButton>
       </template>
-    </div>
+    </template>
 
-    <div
-      v-else-if="!game && !isPlayerBattle && (isBattleReady || isBattleStarted)"
-    >
-      <p>The battle has already started or ended by other players</p>
-      <div style="text-align: center">
-        <p>{{ player1.name }}'s {{ NFT1.name }}</p>
-        <p>VS</p>
-        <p>{{ player2.name }}'s {{ NFT2.name }}</p>
-      </div>
-    </div>
-
-    <SplashScreen v-else-if="!game" message="Loading game...">
-      <div style="text-align: center">
-        <p>{{ player1.name }}'s {{ NFT1.name }}</p>
-        <p>VS</p>
-        <p>{{ player2.name }}'s {{ NFT2.name }}</p>
-      </div>
-    </SplashScreen>
-
-    <div v-else class="battle">
-      <div class="battle-status">
-        <div class="battle-status-actions">
-          <BaseButton v-if="canLeave" type="primary" @click="leaveGame">
-            <FontAwesomeIcon icon="arrow-left" />
-          </BaseButton>
-
-          <BaseButton v-else type="danger" @click="abortGame">
-            <FontAwesomeIcon icon="arrow-left" />
-          </BaseButton>
-        </div>
-
-        <div class="battle-status-primary">
-          <p>=== TURN {{ game.turn }} ===</p>
-
-          <template v-if="aborted">
-            <p style="font-weight: bold; color: #4caf50">YOU WINI!</p>
-            <p>Opponent player aborted the battle.</p>
-          </template>
-
-          <template v-else-if="isGameFinished">
-            <p
-              v-if="playerStatus.hp > opponentStatus.hp"
-              style="font-weight: bold; color: #4caf50"
-            >
-              YOU WINI!
-            </p>
-            <p v-else style="font-weight: bold; color: #f44336">YOU LOSE!</p>
-            <router-link
-              :to="{ name: 'battles' }"
-              style="font-weight: bold; color: #2196f3"
-            >
-              <FontAwesomeIcon icon="arrow-left" />
-              Back to battle list
-            </router-link>
-          </template>
-
-          <template v-else>
-            <p
-              v-if="!opponentPlayer.socket_ids.length > 0"
-              style="color: rgba(255, 255, 255, 0.5)"
-            >
-              Opponent player is OFFLINE
-            </p>
-            <p v-if="canMove" style="font-weight: bold; color: #2196f3">
-              Select your move!
-            </p>
-            <p v-else style="color: rgba(255, 255, 255, 0.5)">
-              Waiting for opponent...
-            </p>
-          </template>
-        </div>
-
-        <div class="battle-status-actions">
-          <BaseButton
-            :type="soundPaused ? 'default' : 'primary'"
-            @click="toggleSound"
+    <template v-if="isBattleReady || isBattleStarted || isBattleEnded">
+      <template v-if="!game">
+        <template v-if="actualBattle">
+          <SplashScreen
+            v-if="isPlayerBattle && (isBattleStarted || isBattleReady)"
+            message="Loading game..."
           >
-            <FontAwesomeIcon v-if="soundPaused" icon="volume-xmark" />
-            <FontAwesomeIcon v-else icon="volume-high" />
-          </BaseButton>
-        </div>
-      </div>
+            <div style="text-align: center">
+              <p>{{ player1.name }}'s {{ NFT1.name }}</p>
+              <p>VS</p>
+              <p>{{ player2.name }}'s {{ NFT2.name }}</p>
+            </div>
+          </SplashScreen>
 
-      <div class="battle-ground">
-        <div
-          class="battle-ground-player"
-          :class="{
-            'is-current-turn': !canMove,
-            'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-            'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp,
-            shake: opponentState.takingDamage
-          }"
-        >
-          <div
-            class="battle-ground-player-name player-name"
-            :class="{
-              'is-online': opponentPlayer.socket_ids.length > 0,
-              'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-              'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
-            }"
-          >
-            {{ opponentPlayer.name }}
+          <ErrorScreen v-else message="The battle already started">
+            <p>The battle has already started by the other players</p>
+            <div style="text-align: center">
+              <p>{{ player1.name }}'s {{ NFT1.name }}</p>
+              <p>VS</p>
+              <p>{{ player2.name }}'s {{ NFT2.name }}</p>
+            </div>
+
+            <p style="margin-top: 16px">
+              <BaseButton type="primary" @click="leaveGame">
+                <FontAwesomeIcon icon="arrow-left" />
+                BACK
+              </BaseButton>
+            </p>
+          </ErrorScreen>
+        </template>
+      </template>
+
+      <template v-else>
+        <div class="battle">
+          <div class="battle-status">
+            <div class="battle-status-actions">
+              <BaseButton v-if="canLeave" type="primary" @click="leaveGame">
+                <FontAwesomeIcon icon="arrow-left" />
+              </BaseButton>
+
+              <BaseButton v-else type="danger" @click="abortGame">
+                <FontAwesomeIcon icon="arrow-left" />
+              </BaseButton>
+            </div>
+
+            <div class="battle-status-primary">
+              <p>=== TURN {{ game.turn }} ===</p>
+
+              <template v-if="aborted">
+                <p style="font-weight: bold; color: #4caf50">YOU WINI!</p>
+                <p>Opponent player aborted the battle.</p>
+              </template>
+
+              <template v-else-if="isGameFinished">
+                <p
+                  v-if="playerStatus.hp > opponentStatus.hp"
+                  style="font-weight: bold; color: #4caf50"
+                >
+                  YOU WINI!
+                </p>
+                <p v-else style="font-weight: bold; color: #f44336">
+                  YOU LOSE!
+                </p>
+                <router-link
+                  :to="{ name: 'battles' }"
+                  style="font-weight: bold; color: #2196f3"
+                >
+                  <FontAwesomeIcon icon="arrow-left" />
+                  Back to battle list
+                </router-link>
+              </template>
+
+              <template v-else>
+                <p
+                  v-if="!opponentPlayer.socket_ids.length > 0"
+                  style="color: rgba(255, 255, 255, 0.5)"
+                >
+                  Opponent player is OFFLINE
+                </p>
+                <p v-if="canMove" style="font-weight: bold; color: #2196f3">
+                  Select your move!
+                </p>
+                <p v-else style="color: rgba(255, 255, 255, 0.5)">
+                  Waiting for opponent...
+                </p>
+              </template>
+            </div>
+
+            <div class="battle-status-actions">
+              <BaseButton
+                :type="soundPaused ? 'default' : 'primary'"
+                @click="toggleSound"
+              >
+                <FontAwesomeIcon v-if="soundPaused" icon="volume-xmark" />
+                <FontAwesomeIcon v-else icon="volume-high" />
+              </BaseButton>
+            </div>
           </div>
 
-          <div class="battle-ground-nft">
+          <div class="battle-ground">
             <div
-              class="battle-ground-nft-name"
+              class="battle-ground-player"
               :class="{
                 'is-current-turn': !canMove,
                 'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
+                'is-lose':
+                  isGameFinished && playerStatus.hp > opponentStatus.hp,
+                shake: opponentState.takingDamage
               }"
             >
-              <p>{{ opponentNFT.name }}</p>
-              <!-- <p>RANK {{ opponentNFT.rank }}</p>
+              <div
+                class="battle-ground-player-name player-name"
+                :class="{
+                  'is-online': opponentPlayer.socket_ids.length > 0,
+                  'is-win':
+                    isGameFinished && playerStatus.hp < opponentStatus.hp,
+                  'is-lose':
+                    isGameFinished && playerStatus.hp > opponentStatus.hp
+                }"
+              >
+                {{ opponentPlayer.name }}
+              </div>
+
+              <div class="battle-ground-nft">
+                <div
+                  class="battle-ground-nft-name"
+                  :class="{
+                    'is-current-turn': !canMove,
+                    'is-win':
+                      isGameFinished && playerStatus.hp < opponentStatus.hp,
+                    'is-lose':
+                      isGameFinished && playerStatus.hp > opponentStatus.hp
+                  }"
+                >
+                  <p>{{ opponentNFT.name }}</p>
+                  <!-- <p>RANK {{ opponentNFT.rank }}</p>
               <p>SCORE {{ opponentNFT.score }}</p> -->
-            </div>
-            <div
-              class="battle-ground-nft-image"
-              :class="{
-                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
-              }"
-            >
-              <img
-                :src="opponentNFT.image_url"
-                alt=""
-                width="512"
-                height="512"
-              />
-            </div>
-            <HealthBar
-              :max-hp="opponentStatus.max_hp"
-              :hp="opponentStatus.hp"
-            />
-            <div
-              class="battle-ground-nft-status"
-              :class="{
-                'is-win': isGameFinished && playerStatus.hp < opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp > opponentStatus.hp
-              }"
-            >
-              <ul>
-                <li>
-                  HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
-                </li>
-                <li>ATTACK {{ opponentStatus.attack }}</li>
-                <li>DEFENSE {{ opponentStatus.defense }}</li>
-                <li>SPEED {{ opponentStatus.speed }}</li>
-              </ul>
-            </div>
-            <!-- <div class="battle-ground-nft-attributes">
+                </div>
+                <div
+                  class="battle-ground-nft-image"
+                  :class="{
+                    'is-win':
+                      isGameFinished && playerStatus.hp < opponentStatus.hp,
+                    'is-lose':
+                      isGameFinished && playerStatus.hp > opponentStatus.hp
+                  }"
+                >
+                  <img
+                    :src="opponentNFT.image_url"
+                    alt=""
+                    width="512"
+                    height="512"
+                  />
+                </div>
+                <HealthBar
+                  :max-hp="opponentStatus.max_hp"
+                  :hp="opponentStatus.hp"
+                />
+                <div
+                  class="battle-ground-nft-status"
+                  :class="{
+                    'is-win':
+                      isGameFinished && playerStatus.hp < opponentStatus.hp,
+                    'is-lose':
+                      isGameFinished && playerStatus.hp > opponentStatus.hp
+                  }"
+                >
+                  <ul>
+                    <li>
+                      HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
+                    </li>
+                    <li>ATTACK {{ opponentStatus.attack }}</li>
+                    <li>DEFENSE {{ opponentStatus.defense }}</li>
+                    <li>SPEED {{ opponentStatus.speed }}</li>
+                  </ul>
+                </div>
+                <!-- <div class="battle-ground-nft-attributes">
               <ul>
                 <li
                   v-for="opponentNFTAttribute in opponentNFT.attributes"
@@ -194,67 +219,86 @@
                 </li>
               </ul>
             </div> -->
-          </div>
-        </div>
+              </div>
+            </div>
 
-        <div
-          class="battle-ground-player"
-          :class="{
-            'is-current-turn': canMove,
-            'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-            'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp,
-            shake: playerState.takingDamage
-          }"
-        >
-          <div
-            class="battle-ground-player-name player-name"
-            :class="{
-              'is-online': player.socket_ids.length > 0,
-              'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-              'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
-            }"
-          >
-            {{ player.name }}
-          </div>
-
-          <div class="battle-ground-nft">
             <div
-              class="battle-ground-nft-name"
+              class="battle-ground-player"
               :class="{
                 'is-current-turn': canMove,
                 'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
+                'is-lose':
+                  isGameFinished && playerStatus.hp < opponentStatus.hp,
+                shake: playerState.takingDamage
               }"
             >
-              <p>{{ playerNFT.name }}</p>
-              <!-- <p>RANK {{ playerNFT.rank }}</p>
+              <div
+                class="battle-ground-player-name player-name"
+                :class="{
+                  'is-online': player.socket_ids.length > 0,
+                  'is-win':
+                    isGameFinished && playerStatus.hp > opponentStatus.hp,
+                  'is-lose':
+                    isGameFinished && playerStatus.hp < opponentStatus.hp
+                }"
+              >
+                {{ player.name }}
+              </div>
+
+              <div class="battle-ground-nft">
+                <div
+                  class="battle-ground-nft-name"
+                  :class="{
+                    'is-current-turn': canMove,
+                    'is-win':
+                      isGameFinished && playerStatus.hp > opponentStatus.hp,
+                    'is-lose':
+                      isGameFinished && playerStatus.hp < opponentStatus.hp
+                  }"
+                >
+                  <p>{{ playerNFT.name }}</p>
+                  <!-- <p>RANK {{ playerNFT.rank }}</p>
               <p>SCORE {{ playerNFT.score }}</p> -->
-            </div>
-            <div
-              class="battle-ground-nft-image"
-              :class="{
-                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
-              }"
-            >
-              <img :src="playerNFT.image_url" alt="" width="512" height="512" />
-            </div>
-            <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
-            <div
-              class="battle-ground-nft-status"
-              :class="{
-                'is-win': isGameFinished && playerStatus.hp > opponentStatus.hp,
-                'is-lose': isGameFinished && playerStatus.hp < opponentStatus.hp
-              }"
-            >
-              <ul>
-                <li>HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}</li>
-                <li>ATTACK {{ playerStatus.attack }}</li>
-                <li>DEFENSE {{ playerStatus.defense }}</li>
-                <li>SPEED {{ playerStatus.speed }}</li>
-              </ul>
-            </div>
-            <!-- <div class="battle-ground-nft-status">
+                </div>
+                <div
+                  class="battle-ground-nft-image"
+                  :class="{
+                    'is-win':
+                      isGameFinished && playerStatus.hp > opponentStatus.hp,
+                    'is-lose':
+                      isGameFinished && playerStatus.hp < opponentStatus.hp
+                  }"
+                >
+                  <img
+                    :src="playerNFT.image_url"
+                    alt=""
+                    width="512"
+                    height="512"
+                  />
+                </div>
+                <HealthBar
+                  :max-hp="playerStatus.max_hp"
+                  :hp="playerStatus.hp"
+                />
+                <div
+                  class="battle-ground-nft-status"
+                  :class="{
+                    'is-win':
+                      isGameFinished && playerStatus.hp > opponentStatus.hp,
+                    'is-lose':
+                      isGameFinished && playerStatus.hp < opponentStatus.hp
+                  }"
+                >
+                  <ul>
+                    <li>
+                      HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
+                    </li>
+                    <li>ATTACK {{ playerStatus.attack }}</li>
+                    <li>DEFENSE {{ playerStatus.defense }}</li>
+                    <li>SPEED {{ playerStatus.speed }}</li>
+                  </ul>
+                </div>
+                <!-- <div class="battle-ground-nft-status">
               <ul>
                 <li>Attack => {{ playerStatus.attack }}</li>
                 <li>Defense => {{ playerStatus.defense }}</li>
@@ -272,29 +316,33 @@
                 </li>
               </ul>
             </div> -->
+              </div>
+            </div>
+          </div>
+
+          <div ref="messages" class="battle-messages">
+            <ul>
+              <li v-for="(message, index) in game.messages" :key="index">
+                {{ message }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="battle-controls">
+            <button :disabled="!canMove" @click="attack">ATTACK</button>
+            <button :disabled="true">SPELL</button>
+            <button :disabled="true">DEFFENCE</button>
+            <button :disabled="true">RUN</button>
           </div>
         </div>
-      </div>
-
-      <div ref="messages" class="battle-messages">
-        <ul>
-          <li v-for="(message, index) in game.messages" :key="index">
-            {{ message }}
-          </li>
-        </ul>
-      </div>
-
-      <div class="battle-controls">
-        <button :disabled="!canMove" @click="attack">ATTACK</button>
-        <button :disabled="true">SPELL</button>
-        <button :disabled="true">DEFFENCE</button>
-        <button :disabled="true">RUN</button>
-      </div>
-    </div>
-  </TheLayoutGame>
+      </template>
+    </template>
+  </template>
 </template>
 
 <script>
+/* eslint-disable vue/no-unused-components */
+
 import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
 import HealthBar from '@/components/HealthBar'
@@ -302,7 +350,6 @@ import { scrollToBottom } from '@/utils/helpers'
 import SelectNFTs from '@/components/SelectNFTs'
 import ErrorScreen from '@/components/ErrorScreen'
 import SplashScreen from '@/components/SplashScreen'
-import TheLayoutGame from '@/components/TheLayoutGame'
 import { PLAYER_MOVE, BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
@@ -312,8 +359,7 @@ export default {
     HealthBar,
     SelectNFTs,
     ErrorScreen,
-    SplashScreen,
-    TheLayoutGame
+    SplashScreen
   },
 
   unwatch: {
@@ -337,7 +383,7 @@ export default {
 
       loading: false,
 
-      battleCache: null,
+      cachedBattle: null,
 
       game: null,
       aborting: false,
@@ -364,16 +410,12 @@ export default {
       playerBattle: 'game/playerBattle'
     }),
 
+    actualBattle() {
+      return this.findBattle(this.$route.params.battleId)
+    },
+
     battle() {
-      return this.findBattle(this.$route.params.battleId) || this.battleCache
-    },
-
-    hasPlayerBattle() {
-      return this.playerBattle !== null
-    },
-
-    isPlayerBattle() {
-      return this.playerBattle && this.playerBattle.id === this.battle.id
+      return this.actualBattle || this.cachedBattle
     },
 
     isBattleCreated() {
@@ -392,19 +434,12 @@ export default {
       return this.battle.state === BATTLE_STATE.ENDED
     },
 
-    battlePlayersJoined() {
-      return !Object.keys(this.battle.players).some(
-        playerKey => this.battle.players[playerKey].id === null
-      )
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
     },
 
     canJoinBattle() {
-      return (
-        !this.hasPlayerBattle &&
-        !this.isPlayerBattle &&
-        this.isBattleCreated &&
-        !this.battlePlayersJoined
-      )
+      return !this.playerBattle && !this.isPlayerBattle && this.isBattleCreated
     },
 
     player1() {
@@ -479,16 +514,22 @@ export default {
       return this.playerHp <= 0 || this.opponentHp <= 0
     },
 
+    isPlayerTurn() {
+      return this.game.current_player === this.playerKey
+    },
+
     canLeave() {
       return !(!this.aborted && !this.isGameFinished)
     },
 
     canMove() {
       return (
+        this.actualBattle &&
+        this.isPlayerBattle &&
         !this.loading &&
         !this.aborted &&
         !this.isGameFinished &&
-        this.game.current_player === this.playerKey
+        this.isPlayerTurn
       )
     }
   },
@@ -496,9 +537,6 @@ export default {
   created() {
     console.log('Game:created')
 
-    this.$socket.on('battle:matched', battleId =>
-      this.onBattleMatched(battleId)
-    )
     this.$socket.on('game:aborted', gameId => this.onGameAborted(gameId))
 
     this.audio.currentTime = 0
@@ -511,7 +549,11 @@ export default {
   mounted() {
     console.log('Game:mounted')
 
-    if (this.battle && (this.isBattleReady || this.isBattleStarted)) {
+    if (
+      this.actualBattle &&
+      this.isPlayerBattle &&
+      (this.isBattleStarted || this.isBattleReady)
+    ) {
       this.$socket.emit('game:start', this.battle.id, this.onGameStart)
     }
   },
@@ -546,7 +588,8 @@ export default {
 
       return this.$router.push(
         {
-          name: 'battles'
+          name: 'battles',
+          replace: true
         },
         () => {}
       )
@@ -575,7 +618,7 @@ export default {
     },
 
     onGameStart({ status, message, game }) {
-      console.log('onGameUpdate', status, message, game)
+      console.log('onGameStart', status, message, game)
 
       if (status) {
         this.addNotification({
@@ -590,7 +633,7 @@ export default {
         })
       }
 
-      this.battleCache = this.battle
+      this.cachedBattle = this.battle
 
       this.game = game
 
@@ -629,6 +672,9 @@ export default {
     onGameAborted(gameId) {
       console.log('onGameAborted', gameId)
 
+      this.unwatch()
+      this.removeEventListener()
+
       if (gameId === this.game.id) {
         this.aborted = true
 
@@ -640,24 +686,6 @@ export default {
           type: NOTIFICATION_TYPE.ERROR,
           timeout: 0
         })
-      }
-    },
-
-    onBattleMatched(battleId) {
-      console.log('onBattleMatched', battleId, this.battle.id)
-
-      if (battleId === this.battle.id) {
-        this.$socket.emit('game:start', this.battle.id, this.onGameStart)
-      } else {
-        this.$router.push(
-          {
-            name: 'game',
-            params: {
-              battleId: battleId
-            }
-          },
-          () => {}
-        )
       }
     },
 
@@ -688,7 +716,6 @@ export default {
     removeEventListener() {
       this.$socket.off('game:update')
       this.$socket.off('game:aborted')
-      this.$socket.off('battle:matched')
     },
 
     watch() {
