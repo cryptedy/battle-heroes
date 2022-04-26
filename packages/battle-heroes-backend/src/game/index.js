@@ -464,7 +464,7 @@ class GameManager {
           })
         } else {
           if (oldOpponentHpRate >= 0.2 && newOpponentHpRate < 0.2) {
-            nextOpponentStatus.criticalRate = 1.5
+            nextOpponentStatus.criticalRate = 0.15
           }
         }
 
