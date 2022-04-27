@@ -38,7 +38,6 @@ export function getScrollbarWidth() {
 export function scrollToBottom(el, smooth = false) {
   try {
     if (smooth) {
-      console.log('smooth')
       el.scrollTo({
         top: el.scrollHeight,
         behavior: 'smooth'
