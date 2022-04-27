@@ -54,7 +54,8 @@ const createStatus = () => {
     defense: defense,
     speed: speed,
     criticalRate: 0.05,
-    missRate: 0.1
+    missRate: 0.1,
+    heal: 1
   }
 }
 
@@ -524,7 +525,7 @@ class GameManager {
           }
         })
       } else {
-        if (oldOpponentHpRate >= 0.2 && newOpponentHpRate < 0.2) {
+        if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
           nextOpponentStatus.criticalRate = 0.15
         }
       }
@@ -541,6 +542,10 @@ class GameManager {
     console.log('heal')
 
     const { game, player, playerKey, playerStatus, localMessages } = payload
+
+    if (playerStatus.heal <= 0) {
+      throw new Error('Failed to move: Can not use heal')
+    }
 
     const nextPlayerStatus = {}
 
@@ -591,6 +596,7 @@ class GameManager {
     }
 
     nextPlayerStatus.hp = newPlayerHp
+    nextPlayerStatus.heal = playerStatus.heal - 1
 
     updateGamePlayer({
       gameId: game.id,

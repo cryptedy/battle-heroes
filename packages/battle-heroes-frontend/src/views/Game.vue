@@ -331,10 +331,14 @@
           <div class="battle-controls">
             <button :disabled="!canMove" @click="attack">ATTACK</button>
             <button
-              :disabled="!canMove || playerStatus.hp === playerStatus.max_hp"
+              :disabled="
+                !canMove ||
+                playerStatus.hp === playerStatus.max_hp ||
+                playerStatus.heal <= 0
+              "
               @click="heal"
             >
-              HEAL
+              HEAL ({{ playerStatus.heal }})
             </button>
             <button :disabled="true">DEFFENCE</button>
             <button :disabled="true">RUN</button>
@@ -591,6 +595,7 @@ export default {
 
       if (!this.canMove) return
       if (this.playerStatus.hp === this.playerStatus.max_hp) return
+      if (this.playerStatus.heal <= 0) return
 
       this.loading = true
 
