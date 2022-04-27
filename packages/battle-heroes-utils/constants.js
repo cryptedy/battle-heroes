@@ -28,7 +28,7 @@ const PLAYER_STATE = Object.freeze({
 
 const PLAYER_MOVE = Object.freeze({
   ATTACK: 'ATTACK',
-  SPELL: 'SPELL',
+  HEAL: 'HEAL',
   DEFENCE: 'DEFENCE',
   RUN: 'RUN'
 })

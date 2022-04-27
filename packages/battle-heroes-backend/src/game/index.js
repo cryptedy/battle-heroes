@@ -341,15 +341,6 @@ class GameManager {
       throw new Error('Failed to move: The battle not found')
     }
 
-    const game = selectBattleGame(battle.id)
-
-    if (!game) {
-      throw new Error('Failed to move: The game not found')
-    }
-
-    const playerKey = this.getBattlePlayerKey(battle, player.id)
-    const playerNFT = selectNFT(battle.players[playerKey].NFT_id)
-
     const opponentPlayer = this.getBattleOpponentPlayer(
       selectBattle(battle.id),
       player.id
@@ -359,121 +350,50 @@ class GameManager {
       throw new Error('Failed to move: The opponent player not found')
     }
 
+    const game = selectBattleGame(battle.id)
+
+    if (!game) {
+      throw new Error('Failed to move: The game not found')
+    }
+
+    const playerKey = this.getBattlePlayerKey(battle, player.id)
+    const playerNFT = selectNFT(battle.players[playerKey].NFT_id)
+    const playerStatus = game.players[playerKey]
+
     const opponentPlayerKey = this.getBattlePlayerKey(battle, opponentPlayer.id)
     const opponentNFT = selectNFT(battle.players[opponentPlayerKey].NFT_id)
+    const opponentStatus = game.players[opponentPlayerKey]
 
     if (move === PLAYER_MOVE.ATTACK) {
-      const nextOpponentStatus = {}
-
-      localMessages.push(`${player.name}'s ${playerNFT.name} attacks!`)
-
-      if (Math.random() < game.players[playerKey].missRate) {
-        localMessages.push('=== MISS!! ===')
-      } else {
-        let damage = Math.floor(
-          (game.players[playerKey].attack * 100) /
-            (100 + game.players[opponentPlayerKey].defense)
-        )
-
-        if (Math.random() < game.players[playerKey].criticalRate) {
-          damage = Math.floor(damage * 1.5)
-
-          localMessages.push('=== CRITICAL HIT!! ===')
-        }
-
-        const opponentMaxHp = game.players[opponentPlayerKey].max_hp
-
-        const oldOpponentHp = game.players[opponentPlayerKey].hp
-        const oldOpponentHpRate = oldOpponentHp / opponentMaxHp
-
-        let newOpponentHp = oldOpponentHp - damage
-        const newOpponentHpRate = newOpponentHp / opponentMaxHp
-
-        localMessages.push(
-          `${opponentPlayer.name}'s ${opponentNFT.name} takes damage ${damage}`
-        )
-
-        if (newOpponentHp < 0) {
-          newOpponentHp = 0
-        }
-
-        nextOpponentStatus.hp = newOpponentHp
-
-        if (newOpponentHp === 0) {
-          localMessages.push(
-            `${opponentPlayer.name}'s ${opponentNFT.name} fainted...`
-          )
-
-          updatePlayer({
-            playerId: player.id,
-            payload: { state: PLAYER_STATE.IDLE }
-          })
-
-          updatePlayer({
-            playerId: opponentPlayer.id,
-            payload: { state: PLAYER_STATE.IDLE }
-          })
-
-          updatePlayerStats(player.id, {
-            exp: player.exp + 3,
-            win: player.win + 1
-          })
-            .then(() => {
-              this.io.emit('player:update', selectPlayer(player.id))
-            })
-            .catch(error => {
-              throw new Error(
-                `Failed to update player stats: ${error.message}: ${error.stack}`
-              )
-            })
-
-          updatePlayerStats(opponentPlayer.id, {
-            exp: opponentPlayer.exp + 1,
-            lose: opponentPlayer.lose + 1
-          })
-            .then(() => {
-              this.io.emit('player:update', selectPlayer(opponentPlayer.id))
-            })
-            .catch(error => {
-              const { messages, stack } = error
-
-              // send to ooponent player
-              this.io.to(opponentPlayer.id).emit('game:error', {
-                message: `Failed to update player status: ${messages}`,
-                stack: stack
-              })
-            })
-
-          updateBattle({
-            battleId: battle.id,
-            payload: { state: BATTLE_STATE.ENDED }
-          })
-
-          this.io.emit('player:update', selectPlayer(player.id))
-          this.io.emit('player:update', selectPlayer(opponentPlayer.id))
-          this.io.emit('battle:update', selectBattle(battle.id))
-
-          postDiscord({
-            type: DISCORD_POST_TYPE.BATTLE_ENDED,
-            payload: {
-              winnerPlayer: selectPlayer(player.id),
-              loserPlayer: selectPlayer(opponentPlayer.id),
-              battle: selectBattle(battle.id),
-              game: selectGame(game.id)
-            }
-          })
-        } else {
-          if (oldOpponentHpRate >= 0.2 && newOpponentHpRate < 0.2) {
-            nextOpponentStatus.criticalRate = 0.15
-          }
-        }
-
-        updateGamePlayer({
-          gameId: game.id,
-          playerKey: opponentPlayerKey,
-          payload: nextOpponentStatus
-        })
-      }
+      this.attack({
+        battle,
+        game,
+        player,
+        playerKey,
+        playerNFT,
+        playerStatus,
+        opponentPlayer,
+        opponentPlayerKey,
+        opponentNFT,
+        opponentStatus,
+        localMessages
+      })
+    } else if (move === PLAYER_MOVE.HEAL) {
+      this.heal({
+        battle,
+        game,
+        player,
+        playerKey,
+        playerNFT,
+        playerStatus,
+        opponentPlayer,
+        opponentPlayerKey,
+        opponentNFT,
+        opponentStatus,
+        localMessages
+      })
+    } else {
+      throw new Error('Failed to move: Invalid move type')
     }
 
     const currentPlayer = game.current_player === 1 ? 2 : 1
@@ -490,10 +410,193 @@ class GameManager {
     })
 
     this.io.to(player.id).emit('game:update', selectGame(game.id))
+    this.io.to(opponentPlayer.id).emit('game:update', selectGame(game.id))
 
-    if (opponentPlayer) {
-      this.io.to(opponentPlayer.id).emit('game:update', selectGame(game.id))
+    // TODO: send to audience
+  }
+
+  attack(payload) {
+    console.log('attack')
+
+    const {
+      battle,
+      game,
+      player,
+      playerStatus,
+      opponentPlayer,
+      opponentPlayerKey,
+      opponentStatus,
+      localMessages
+    } = payload
+
+    // const nextPlayerStatus = {}
+    const nextOpponentStatus = {}
+
+    localMessages.push(`${player.name} attacks!`)
+
+    const rand = Math.random()
+
+    if (rand < playerStatus.missRate) {
+      localMessages.push('=== ATTACK MISS!! ===')
+    } else {
+      let damage = Math.floor(
+        (playerStatus.attack * 100) / (100 + opponentStatus.defense)
+      )
+
+      if (rand < playerStatus.criticalRate) {
+        localMessages.push('=== CRITICAL HIT!! ===')
+
+        damage = Math.floor(damage * 1.5)
+      }
+
+      const oldOpponentHp = opponentStatus.hp
+      const oldOpponentHpRate = oldOpponentHp / opponentStatus.max_hp
+
+      let newOpponentHp = oldOpponentHp - damage
+      const newOpponentHpRate = newOpponentHp / opponentStatus.max_hp
+
+      localMessages.push(`${opponentPlayer.name} takes damage ${damage}`)
+
+      if (newOpponentHp < 0) {
+        newOpponentHp = 0
+      }
+
+      nextOpponentStatus.hp = newOpponentHp
+
+      if (newOpponentHp === 0) {
+        localMessages.push(`${opponentPlayer.name} fainted...`)
+
+        updatePlayer({
+          playerId: player.id,
+          payload: { state: PLAYER_STATE.IDLE }
+        })
+
+        updatePlayer({
+          playerId: opponentPlayer.id,
+          payload: { state: PLAYER_STATE.IDLE }
+        })
+
+        updatePlayerStats(player.id, {
+          exp: player.exp + 3,
+          win: player.win + 1
+        })
+          .then(() => {
+            this.io.emit('player:update', selectPlayer(player.id))
+          })
+          .catch(error => {
+            throw new Error(
+              `Failed to update player stats: ${error.message}: ${error.stack}`
+            )
+          })
+
+        updatePlayerStats(opponentPlayer.id, {
+          exp: opponentPlayer.exp + 1,
+          lose: opponentPlayer.lose + 1
+        })
+          .then(() => {
+            this.io.emit('player:update', selectPlayer(opponentPlayer.id))
+          })
+          .catch(error => {
+            const { messages, stack } = error
+            // send to ooponent player
+            this.io.to(opponentPlayer.id).emit('game:error', {
+              message: `Failed to update player status: ${messages}`,
+              stack: stack
+            })
+          })
+
+        updateBattle({
+          battleId: battle.id,
+          payload: { state: BATTLE_STATE.ENDED }
+        })
+
+        this.io.emit('player:update', selectPlayer(player.id))
+        this.io.emit('player:update', selectPlayer(opponentPlayer.id))
+        this.io.emit('battle:update', selectBattle(battle.id))
+
+        postDiscord({
+          type: DISCORD_POST_TYPE.BATTLE_ENDED,
+          payload: {
+            winnerPlayer: selectPlayer(player.id),
+            loserPlayer: selectPlayer(opponentPlayer.id),
+            battle: selectBattle(battle.id),
+            game: selectGame(game.id)
+          }
+        })
+      } else {
+        if (oldOpponentHpRate >= 0.2 && newOpponentHpRate < 0.2) {
+          nextOpponentStatus.criticalRate = 0.15
+        }
+      }
+
+      updateGamePlayer({
+        gameId: game.id,
+        playerKey: opponentPlayerKey,
+        payload: nextOpponentStatus
+      })
     }
+  }
+
+  heal(payload) {
+    console.log('heal')
+
+    const { game, player, playerKey, playerStatus, localMessages } = payload
+
+    const nextPlayerStatus = {}
+
+    localMessages.push(`${player.name} attempted to recover HP`)
+
+    let recoveryAmount = 0
+
+    const rand = Math.random()
+
+    if (rand < 0.02) {
+      localMessages.push('=== RECOVER 100 HP ===')
+
+      recoveryAmount = 100
+    } else if (rand < 0.05) {
+      localMessages.push('=== RECOVER MISS!! ===')
+
+      recoveryAmount = 0
+    } else if (rand < 0.1) {
+      localMessages.push('=== RECOVER 50 HP ===')
+
+      recoveryAmount = 50
+    } else if (rand < 0.2) {
+      localMessages.push('=== RECOVER 30 HP ===')
+
+      recoveryAmount = 30
+    } else if (rand < 0.3) {
+      localMessages.push('=== RECOVER 10 HP ===')
+
+      recoveryAmount = 10
+    } else if (rand < 0.4) {
+      localMessages.push('=== RECOVER 20 HP ===')
+
+      recoveryAmount = 20
+    } else {
+      localMessages.push('=== RECOVER 15 HP ===')
+
+      recoveryAmount = 15
+    }
+
+    const oldPlayerHp = playerStatus.hp
+
+    let newPlayerHp = oldPlayerHp + recoveryAmount
+
+    localMessages.push(`${player.name} recover HP ${recoveryAmount}`)
+
+    if (newPlayerHp > playerStatus.max_hp) {
+      newPlayerHp = playerStatus.max_hp
+    }
+
+    nextPlayerStatus.hp = newPlayerHp
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: playerKey,
+      payload: nextPlayerStatus
+    })
   }
 
   createBattle(NFTId, callback) {

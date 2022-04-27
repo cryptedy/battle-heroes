@@ -150,6 +150,8 @@ const createBattleEndedData = (winnerPlayer, loserPlayer, battle, game) => {
 const postDiscord = ({ type, payload }) => {
   console.log('postDiscord', type, payload)
 
+  if (!DISCORD_WEBHOOK_URL) return
+
   if (type === DISCORD_POST_TYPE.BATTLE_CREATED) {
     const { player, battle } = payload
 

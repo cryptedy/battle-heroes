@@ -330,7 +330,12 @@
 
           <div class="battle-controls">
             <button :disabled="!canMove" @click="attack">ATTACK</button>
-            <button :disabled="true">SPELL</button>
+            <button
+              :disabled="!canMove || playerStatus.hp === playerStatus.max_hp"
+              @click="heal"
+            >
+              HEAL
+            </button>
             <button :disabled="true">DEFFENCE</button>
             <button :disabled="true">RUN</button>
           </div>
@@ -341,8 +346,6 @@
 </template>
 
 <script>
-/* eslint-disable vue/no-unused-components */
-
 import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
 import HealthBar from '@/components/HealthBar'
@@ -581,6 +584,17 @@ export default {
       this.loading = true
 
       this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
+    },
+
+    heal() {
+      console.log('heal')
+
+      if (!this.canMove) return
+      if (this.playerStatus.hp === this.playerStatus.max_hp) return
+
+      this.loading = true
+
+      this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
     },
 
     leaveGame() {
