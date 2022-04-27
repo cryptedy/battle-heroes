@@ -30,7 +30,7 @@
   </ErrorScreen>
 
   <template v-else-if="isGameView">
-    <slot />
+    <slot :key="gameViewKey" />
   </template>
 
   <div v-else class="game">
@@ -70,6 +70,7 @@ export default {
 
   data() {
     return {
+      gameViewKey: false,
       attemptingGameLogin: false,
       reconnectingSocket: false,
       socketConnectError: '',
@@ -196,9 +197,19 @@ export default {
 
       if (this.isGameView) {
         if (this.$route.params.battleId === battleId) {
-          this.$router.go({ path: this.$router.currentRoute.path, force: true })
+          this.reloadGameView()
         } else {
-          this.$router.go({ path: `/battles/${battleId}`, force: true })
+          this.$router
+            .replace(
+              {
+                name: 'game',
+                params: {
+                  battleId: battleId
+                }
+              },
+              () => {}
+            )
+            .then(() => this.reloadGameView())
         }
       } else {
         this.$router.push(
@@ -211,6 +222,12 @@ export default {
           () => {}
         )
       }
+    },
+
+    reloadGameView() {
+      console.log('reloadGameView')
+
+      return (this.gameViewKey = !this.gameViewKey)
     },
 
     async reloginGame() {
