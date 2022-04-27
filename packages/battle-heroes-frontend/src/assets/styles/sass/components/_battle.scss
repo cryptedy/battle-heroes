@@ -117,6 +117,10 @@
         margin-top: 4px;
         font-size: 14px;
 
+        .has-advantage {
+          color: palette(orange, 500);
+        }
+
         &.is-win {
           color: palette(green, 500);
         }

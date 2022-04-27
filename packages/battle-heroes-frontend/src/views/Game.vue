@@ -168,7 +168,7 @@
                 >
                   <p>{{ opponentNFT.name }}</p>
                   <!-- <p>RANK {{ opponentNFT.rank }}</p>
-              <p>SCORE {{ opponentNFT.score }}</p> -->
+                  <p>SCORE {{ opponentNFT.score }}</p> -->
                 </div>
                 <div
                   class="battle-ground-nft-image"
@@ -202,23 +202,54 @@
                   <ul>
                     <li>
                       HP {{ opponentStatus.hp }} / {{ opponentStatus.max_hp }}
+
+                      <span
+                        v-if="opponentStatus.max_hp > playerStatus.max_hp"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
                     </li>
-                    <li>ATTACK {{ opponentStatus.attack }}</li>
-                    <li>DEFENSE {{ opponentStatus.defense }}</li>
-                    <li>SPEED {{ opponentStatus.speed }}</li>
+                    <li>
+                      ATTACK {{ opponentStatus.attack }}
+                      <span
+                        v-if="opponentStatus.attack > playerStatus.attack"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
+                    </li>
+                    <li>
+                      DEFENSE {{ opponentStatus.defense }}
+                      <span
+                        v-if="opponentStatus.defense > playerStatus.defense"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
+                    </li>
+                    <li>
+                      SPEED {{ opponentStatus.speed }}
+                      <span
+                        v-if="opponentStatus.speed > playerStatus.speed"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
+                    </li>
                   </ul>
                 </div>
                 <!-- <div class="battle-ground-nft-attributes">
-              <ul>
-                <li
-                  v-for="opponentNFTAttribute in opponentNFT.attributes"
-                  :key="opponentNFTAttribute.trait_type"
-                >
-                  {{ opponentNFTAttribute.trait_type }} =>
-                  {{ opponentNFTAttribute.value }}
-                </li>
-              </ul>
-            </div> -->
+                  <ul>
+                    <li
+                      v-for="opponentNFTAttribute in opponentNFT.attributes"
+                      :key="opponentNFTAttribute.trait_type"
+                    >
+                      {{ opponentNFTAttribute.trait_type }} =>
+                      {{ opponentNFTAttribute.value }}
+                    </li>
+                  </ul>
+                </div> -->
               </div>
             </div>
 
@@ -258,7 +289,7 @@
                 >
                   <p>{{ playerNFT.name }}</p>
                   <!-- <p>RANK {{ playerNFT.rank }}</p>
-              <p>SCORE {{ playerNFT.score }}</p> -->
+                  <p>SCORE {{ playerNFT.score }}</p> -->
                 </div>
                 <div
                   class="battle-ground-nft-image"
@@ -292,30 +323,60 @@
                   <ul>
                     <li>
                       HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
+                      <span
+                        v-if="playerStatus.max_hp > opponentStatus.max_hp"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
                     </li>
-                    <li>ATTACK {{ playerStatus.attack }}</li>
-                    <li>DEFENSE {{ playerStatus.defense }}</li>
-                    <li>SPEED {{ playerStatus.speed }}</li>
+                    <li>
+                      ATTACK {{ playerStatus.attack }}
+                      <span
+                        v-if="playerStatus.attack > opponentStatus.attack"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
+                    </li>
+                    <li>
+                      DEFENSE {{ playerStatus.defense }}
+                      <span
+                        v-if="playerStatus.defense > opponentStatus.defense"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
+                    </li>
+                    <li>
+                      SPEED {{ playerStatus.speed }}
+                      <span
+                        v-if="playerStatus.speed > opponentStatus.speed"
+                        class="has-advantage"
+                      >
+                        <FontAwesomeIcon icon="star" />
+                      </span>
+                    </li>
                   </ul>
                 </div>
                 <!-- <div class="battle-ground-nft-status">
-              <ul>
-                <li>Attack => {{ playerStatus.attack }}</li>
-                <li>Defense => {{ playerStatus.defense }}</li>
-                <li>Speed => {{ playerStatus.speed }}</li>
-              </ul>
-            </div>
-            <div class="battle-ground-nft-attributes">
-              <ul>
-                <li
-                  v-for="playerNFTAttribute in playerNFT.attributes"
-                  :key="playerNFTAttribute.trait_type"
-                >
-                  {{ playerNFTAttribute.trait_type }} =>
-                  {{ playerNFTAttribute.value }}
-                </li>
-              </ul>
-            </div> -->
+                  <ul>
+                    <li>Attack => {{ playerStatus.attack }}</li>
+                    <li>Defense => {{ playerStatus.defense }}</li>
+                    <li>Speed => {{ playerStatus.speed }}</li>
+                  </ul>
+                </div>
+                <div class="battle-ground-nft-attributes">
+                  <ul>
+                    <li
+                      v-for="playerNFTAttribute in playerNFT.attributes"
+                      :key="playerNFTAttribute.trait_type"
+                    >
+                      {{ playerNFTAttribute.trait_type }} =>
+                      {{ playerNFTAttribute.value }}
+                    </li>
+                  </ul>
+                </div> -->
               </div>
             </div>
           </div>

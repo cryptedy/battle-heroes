@@ -527,6 +527,8 @@ class GameManager {
       } else {
         if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
           nextOpponentStatus.criticalRate = 0.15
+        } else if (oldOpponentHpRate >= 0.05 && newOpponentHpRate < 0.05) {
+          nextOpponentStatus.criticalRate = 0.25
         }
       }
 
@@ -567,22 +569,18 @@ class GameManager {
       localMessages.push('=== RECOVER 50 HP ===')
 
       recoveryAmount = 50
-    } else if (rand < 0.2) {
-      localMessages.push('=== RECOVER 30 HP ===')
-
-      recoveryAmount = 30
-    } else if (rand < 0.3) {
-      localMessages.push('=== RECOVER 10 HP ===')
-
-      recoveryAmount = 10
-    } else if (rand < 0.4) {
-      localMessages.push('=== RECOVER 20 HP ===')
-
-      recoveryAmount = 20
-    } else {
+    } else if (rand < 0.15) {
       localMessages.push('=== RECOVER 15 HP ===')
 
       recoveryAmount = 15
+    } else if (rand < 0.3) {
+      localMessages.push('=== RECOVER 30 HP ===')
+
+      recoveryAmount = 30
+    } else {
+      localMessages.push('=== RECOVER 25 HP ===')
+
+      recoveryAmount = 25
     }
 
     const oldPlayerHp = playerStatus.hp
