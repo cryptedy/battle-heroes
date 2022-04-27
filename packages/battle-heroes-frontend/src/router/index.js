@@ -22,17 +22,21 @@ router.afterEach(afterEach)
 export default router
 
 async function onError(error) {
-  store.dispatch('app/setError', error.message)
+  if (/Loading chunk (\d)+ failed/g.test(error.message)) {
+    window.location.href = router.resolve(router.currentRoute.value).href
+  } else {
+    store.dispatch('app/setError', error.message)
 
-  store.dispatch(
-    'notification/add',
-    {
-      message: `${error.message}: ${error.stack}`,
-      type: NOTIFICATION_TYPE.ERROR,
-      timeout: 0
-    },
-    { root: true }
-  )
+    store.dispatch(
+      'notification/add',
+      {
+        message: `${error.message}: ${error.stack}`,
+        type: NOTIFICATION_TYPE.ERROR,
+        timeout: 0
+      },
+      { root: true }
+    )
+  }
 }
 
 async function beforeEach(to, from, next) {
