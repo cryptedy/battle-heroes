@@ -23,6 +23,10 @@
     max-width: 90%;
     max-height: 90%;
 
+    @include mediaQuery(md) {
+      max-width: 1024px;
+    }
+
     &-enter-active,
     &-leave-active {
       transition: all 225ms;
