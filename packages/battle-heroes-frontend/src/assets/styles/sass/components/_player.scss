@@ -125,7 +125,9 @@
       }
 
       &-actions {
-        align-self: center;
+        display: flex;
+        gap: 16px;
+        align-items: center;
       }
     }
 

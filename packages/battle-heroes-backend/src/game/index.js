@@ -38,6 +38,23 @@ const {
   selectUserPlayer
 } = require('../player/selectors')
 
+const PROCESS_LOGIN = 'PROCESS_LOGIN'
+
+const PROCESS = {
+  [PROCESS_LOGIN]: false
+}
+
+const waitProcess = name => {
+  return new Promise(resolve => {
+    let interval = setInterval(() => {
+      if (!PROCESS[name]) {
+        clearInterval(interval)
+        resolve(true)
+      }
+    }, 500)
+  })
+}
+
 const getRandomValue = (min, max) =>
   Math.floor(Math.random() * (max - min) + min)
 
@@ -236,6 +253,34 @@ class GameManager {
     }
   }
 
+  loadGame(battleId, callback) {
+    console.log('loadGame', this.socket.id, battleId)
+
+    const battle = selectBattle(battleId)
+
+    if (!battle) {
+      return callback({
+        status: false,
+        message: 'Failed to load a game: The battle not found'
+      })
+    }
+
+    const game = selectBattleGame(battle.id)
+
+    if (!game) {
+      return callback({
+        status: false,
+        message: 'Failed to load a game: The game not found'
+      })
+    }
+
+    callback({
+      status: true,
+      message: 'The game found',
+      game: game
+    })
+  }
+
   finishGame(gameId) {
     console.log('finishGame', this.socket.id, gameId)
 
@@ -361,6 +406,10 @@ class GameManager {
     const playerNFT = selectNFT(battle.players[playerKey].NFT_id)
     const playerStatus = game.players[playerKey]
 
+    if (game.current_player !== playerKey) {
+      throw new Error('Failed to move: It is not the player turn')
+    }
+
     const opponentPlayerKey = this.getBattlePlayerKey(battle, opponentPlayer.id)
     const opponentNFT = selectNFT(battle.players[opponentPlayerKey].NFT_id)
     const opponentStatus = game.players[opponentPlayerKey]
@@ -466,6 +515,7 @@ class GameManager {
 
       if (newOpponentHp === 0) {
         localMessages.push(`${opponentPlayer.name} fainted...`)
+        localMessages.push(`=== ${player.name} WIN ===`)
 
         updatePlayer({
           playerId: player.id,
@@ -930,10 +980,18 @@ class GameManager {
   }
 
   eventListeners = {
-    'game:login': (...args) => {
+    'game:login': async (...args) => {
       try {
-        this.login(...args)
+        await waitProcess(PROCESS_LOGIN)
+
+        PROCESS.PROCESS_LOGIN = true
+
+        await this.login(...args)
+
+        PROCESS.PROCESS_LOGIN = false
       } catch (error) {
+        PROCESS.PROCESS_LOGIN = false
+
         this.errorHandler(error)
       }
     },
@@ -947,6 +1005,13 @@ class GameManager {
     'game:start': (...args) => {
       try {
         this.startGame(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'game:load': (...args) => {
+      try {
+        this.loadGame(...args)
       } catch (error) {
         this.errorHandler(error)
       }
@@ -1057,6 +1122,7 @@ class GameManager {
     this.socket.on('game:login', this.eventListeners['game:login'])
     this.socket.on('game:logout', this.eventListeners['game:logout'])
     this.socket.on('game:start', this.eventListeners['game:start'])
+    this.socket.on('game:load', this.eventListeners['game:load'])
     this.socket.on('game:finish', this.eventListeners['game:finish'])
     this.socket.on('game:abort', this.eventListeners['game:abort'])
     this.socket.on('game:move', this.eventListeners['game:move'])
@@ -1081,6 +1147,7 @@ class GameManager {
     this.socket.off('game:login', this.eventListeners['game:login'])
     this.socket.off('game:logout', this.eventListeners['game:logout'])
     this.socket.off('game:start', this.eventListeners['game:start'])
+    this.socket.off('game:load', this.eventListeners['game:load'])
     this.socket.off('game:finish', this.eventListeners['game:finish'])
     this.socket.off('game:abort', this.eventListeners['game:abort'])
     this.socket.off('game:move', this.eventListeners['game:move'])

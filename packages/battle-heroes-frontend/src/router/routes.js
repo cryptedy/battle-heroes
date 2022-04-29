@@ -69,12 +69,12 @@ export default [
   },
   {
     path: '/battles/:battleId',
-    name: 'game',
+    name: 'battle',
     meta: {
       layout: 'game',
       middleware: ['auth', 'game']
     },
-    component: view('Game')
+    component: view('Battle')
   },
   {
     path: '/settings',

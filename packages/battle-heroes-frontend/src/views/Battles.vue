@@ -1,6 +1,6 @@
 <template>
   <div class="view-battles">
-    <BattleCreateButton />
+    <BattleCreateButton style="margin-top: 16px" />
 
     <BattleList :battles="battles" />
   </div>

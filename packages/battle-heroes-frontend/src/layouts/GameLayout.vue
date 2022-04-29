@@ -29,8 +29,8 @@
     <BaseButton type="primary" @click="retry"> RETRY </BaseButton>
   </ErrorScreen>
 
-  <template v-else-if="isGameView">
-    <slot :key="gameViewKey" />
+  <template v-else-if="isBattleView">
+    <slot :key="battleComponentKey" />
   </template>
 
   <div v-else class="game">
@@ -70,7 +70,7 @@ export default {
 
   data() {
     return {
-      gameViewKey: false,
+      battleComponentKey: false,
       attemptingGameLogin: false,
       reconnectingSocket: false,
       socketConnectError: '',
@@ -86,8 +86,8 @@ export default {
       notifications: 'notification/all'
     }),
 
-    isGameView() {
-      return this.$route.name === 'game'
+    isBattleView() {
+      return this.$route.name === 'battle'
     }
   },
 
@@ -96,7 +96,7 @@ export default {
 
     if (this.playerBattle && this.playerBattle.state !== BATTLE_STATE.CREATED) {
       this.$router.push({
-        name: 'game',
+        name: 'battle',
         params: {
           battleId: this.playerBattle.id
         }
@@ -195,26 +195,26 @@ export default {
         type: NOTIFICATION_TYPE.SUCCESS
       })
 
-      if (this.isGameView) {
+      if (this.isBattleView) {
         if (this.$route.params.battleId === battleId) {
-          this.reloadGameView()
+          this.reloadBattleView()
         } else {
           this.$router
             .replace(
               {
-                name: 'game',
+                name: 'battle',
                 params: {
                   battleId: battleId
                 }
               },
               () => {}
             )
-            .then(() => this.reloadGameView())
+            .then(() => this.reloadBattleView())
         }
       } else {
         this.$router.push(
           {
-            name: 'game',
+            name: 'battle',
             params: {
               battleId: battleId
             }
@@ -224,10 +224,10 @@ export default {
       }
     },
 
-    reloadGameView() {
-      console.log('reloadGameView')
+    reloadBattleView() {
+      console.log('reloadBattleView')
 
-      return (this.gameViewKey = !this.gameViewKey)
+      return (this.battleComponentKey = !this.battleComponentKey)
     },
 
     async reloginGame() {

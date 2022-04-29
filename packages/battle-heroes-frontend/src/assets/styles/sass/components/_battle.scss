@@ -3,8 +3,13 @@
   grid-gap: 12px;
   grid-template-rows: min-content min-content auto min-content;
   min-height: 100vh;
+  margin: 0 auto;
   padding: 12px;
   background-color: palette(grey, 1000);
+
+  @include mediaQuery(md) {
+    max-width: 1024px;
+  }
 
   a {
     color: inherit
@@ -102,7 +107,7 @@
           opacity: 0.4;;
         }
 
-        > img {
+        img {
           width: 100%;
           height: 100%;
         }
@@ -183,6 +188,7 @@
     &-item {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 16px;
       padding-top: 12px;
       padding-right: 16px;
@@ -193,23 +199,19 @@
         padding-left: 0;
       }
 
-      &-primary, &-secondary {
-        img {
-          width: 100%;
-          height: auto;
-        }
-      }
-
       &-primary {
-        //
+        flex-grow: 1;
+        max-width: 150px;
       }
 
       &-secondary {
         flex-grow: 1;
+        max-width: 150px;
       }
 
       &-actions {
-        align-self: center;
+        flex-grow: 1;
+        text-align: right;
       }
     }
   }

@@ -36,101 +36,35 @@
     </div>
 
     <div class="player-list-item-actions">
-      <template v-if="isPlayer">
-        <template v-if="isPlayerStateIdle">
-          <BattleCreateButton />
-        </template>
+      <template v-if="battle">
+        <template v-if="playerNFT">
+          <img
+            :src="playerNFT.image_url"
+            :alt="playerNFT.name"
+            width="42"
+            height="42"
+          />
 
-        <template v-if="isPlayerStateBattle && playerBattle">
-          <div v-if="playerNFT" style="display: flex; height: 36px">
+          <template v-if="opponentPlayerKey && opponentPlayerNFT">
+            <template v-if="playerNFT"> VS </template>
+
             <img
-              style="
-                width: 100%;
-                height: auto;
-                border-radius: 2px;
-                margin-right: 12px;
-              "
-              :src="playerNFT.image_url"
-              :alt="playerNFT.name"
-              width="512"
-              height="512"
+              :src="opponentPlayerNFT.image_url"
+              :alt="opponentPlayerNFT.name"
+              width="42"
+              height="42"
             />
-
-            <BattleDeleteButton />
-          </div>
-        </template>
-
-        <template v-else-if="isPlayerStateStandby && playerBattle">
-          <div v-if="playerNFT" style="display: flex; height: 36px">
-            <img
-              style="
-                width: 100%;
-                height: auto;
-                border-radius: 2px;
-                margin-right: 12px;
-              "
-              :src="playerNFT.image_url"
-              :alt="playerNFT.name"
-              width="512"
-              height="512"
-            />
-
-            <BattleDeleteButton />
-          </div>
+          </template>
         </template>
       </template>
 
-      <template v-else>
-        <template v-if="playerBattle && playerNFT && opponentPlayerNFT">
-          <div style="display: flex; height: 36px">
-            <img
-              style="
-                width: 100%;
-                height: auto;
-                border-radius: 2px;
-                margin-right: 12px;
-              "
-              :src="playerNFT.image_url"
-              :alt="playerNFT.name"
-              width="512"
-              height="512"
-            />
+      <template v-if="isPlayer">
+        <BattleCreateButton />
+        <BattleDeleteButton />
+      </template>
 
-            <span style=""> VS </span>
-
-            <img
-              style="
-                width: 100%;
-                height: auto;
-                border-radius: 2px;
-                margin-left: 12px;
-              "
-              :src="opponentPlayerNFT.image_url"
-              :alt="opponentPlayerNFT.name"
-              width="512"
-              height="512"
-            />
-          </div>
-        </template>
-
-        <template v-else-if="isPlayerStateStandby && playerBattle">
-          <div v-if="playerNFT" style="display: flex; height: 36px">
-            <img
-              style="
-                width: 100%;
-                height: auto;
-                border-radius: 2px;
-                margin-right: 12px;
-              "
-              :src="playerNFT.image_url"
-              :alt="playerNFT.name"
-              width="512"
-              height="512"
-            />
-
-            <BattleJoinButton :battle="playerBattle" />
-          </div>
-        </template>
+      <template v-else-if="battle">
+        <BattleJoinButton :battle="battle" />
       </template>
     </div>
   </BaseListItem>
@@ -191,20 +125,20 @@ export default {
       return this.player.state === PLAYER_STATE.BATTLE
     },
 
-    playerBattle() {
+    battle() {
       return this.battleByPlayer(this.player)
     },
 
     playerKey() {
-      const playerKey = Object.keys(this.playerBattle.players).find(
-        playerKey => this.playerBattle.players[playerKey].id === this.player.id
+      const playerKey = Object.keys(this.battle.players).find(
+        playerKey => this.battle.players[playerKey].id === this.player.id
       )
 
       return Number.parseInt(playerKey)
     },
 
     playerNFTId() {
-      return this.playerBattle.players[this.playerKey].NFT_id
+      return this.battle.players[this.playerKey].NFT_id
     },
 
     playerNFT() {
@@ -216,7 +150,7 @@ export default {
     },
 
     opponentPlayerNFTId() {
-      return this.playerBattle.players[this.opponentPlayerKey].NFT_id
+      return this.battle.players[this.opponentPlayerKey].NFT_id
     },
 
     opponentPlayerNFT() {

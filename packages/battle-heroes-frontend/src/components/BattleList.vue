@@ -1,9 +1,9 @@
 <template>
-  <BaseEmpty v-if="!battles.length > 0" text="NO BATTLES" />
+  <BaseEmpty v-if="!availableBattles.length > 0" text="NO BATTLES" />
 
   <BaseList v-else class="battle-list">
     <BattleListItem
-      v-for="battle in battles"
+      v-for="battle in availableBattles"
       :key="battle.id"
       :battle="battle"
     />
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { BATTLE_STATE } from '@/utils/constants'
 import BattleListItem from '@/components/BattleListItem'
 
 export default {
@@ -24,6 +25,12 @@ export default {
     battles: {
       type: Array,
       required: true
+    }
+  },
+
+  computed: {
+    availableBattles() {
+      return this.battles.filter(battle => battle.state !== BATTLE_STATE.ENDED)
     }
   }
 }
