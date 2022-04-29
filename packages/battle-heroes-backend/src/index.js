@@ -85,7 +85,7 @@ const main = async () => {
 
       setPlayers(players)
     } catch (error) {
-      console.eror(error)
+      console.error(error)
 
       process.exit(1)
     }
