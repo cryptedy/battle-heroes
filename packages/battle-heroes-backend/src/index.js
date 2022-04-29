@@ -75,7 +75,7 @@ const main = async () => {
       const NFTs = await getNFTs()
       setNFTs(NFTs)
     } catch (error) {
-      console.log(error)
+      console.error(error)
 
       process.exit(1)
     }
