@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import HealthBar from '@/components/HealthBar'
 import BattleJoinButton from '@/components/BattleJoinButton'
 import BattleDeleteButton from '@/components/BattleDeleteButton'
@@ -55,14 +55,15 @@ export default {
     battle: {
       type: Object,
       required: true
+    },
+
+    games: {
+      type: Array,
+      required: true
     }
   },
 
-  data() {
-    return {
-      game: null
-    }
-  },
+  emits: ['game-load'],
 
   computed: {
     ...mapGetters({
@@ -88,6 +89,10 @@ export default {
       return this.findNFT(this.battle.players[2].NFT_id)
     },
 
+    game() {
+      return this.games.find(game => game.battle_id === this.battle.id)
+    },
+
     status1() {
       return this.game.players[1]
     },
@@ -101,30 +106,12 @@ export default {
     this.$socket.emit('game:load', this.battle.id, this.onGameLoad)
   },
 
-  beforeUnmount() {
-    this.$socket.off('game:update')
-  },
-
   methods: {
-    ...mapActions({
-      addNotification: 'notification/add'
-    }),
-
     onGameLoad({ status, message, game }) {
       console.log('onGameLoad', status, message, game)
 
       if (status) {
-        this.game = game
-
-        this.$socket.on('game:update', this.onGameUpdate)
-      }
-    },
-
-    onGameUpdate(game) {
-      console.log('onGameUpdate', game)
-
-      if (this.game.id === game.id) {
-        this.game = game
+        this.$emit('game-load', game)
       }
     }
   }

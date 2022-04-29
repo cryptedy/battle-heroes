@@ -199,6 +199,8 @@ export default {
 
     if (this.canStartBattle) {
       this.$socket.emit('game:start', this.battle.id, this.onGameStart)
+    } else if (this.battle) {
+      this.$socket.emit('game:load', this.battle.id, this.onGameStart)
     }
   },
 

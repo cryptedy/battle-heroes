@@ -276,7 +276,7 @@ class GameManager {
 
     callback({
       status: true,
-      message: 'The game found',
+      message: 'The game loaded',
       game: game
     })
   }
@@ -459,10 +459,8 @@ class GameManager {
       }
     })
 
-    this.io.to(player.id).emit('game:update', selectGame(game.id))
-    this.io.to(opponentPlayer.id).emit('game:update', selectGame(game.id))
-
-    // TODO: send to audience
+    this.io.emit('game:update', selectGame(game.id))
+    this.io.emit('game:update', selectGame(game.id))
   }
 
   attack(payload) {
