@@ -39,7 +39,6 @@ const main = async () => {
       next()
     }
   })
-
   app.use(api)
 
   const io = new Server(server, {

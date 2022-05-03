@@ -4,6 +4,10 @@ const { selectPlayers } = require('../player/selectors')
 
 const router = Router()
 
+router.get('/', async (req, res) => {
+  res.sendStatus(200)
+})
+
 router.get('/nfts', async (req, res) => {
   try {
     res.json(selectNFTs())
