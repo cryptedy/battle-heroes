@@ -52,10 +52,14 @@ export default {
   },
 
   mounted() {
+    console.log('BattleList:mounted')
+
     this.$socket.on('game:update', this.onGameUpdate)
   },
 
   beforeUnmount() {
+    console.log('BattleList:beforeUnmount')
+
     this.$socket.off('game:update')
   },
 

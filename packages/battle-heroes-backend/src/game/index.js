@@ -460,7 +460,6 @@ class GameManager {
     })
 
     this.io.emit('game:update', selectGame(game.id))
-    this.io.emit('game:update', selectGame(game.id))
   }
 
   attack(payload) {

@@ -255,7 +255,9 @@ export default {
     onGameUpdate(game) {
       console.log('onGameUpdate', game)
 
-      this.game = game
+      if (game.id === this.game.id) {
+        this.game = game
+      }
     },
 
     onGameAbort() {
