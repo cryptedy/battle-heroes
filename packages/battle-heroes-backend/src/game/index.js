@@ -545,10 +545,10 @@ class GameManager {
             this.io.emit('player:update', selectPlayer(opponentPlayer.id))
           })
           .catch(error => {
-            const { messages, stack } = error
+            const { message, stack } = error
             // send to ooponent player
             this.io.to(opponentPlayer.id).emit('game:error', {
-              message: `Failed to update player status: ${messages}`,
+              message: `Failed to update player status: ${message}`,
               stack: stack
             })
           })
