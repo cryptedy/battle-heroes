@@ -31,7 +31,7 @@
           >
             <div style="text-align: center">
               <p>{{ player1.name }}'s {{ NFT1.name }}</p>
-              <p>VS</p>
+              <p>⚔️</p>
               <p>{{ player2.name }}'s {{ NFT2.name }}</p>
             </div>
           </SplashScreen>
@@ -40,7 +40,7 @@
             <p>The battle has already started by the other players</p>
             <div style="text-align: center">
               <p>{{ player1.name }}'s {{ NFT1.name }}</p>
-              <p>VS</p>
+              <p>⚔️</p>
               <p>{{ player2.name }}'s {{ NFT2.name }}</p>
             </div>
 

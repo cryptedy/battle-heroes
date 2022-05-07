@@ -1,6 +1,8 @@
 <template>
   <div class="view-battles">
-    <BattleCreateButton style="margin-top: 16px" />
+    <div class="view-actions">
+      <BattleCreateButton />
+    </div>
 
     <BattleList :battles="battles" />
   </div>

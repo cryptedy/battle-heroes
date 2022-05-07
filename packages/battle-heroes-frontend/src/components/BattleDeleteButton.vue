@@ -11,14 +11,25 @@ import { NOTIFICATION_TYPE } from '@/utils/constants'
 export default {
   name: 'BattleDeleteButton',
 
+  props: {
+    battle: {
+      type: Object,
+      required: true
+    }
+  },
+
   computed: {
     ...mapGetters({
       player: 'game/player',
       playerBattle: 'game/playerBattle'
     }),
 
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
+    },
+
     canDeleteBattle() {
-      return this.playerBattle
+      return this.playerBattle && this.isPlayerBattle
     }
   },
 

@@ -481,19 +481,20 @@ class GameManager {
 
     localMessages.push(`${player.name} attacks!`)
 
-    const rand = Math.random()
-
-    if (rand < playerStatus.missRate) {
-      localMessages.push('=== ATTACK MISS!! ===')
+    if (Math.random() < playerStatus.missRate) {
+      localMessages.push('=== 😞 ATTACK MISS 😞 ===')
     } else {
       let damage = Math.floor(
         (playerStatus.attack * 100) / (100 + opponentStatus.defense)
       )
 
-      if (rand < playerStatus.criticalRate) {
-        localMessages.push('=== CRITICAL HIT!! ===')
+      if (Math.random() < playerStatus.criticalRate) {
+        localMessages.push('=== 🔥CRITICAL HIT 🔥 ===')
 
         damage = Math.floor(damage * 1.5)
+      } else {
+        const adjustDamage = getRandomValue(-2, 2)
+        damage = damage + adjustDamage
       }
 
       const oldOpponentHp = opponentStatus.hp
@@ -602,32 +603,29 @@ class GameManager {
 
     let recoveryAmount = 0
 
-    const rand = Math.random()
-
-    if (rand < 0.02) {
-      localMessages.push('=== RECOVER 100 HP ===')
+    if (Math.random() < 0.02) {
+      localMessages.push('=== ❤️‍🔥 RECOVER 100 HP ❤️‍🔥 ===')
 
       recoveryAmount = 100
-    } else if (rand < 0.05) {
-      localMessages.push('=== RECOVER MISS!! ===')
+    } else if (Math.random() < 0.05) {
+      localMessages.push('=== 💔 RECOVER MISS!! 💔 ===')
 
       recoveryAmount = 0
-    } else if (rand < 0.1) {
-      localMessages.push('=== RECOVER 50 HP ===')
-
+    } else if (Math.random() < 0.1) {
       recoveryAmount = 50
-    } else if (rand < 0.15) {
-      localMessages.push('=== RECOVER 15 HP ===')
-
-      recoveryAmount = 15
-    } else if (rand < 0.3) {
-      localMessages.push('=== RECOVER 30 HP ===')
-
+    } else if (Math.random() < 0.3) {
       recoveryAmount = 30
-    } else {
-      localMessages.push('=== RECOVER 25 HP ===')
-
+    } else if (Math.random() < 0.85) {
       recoveryAmount = 25
+    } else {
+      recoveryAmount = 15
+    }
+
+    if (recoveryAmount !== 0 && recoveryAmount !== 100) {
+      const adjustRecoveryAmount = getRandomValue(-2, 2)
+      recoveryAmount = recoveryAmount + adjustRecoveryAmount
+
+      localMessages.push(`=== 💖 RECOVER ${recoveryAmount} HP 💖 ===`)
     }
 
     const oldPlayerHp = playerStatus.hp

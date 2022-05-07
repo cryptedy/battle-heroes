@@ -1,5 +1,5 @@
 <template>
-  <div v-if="canCreateBattle">
+  <template v-if="canCreateBattle">
     <BaseDialog
       :open="dialogShown"
       title="Select a NFT to use in battle"
@@ -9,7 +9,7 @@
     </BaseDialog>
 
     <BaseButton type="primary" @click="handleCreateBattle"> CREATE </BaseButton>
-  </div>
+  </template>
 </template>
 
 <script>

@@ -60,7 +60,8 @@
 
       <template v-if="isPlayer">
         <BattleCreateButton />
-        <BattleDeleteButton />
+
+        <BattleDeleteButton v-if="battle" :battle="battle" />
       </template>
 
       <template v-else-if="battle">

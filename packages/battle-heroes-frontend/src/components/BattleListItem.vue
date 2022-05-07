@@ -12,11 +12,12 @@
       <template v-if="!player2">
         <img
           src="@/assets/images/blank-NFT.png"
-          alt="OPPONENT WANTED"
+          alt="Opponent Wanted"
           width="64"
           height="64"
         />
-        <p>OPPONENT WANTED</p>
+        <p>Opponent</p>
+        <p>Wanted⚔️</p>
       </template>
 
       <template v-else>
@@ -29,7 +30,7 @@
     </div>
 
     <div class="battle-list-item-actions">
-      <BattleDeleteButton />
+      <BattleDeleteButton :battle="battle" />
 
       <BattleJoinButton :battle="battle" />
     </div>

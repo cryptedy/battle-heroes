@@ -6,7 +6,7 @@
       </h1>
     </div>
 
-    <div class="card-body">
+    <div v-if="$slots.default" class="card-body">
       <slot />
     </div>
   </div>

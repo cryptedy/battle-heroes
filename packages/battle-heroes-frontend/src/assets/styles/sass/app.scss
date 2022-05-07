@@ -145,7 +145,15 @@ body {
       overflow: hidden;
     }
 
-    > .view {
+    .view {
+      &-actions {
+        padding: 16px;
+        @include mediaQuery(md) {
+          padding: 16px 0;
+        }
+        border-bottom: 1px solid color(divider, light);
+      }
+
       &-home, &-battles, &-players, &-messages, &-settings {
         height: 100%;
         max-width: 1024px;

@@ -125,7 +125,7 @@
 
           <BattleCreateButton />
 
-          <BattleDeleteButton />
+          <BattleDeleteButton v-if="playerBattle" :battle="playerBattle" />
         </li>
       </ul>
     </div>
@@ -152,7 +152,8 @@ export default {
   computed: {
     ...mapGetters({
       player: 'game/player',
-      playerNFT: 'battle/playerNFT'
+      playerNFT: 'battle/playerNFT',
+      playerBattle: 'game/playerBattle'
     })
   }
 }

@@ -12,6 +12,16 @@
     <h2 class="hero-text-primary">A Pixel Heroes Game</h2>
 
     <p class="hero-text-secondary">Prototype version 0.01</p>
+    <p class="hero-text-secondary">
+      "Pixel Heroes" NFT 同士でバトルができるシンプルなゲームです。
+    </p>
+    <p class="hero-text-secondary">
+      現在プロトタイプバージョンのためご利用は自己責任でお願いします。
+    </p>
+    <p class="hero-text-secondary">
+      ログインすると OpenSea
+      のユーザ名、アバター画像が設定され、他のプレイヤーに表示されます。
+    </p>
 
     <LoginButton />
 
