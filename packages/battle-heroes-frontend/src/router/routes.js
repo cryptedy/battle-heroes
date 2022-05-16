@@ -77,6 +77,14 @@ export default [
     component: view('Battle')
   },
   {
+    path: '/battles/practice/:monsterId',
+    name: 'battle-practice',
+    meta: {
+      middleware: ['auth', 'game']
+    },
+    component: view('BattlePractice')
+  },
+  {
     path: '/settings',
     name: 'settings',
     meta: {

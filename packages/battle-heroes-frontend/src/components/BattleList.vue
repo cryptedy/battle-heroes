@@ -29,12 +29,6 @@ export default {
     }
   },
 
-  data() {
-    return {
-      games: []
-    }
-  },
-
   watch: {
     battles: {
       // eslint-disable-next-line no-unused-vars

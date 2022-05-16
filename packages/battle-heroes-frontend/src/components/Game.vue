@@ -137,7 +137,6 @@
 <script>
 import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
-import { PLAYER_MOVE } from '@/utils/constants'
 import GamePlayer from '@/components/GamePlayer'
 import { scrollToBottom } from '@/utils/helpers'
 
@@ -186,7 +185,7 @@ export default {
     }
   },
 
-  emits: ['abort', 'finish'],
+  emits: ['attack', 'heal', 'abort', 'finish'],
 
   data() {
     return {
@@ -347,23 +346,23 @@ export default {
     },
 
     attack() {
-      console.log('attack')
+      console.log('Game:attack')
 
       if (!this.canAttack) return
 
       this.moving = true
 
-      this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
+      this.$emit('attack')
     },
 
     heal() {
-      console.log('heal')
+      console.log('Game:heal')
 
       if (!this.canHeal) return
 
       this.moving = true
 
-      this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
+      this.$emit('heal')
     },
 
     leaveGame() {

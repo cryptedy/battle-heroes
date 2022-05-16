@@ -63,6 +63,8 @@
         :player2="player2"
         :nft1="NFT1"
         :nft2="NFT2"
+        @attack="onAttack"
+        @heal="onHeal"
         @finish="onGameFinished"
         @abort="onGameAbort"
       />
@@ -76,7 +78,7 @@ import { mapGetters, mapActions } from 'vuex'
 import ErrorScreen from '@/components/ErrorScreen'
 import SplashScreen from '@/components/SplashScreen'
 import BattleJoinButton from '@/components/BattleJoinButton'
-import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
+import { PLAYER_MOVE, BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   name: 'Battle',
@@ -293,6 +295,18 @@ export default {
       this.gameFinished = true
 
       this.$socket.emit('game:finish', this.game.id)
+    },
+
+    onAttack() {
+      console.log('attack')
+
+      this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
+    },
+
+    onHeal() {
+      console.log('heal')
+
+      this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
     }
   }
 }
