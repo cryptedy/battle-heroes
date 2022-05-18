@@ -14,14 +14,24 @@
               <strong>他プレイヤーのバトルへ参加</strong>
               することでバトルが開始されます。
             </p>
-            <p class="how-to-play-text is-warning">
-              <strong>
+            <p>
+              <del>
                 現在、他のオンラインプレイヤーがいないと遊ぶことができません。
+              </del>
+            </p>
+            <p>
+              <strong>
+                1人プレイ用の「モンスターバトル」モードを追加しました。
               </strong>
             </p>
-            <p class="how-to-play-text is-warning">
-              ※ CPU
-              戦やオフラインプレイヤーとのオートバトルなど1人で遊べるモードを検討中です。
+            <p>
+              <router-link :to="{ name: 'battles' }"> バトル一覧 </router-link>
+              の
+              <strong class="how-to-play-monster-battle">MOSTER BATTLE</strong>
+              ボタンを押すことでモンスターとバトルすることができます。
+            </p>
+            <p>
+              モンスターバトルでは勝敗数や経験値は残らないので、バトルの練習や対戦相手のプレイヤーがいない場合などに気軽にプレイしてください。
             </p>
           </section>
           <section>
