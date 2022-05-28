@@ -80,15 +80,15 @@ const main = async () => {
       process.exit(1)
     }
 
-    // try {
-    //   const players = await getPlayers()
+    try {
+      const players = await getPlayers()
 
-    //   setPlayers(players)
-    // } catch (error) {
-    //   console.error(error)
+      setPlayers(players)
+    } catch (error) {
+      console.error(error)
 
-    //   process.exit(1)
-    // }
+      process.exit(1)
+    }
 
     isReady = true
   })
