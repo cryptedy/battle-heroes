@@ -27,7 +27,9 @@
             <p>
               <router-link :to="{ name: 'battles' }"> バトル一覧 </router-link>
               の
-              <strong class="how-to-play-monster-battle">MOSTER BATTLE</strong>
+              <strong class="how-to-play-monster-battle">
+                MOSTER BATTLE - VS CPU
+              </strong>
               ボタンを押すことでモンスターとバトルすることができます。
             </p>
             <p>

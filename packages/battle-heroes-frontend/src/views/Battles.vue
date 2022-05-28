@@ -12,7 +12,7 @@
       </BaseDialog>
 
       <BaseButton type="primary" @click="handleCreatePracticeBattle">
-        MOSTER BATTLE
+        MOSTER BATTLE - VS CPU
       </BaseButton>
     </div>
 
