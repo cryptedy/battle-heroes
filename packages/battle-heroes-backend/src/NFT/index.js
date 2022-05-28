@@ -10,7 +10,7 @@ const getNFTs = async () => {
   const collections = selectCollections()
 
   for (const collection of collections) {
-    const NFTsForCollection = await getNFTsForCollection(collection.id)
+    const NFTsForCollection = await getNFTsForCollection(collection)
 
     NFTsForCollection.forEach(NFTForCollection => {
       NFTForCollection.id = NFTs.length + 1
@@ -22,20 +22,22 @@ const getNFTs = async () => {
   return NFTs
 }
 
-const getNFTsForCollection = async collectionId => {
+const getNFTsForCollection = async collection => {
   const NFTs = []
 
-  const { data: metadata } = await getMetadata(collectionId)
+  const { data: metadata } = await getMetadata(collection)
 
   metadata.forEach(data => {
-    const { name, edition, attributes } = data
-    const tokenId = edition
+    const { name, attributes } = data
+
+    const words = name.split('#')
+    const tokenId = Number.parseInt(words[1])
 
     NFTs.push({
       token_id: tokenId,
-      collection_id: collectionId,
+      collection_id: collection.id,
       name,
-      image_url: `${IMAGE_URL}/${collectionId}/${tokenId}.png`,
+      image_url: `${IMAGE_URL}/${collection.id}/${tokenId}.png`,
       attributes
     })
   })
@@ -55,6 +57,8 @@ const getNFTIdsForAddress = async address => {
   const tokenIds = await getTokenIdsForAddress(address)
 
   for (const collection of collections) {
+    console.log(collection)
+
     tokenIds[collection.id].forEach(tokenId => {
       const NFT = NFTs.find(
         NFT => NFT.collection_id === collection.id && NFT.token_id === tokenId
@@ -76,7 +80,7 @@ const getTokenIdsForAddress = async address => {
     tokenIds[collection.id] = []
 
     tokenIds[collection.id] = await getTokenIdsForCollectionAndAddress(
-      collection.id,
+      collection,
       address
     )
   }
@@ -84,26 +88,26 @@ const getTokenIdsForAddress = async address => {
   return tokenIds
 }
 
-const getTokenIdsForCollectionAndAddress = async (collectionId, address) => {
-  const NFTs = await getNFTsForCollectionAndAddress(collectionId, address)
+const getTokenIdsForCollectionAndAddress = async (collection, address) => {
+  const NFTs = await getNFTsForCollectionAndAddress(collection, address)
 
   return NFTs.map(NFT => NFT.token_id).sort((a, b) => a - b)
 }
 
-const getNFTsForCollectionAndAddress = async (collectionId, address) => {
+const getNFTsForCollectionAndAddress = async (collection, address) => {
   const currentPage = 1
   const offset = currentPage - 1
   const perPage = 500
 
   const { total, result: firstNFTs } = await getNFTsForContract(
-    collectionId,
+    collection,
     address,
     offset,
     perPage
   )
 
   const paginatedNFTs = await getPaginatedNFTsForCollectionAndAddress(
-    collectionId,
+    collection,
     address,
     currentPage,
     total,
@@ -118,7 +122,7 @@ const getNFTsForCollectionAndAddress = async (collectionId, address) => {
 }
 
 const getPaginatedNFTsForCollectionAndAddress = async (
-  collectionId,
+  collection,
   address,
   currentPage,
   total,
@@ -131,7 +135,7 @@ const getPaginatedNFTsForCollectionAndAddress = async (
     const offset = (page - 1) * perPage
 
     const { result: NFTs } = await getNFTsForContract(
-      collectionId,
+      collection,
       address,
       offset,
       perPage
@@ -144,7 +148,7 @@ const getPaginatedNFTsForCollectionAndAddress = async (
 }
 
 const getNFTsForContract = async (
-  collectionId,
+  collection,
   address,
   offset = 0,
   limit = 500
@@ -154,9 +158,9 @@ const getNFTsForContract = async (
     setTimeout(() => {
       try {
         const NFTs = Moralis.Web3API.account.getNFTsForContract({
-          chain: 'matic',
+          chain: collection.chain,
           address,
-          token_address: getContractAddress(collectionId),
+          token_address: collection.contract_address,
           offset,
           limit
         })
@@ -257,15 +261,8 @@ const rarityFormat = rarity => (rarity * 100).toFixed(1)
 
 const scoreFormat = score => score.toFixed(2)
 
-const getMetadata = async collectionId => {
-  return axios.get(`${METADATA_URL}/${collectionId}/index.json`)
-}
-
-const getContractAddress = collectionId => {
-  const collections = selectCollections()
-
-  return collections.find(collection => collection.id === collectionId)
-    .contract_address
+const getMetadata = async collection => {
+  return axios.get(`${METADATA_URL}/${collection.id}/index.json`)
 }
 
 module.exports = {
