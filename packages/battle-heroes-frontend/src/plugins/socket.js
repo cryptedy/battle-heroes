@@ -3,7 +3,7 @@ import { BACKEND_URL, SOCKET_TIMEOUT } from '@/utils/constants'
 
 const socket = io(BACKEND_URL, {
   path: '/socket',
-  // transports: ['websocket'],
+  transports: ['websocket'],
   timeout: SOCKET_TIMEOUT,
   autoConnect: false,
   reconnection: false
