@@ -97,7 +97,7 @@ const getTokenIdsForCollectionAndAddress = async (collection, address) => {
 const getNFTsForCollectionAndAddress = async (collection, address) => {
   const currentPage = 1
   const offset = currentPage - 1
-  const perPage = 500
+  const perPage = 100
 
   const { total, result: firstNFTs } = await getNFTsForContract(
     collection,
@@ -151,7 +151,7 @@ const getNFTsForContract = async (
   collection,
   address,
   offset = 0,
-  limit = 500
+  limit = 100
 ) => {
   return await new Promise((resolve, reject) => {
     // wait 5 second for avoid rate limit
