@@ -95,82 +95,38 @@ const getTokenIdsForCollectionAndAddress = async (collection, address) => {
 }
 
 const getNFTsForCollectionAndAddress = async (collection, address) => {
-  const currentPage = 1
-  const offset = currentPage - 1
-  const perPage = 100
-
-  const { total, result: firstNFTs } = await getNFTsForContract(
-    collection,
-    address,
-    offset,
-    perPage
-  )
-
-  const paginatedNFTs = await getPaginatedNFTsForCollectionAndAddress(
-    collection,
-    address,
-    currentPage,
-    total,
-    perPage
-  )
-
-  const NFTs = firstNFTs.concat(...paginatedNFTs)
+  const NFTs = await getNFTsForContract(collection, address)
 
   NFTs.forEach(NFT => (NFT.token_id = Number.parseInt(NFT.token_id)))
 
   return NFTs
 }
 
-const getPaginatedNFTsForCollectionAndAddress = async (
-  collection,
-  address,
-  currentPage,
-  total,
-  perPage
-) => {
-  const lastPage = Math.ceil(total / perPage)
-  const paginatedNFTs = []
+const getNFTsForContract = async (collection, address) => {
+  let cursor = null
+  const NFTs = []
 
-  for (let page = currentPage + 1; page <= lastPage; page++) {
-    const offset = (page - 1) * perPage
-
-    const { result: NFTs } = await getNFTsForContract(
-      collection,
+  do {
+    const response = await Moralis.Web3API.account.getNFTsForContract({
+      chain: collection.chain,
       address,
-      offset,
-      perPage
+      token_address: collection.contract_address,
+      limit: 100,
+      cursor: cursor
+    })
+
+    console.log(
+      `Got page ${response.page} of ${Math.ceil(
+        response.total / response.page_size
+      )}, ${response.total} total`
     )
 
-    paginatedNFTs.push(NFTs)
-  }
+    NFTs.push(...response.result)
 
-  return paginatedNFTs
-}
+    cursor = response.cursor
+  } while (cursor !== '' && cursor !== null)
 
-const getNFTsForContract = async (
-  collection,
-  address,
-  offset = 0,
-  limit = 100
-) => {
-  return await new Promise((resolve, reject) => {
-    // wait 5 second for avoid rate limit
-    setTimeout(() => {
-      try {
-        const NFTs = Moralis.Web3API.account.getNFTsForContract({
-          chain: collection.chain,
-          address,
-          token_address: collection.contract_address,
-          offset,
-          limit
-        })
-
-        resolve(NFTs)
-      } catch (error) {
-        reject(error)
-      }
-    }, 5000)
-  })
+  return NFTs
 }
 
 const getTraits = NFTs => {
