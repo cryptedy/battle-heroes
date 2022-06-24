@@ -120,7 +120,8 @@
         height: 32px;
         border-radius: 4px;
         color: color(inactive-icon, dark);
-        &:hover, &:active {
+        &:hover,
+        &:active {
           color: color(active-icon, dark);
         }
         &:active {

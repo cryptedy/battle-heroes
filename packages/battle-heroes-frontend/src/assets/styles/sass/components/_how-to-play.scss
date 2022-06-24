@@ -29,7 +29,8 @@
     }
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin-top: 12px;
     margin-bottom: 12px;
     margin-left: 8px;
@@ -52,7 +53,11 @@
     }
   }
 
-  &-monster-battle, &-create, &-join, &-attack, &-heal {
+  &-monster-battle,
+  &-create,
+  &-join,
+  &-attack,
+  &-heal {
     border-radius: 4px;
     background-color: palette(blue, 500);
     padding-right: 8px;

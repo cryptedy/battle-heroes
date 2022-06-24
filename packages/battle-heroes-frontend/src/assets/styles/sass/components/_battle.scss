@@ -1,4 +1,17 @@
+@font-face {
+  font-family: 'NuAnkoMochiCt-Reg';
+  src: url('@/assets/fonts/NuAnkoMochiCt/NuAnkoMochiCt-Reg.otf')
+    format('truetype');
+}
+
+@font-face {
+  font-family: 'PixelMplus';
+  src: url('@/assets/fonts/PixelMplus/PixelMplus10-Regular.ttf')
+    format('truetype');
+}
+
 .battle {
+  font-family: PixelMplus;
   display: grid;
   grid-gap: 12px;
   grid-template-rows: min-content min-content auto min-content;
@@ -12,7 +25,7 @@
   }
 
   a {
-    color: inherit
+    color: inherit;
   }
 
   &-status {
@@ -104,7 +117,7 @@
         }
 
         &.is-lose {
-          opacity: 0.4;;
+          opacity: 0.4;
         }
 
         img {
@@ -119,8 +132,22 @@
       }
 
       &-status {
-        margin-top: 4px;
+        margin-top: 8px;
         font-size: 14px;
+
+        &-list {
+          display: flex;
+          flex-wrap: wrap;
+          width: 100%;
+
+          &-title {
+            width: 40%;
+          }
+
+          &-data {
+            width: 60%;
+          }
+        }
 
         .has-advantage {
           color: palette(orange, 500);

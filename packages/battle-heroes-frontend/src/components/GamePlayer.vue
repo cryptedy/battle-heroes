@@ -73,45 +73,48 @@
           'is-lose': isLose
         }"
       >
-        <ul>
-          <li>
-            HP {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
-
+        <dl class="battle-ground-nft-status-list">
+          <dt class="battle-ground-nft-status-list-title">HP</dt>
+          <dd class="battle-ground-nft-status-list-data">
+            {{ playerStatus.hp }} / {{ playerStatus.max_hp }}
             <span
               v-if="playerStatus.max_hp > opponentStatus.max_hp"
               class="has-advantage"
             >
               <FontAwesomeIcon icon="star" />
             </span>
-          </li>
-          <li>
-            ATTACK {{ playerStatus.attack }}
+          </dd>
+          <dt class="battle-ground-nft-status-list-title">ATTACK</dt>
+          <dd class="battle-ground-nft-status-list-data">
+            {{ playerStatus.attack }}
             <span
               v-if="playerStatus.attack > opponentStatus.attack"
               class="has-advantage"
             >
               <FontAwesomeIcon icon="star" />
             </span>
-          </li>
-          <li>
-            DEFENSE {{ playerStatus.defense }}
+          </dd>
+          <dt class="battle-ground-nft-status-list-title">DEFENSE</dt>
+          <dd class="battle-ground-nft-status-list-data">
+            {{ playerStatus.defense }}
             <span
               v-if="playerStatus.defense > opponentStatus.defense"
               class="has-advantage"
             >
               <FontAwesomeIcon icon="star" />
             </span>
-          </li>
-          <li>
-            SPEED {{ playerStatus.speed }}
+          </dd>
+          <dt class="battle-ground-nft-status-list-title">SPEED</dt>
+          <dd class="battle-ground-nft-status-list-data">
+            {{ playerStatus.speed }}
             <span
               v-if="playerStatus.speed > opponentStatus.speed"
               class="has-advantage"
             >
               <FontAwesomeIcon icon="star" />
             </span>
-          </li>
-        </ul>
+          </dd>
+        </dl>
       </div>
     </div>
   </div>

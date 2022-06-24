@@ -11,14 +11,18 @@ body {
   -webkit-font-smoothing: antialiased;
   height: 100%;
   background-color: palette(grey, 900);
-  font-family: Inter var,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";;
+  font-family: Inter var, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
   font-size: 15px;
   @include mediaQuery(lg) {
     font-size: 14px;
   }
   color: color(primary, light);
 
-  &.has-dialog, &.has-drawer {
+  &.has-dialog,
+  &.has-drawer {
     overflow: hidden;
   }
 }
@@ -156,7 +160,11 @@ body {
         border-bottom: 1px solid color(divider, light);
       }
 
-      &-home, &-battles, &-players, &-messages, &-settings {
+      &-home,
+      &-battles,
+      &-players,
+      &-messages,
+      &-settings {
         height: 100%;
         max-width: 1024px;
         margin: 0 auto;
@@ -173,14 +181,17 @@ body {
         }
       }
 
-      &-home, &-settings {
+      &-home,
+      &-settings {
         padding: 0 16px;
         @include mediaQuery(md) {
           padding: 0 24px;
         }
       }
 
-      &-battles, &-players, &-messages {
+      &-battles,
+      &-players,
+      &-messages {
         @include mediaQuery(md) {
           padding: 0 24px;
         }

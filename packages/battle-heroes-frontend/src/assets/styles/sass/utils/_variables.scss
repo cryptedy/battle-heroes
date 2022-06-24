@@ -3,11 +3,11 @@ $breakpoints: (
   'md': 'screen and (min-width: 768px)',
   'lg': 'screen and (min-width: 1024px)',
   'xl': 'screen and (min-width: 1280px)',
-  '2xl': 'screen and (min-width: 1536px)',
+  '2xl': 'screen and (min-width: 1536px)'
 ) !default;
 
 $z-indexes: (
-  'foo': 1,
+  'foo': 1
 ) !default;
 
-$font-awesome-icon-class: '.svg-inline--fa'
+$font-awesome-icon-class: '.svg-inline--fa';
