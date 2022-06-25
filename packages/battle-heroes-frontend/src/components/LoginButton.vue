@@ -9,7 +9,7 @@
 
     <template v-else>
       <BaseSpinner v-if="loading" />
-      LOGIN
+      ログイン
     </template>
   </BaseButton>
 </template>

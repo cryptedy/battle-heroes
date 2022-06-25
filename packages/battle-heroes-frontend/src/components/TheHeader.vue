@@ -5,7 +5,7 @@
     </h1>
 
     <p class="login-text">
-      <router-link :to="{ name: 'login' }"> LOGIN </router-link>
+      <router-link :to="{ name: 'login' }"> ログイン </router-link>
     </p>
   </div>
 </template>

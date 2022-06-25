@@ -4,7 +4,7 @@
     <p style="margin-top: 16px">
       <BaseButton type="primary" @click="leaveBattle">
         <FontAwesomeIcon icon="arrow-left" />
-        BACK
+        戻る
       </BaseButton>
     </p>
   </ErrorScreen>
@@ -47,7 +47,7 @@
             <p style="margin-top: 16px">
               <BaseButton type="primary" @click="leaveBattle">
                 <FontAwesomeIcon icon="arrow-left" />
-                BACK
+                戻る
               </BaseButton>
             </p>
           </ErrorScreen>

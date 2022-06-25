@@ -2,13 +2,15 @@
   <template v-if="canCreateBattle">
     <BaseDialog
       :open="dialogShown"
-      title="Select a NFT to use in battle"
+      title="バトルに使用する NFT を選択"
       @close="onCloseDialog"
     >
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
-    <BaseButton type="primary" @click="handleCreateBattle"> CREATE </BaseButton>
+    <BaseButton type="primary" @click="handleCreateBattle">
+      バトル作成
+    </BaseButton>
   </template>
 </template>
 

@@ -4,7 +4,7 @@
     <p style="margin-top: 16px">
       <BaseButton type="primary" @click="leaveBattle">
         <FontAwesomeIcon icon="arrow-left" />
-        BACK
+        戻る
       </BaseButton>
     </p>
   </ErrorScreen>
@@ -121,7 +121,7 @@ const createStatus = () => {
 }
 
 const createGame = battleId => {
-  const message = 'START BATTLE!'
+  const message = 'バトルスタート！'
 
   const status = {
     1: createStatus(),
@@ -405,13 +405,16 @@ export default {
 
       const nextOpponentStatus = {}
 
-      this.game.messages.push(`${this.currentPlayer.name} attacks!`)
+      this.game.messages.push(`${this.currentPlayer.name} の攻撃！`)
 
       console.log(this.currentPlayerKey)
       console.log(this.currentOpponentStatus)
 
       if (Math.random() < this.currentPlayerStatus.missRate) {
-        this.game.messages.push('=== 😞 ATTACK MISS 😞 ===')
+        this.game.messages.push('ミス！')
+        this.game.messages.push(
+          `${this.currentOpponentPlayer.name} にダメージを与えられない`
+        )
       } else {
         let damage = Math.floor(
           (this.currentPlayerStatus.attack * 100) /
@@ -419,7 +422,7 @@ export default {
         )
 
         if (Math.random() < this.currentPlayerStatus.criticalRate) {
-          this.game.messages.push('=== 🔥CRITICAL HIT 🔥 ===')
+          this.game.messages.push('クリティカルヒット！')
 
           damage = Math.floor(damage * 1.5)
         } else {
@@ -436,7 +439,7 @@ export default {
           newOpponentHp / this.currentOpponentStatus.max_hp
 
         this.game.messages.push(
-          `${this.currentOpponentPlayer.name} takes damage ${damage}`
+          `${this.currentOpponentPlayer.name} に ${damage} のダメージ！`
         )
 
         if (newOpponentHp < 0) {
@@ -447,9 +450,9 @@ export default {
 
         if (newOpponentHp === 0) {
           this.game.messages.push(
-            `${this.currentOpponentPlayer.name} fainted...`
+            `${this.currentOpponentPlayer.name} は気絶してしまった！`
           )
-          this.game.messages.push(`=== ${this.currentPlayer.name} WIN ===`)
+          this.game.messages.push(`${this.currentPlayer.name} の勝利！`)
         } else {
           if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
             nextOpponentStatus.criticalRate = 0.15
@@ -478,19 +481,13 @@ export default {
 
       const nextPlayerStatus = {}
 
-      this.game.messages.push(
-        `${this.currentPlayer.name} attempted to recover HP`
-      )
+      this.game.messages.push(`${this.currentPlayer.name} の回復！`)
 
       let recoveryAmount = 0
 
       if (Math.random() < 0.02) {
-        this.game.messages.push('=== ❤️‍🔥 RECOVER 100 HP ❤️‍🔥 ===')
-
         recoveryAmount = 100
       } else if (Math.random() < 0.05) {
-        this.game.messages.push('=== 💔 RECOVER MISS!! 💔 ===')
-
         recoveryAmount = 0
       } else if (Math.random() < 0.1) {
         recoveryAmount = 50
@@ -505,17 +502,11 @@ export default {
       if (recoveryAmount !== 0 && recoveryAmount !== 100) {
         const adjustRecoveryAmount = getRandomValue(-2, 2)
         recoveryAmount = recoveryAmount + adjustRecoveryAmount
-
-        this.game.messages.push(`=== 💖 RECOVER ${recoveryAmount} HP 💖 ===`)
       }
 
       const oldPlayerHp = this.currentPlayerStatus.hp
 
       let newPlayerHp = oldPlayerHp + recoveryAmount
-
-      this.game.messages.push(
-        `${this.currentPlayer.name} recover HP ${recoveryAmount}`
-      )
 
       if (newPlayerHp > this.currentPlayerStatus.max_hp) {
         newPlayerHp = this.currentPlayerStatus.max_hp
@@ -523,6 +514,17 @@ export default {
 
       nextPlayerStatus.hp = newPlayerHp
       nextPlayerStatus.heal = this.currentPlayerStatus.heal - 1
+
+      if (recoveryAmount === 0) {
+        this.game.messages.push('ミス！')
+        this.game.messages.push(
+          `${this.currentPlayer.name} は HP を回復できなかった！`
+        )
+      } else {
+        this.game.messages.push(
+          `${this.currentPlayer.name} の HP が ${recoveryAmount} 回復した！`
+        )
+      }
 
       this.game.players[this.currentPlayerKey] = {
         ...this.game.players[this.currentPlayerKey],

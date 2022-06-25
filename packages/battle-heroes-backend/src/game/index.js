@@ -77,7 +77,7 @@ const createStatus = () => {
 }
 
 const createGame = battleId => {
-  const message = 'START BATTLE!'
+  const message = 'バトルスタート！'
 
   const status = {
     1: createStatus(),
@@ -479,17 +479,18 @@ class GameManager {
     // const nextPlayerStatus = {}
     const nextOpponentStatus = {}
 
-    localMessages.push(`${player.name} attacks!`)
+    localMessages.push(`${player.name} の攻撃！`)
 
     if (Math.random() < playerStatus.missRate) {
-      localMessages.push('=== 😞 ATTACK MISS 😞 ===')
+      localMessages.push('ミス！')
+      localMessages.push(`${opponentPlayer.name} にダメージを与えられない`)
     } else {
       let damage = Math.floor(
         (playerStatus.attack * 100) / (100 + opponentStatus.defense)
       )
 
       if (Math.random() < playerStatus.criticalRate) {
-        localMessages.push('=== 🔥CRITICAL HIT 🔥 ===')
+        localMessages.push('クリティカルヒット！')
 
         damage = Math.floor(damage * 1.5)
       } else {
@@ -503,7 +504,7 @@ class GameManager {
       let newOpponentHp = oldOpponentHp - damage
       const newOpponentHpRate = newOpponentHp / opponentStatus.max_hp
 
-      localMessages.push(`${opponentPlayer.name} takes damage ${damage}`)
+      localMessages.push(`${opponentPlayer.name} に ${damage} のダメージ！`)
 
       if (newOpponentHp < 0) {
         newOpponentHp = 0
@@ -512,8 +513,8 @@ class GameManager {
       nextOpponentStatus.hp = newOpponentHp
 
       if (newOpponentHp === 0) {
-        localMessages.push(`${opponentPlayer.name} fainted...`)
-        localMessages.push(`=== ${player.name} WIN ===`)
+        localMessages.push(`${opponentPlayer.name} は気絶してしまった！`)
+        localMessages.push(`${player.name} の勝利！`)
 
         updatePlayer({
           playerId: player.id,
@@ -599,17 +600,13 @@ class GameManager {
 
     const nextPlayerStatus = {}
 
-    localMessages.push(`${player.name} attempted to recover HP`)
+    localMessages.push(`${player.name} の回復！`)
 
     let recoveryAmount = 0
 
     if (Math.random() < 0.02) {
-      localMessages.push('=== ❤️‍🔥 RECOVER 100 HP ❤️‍🔥 ===')
-
       recoveryAmount = 100
     } else if (Math.random() < 0.05) {
-      localMessages.push('=== 💔 RECOVER MISS!! 💔 ===')
-
       recoveryAmount = 0
     } else if (Math.random() < 0.1) {
       recoveryAmount = 50
@@ -624,15 +621,11 @@ class GameManager {
     if (recoveryAmount !== 0 && recoveryAmount !== 100) {
       const adjustRecoveryAmount = getRandomValue(-2, 2)
       recoveryAmount = recoveryAmount + adjustRecoveryAmount
-
-      localMessages.push(`=== 💖 RECOVER ${recoveryAmount} HP 💖 ===`)
     }
 
     const oldPlayerHp = playerStatus.hp
 
     let newPlayerHp = oldPlayerHp + recoveryAmount
-
-    localMessages.push(`${player.name} recover HP ${recoveryAmount}`)
 
     if (newPlayerHp > playerStatus.max_hp) {
       newPlayerHp = playerStatus.max_hp
@@ -640,6 +633,13 @@ class GameManager {
 
     nextPlayerStatus.hp = newPlayerHp
     nextPlayerStatus.heal = playerStatus.heal - 1
+
+    if (recoveryAmount === 0) {
+      localMessages.push('ミス！')
+      localMessages.push(`${player.name} は HP を回復できなかった！`)
+    } else {
+      localMessages.push(`${player.name} の HP が ${recoveryAmount} 回復した！`)
+    }
 
     updateGamePlayer({
       gameId: game.id,

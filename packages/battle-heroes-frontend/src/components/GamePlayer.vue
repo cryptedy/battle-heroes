@@ -38,30 +38,12 @@
           'is-lose': isLose
         }"
       >
-        <BaseDialog :title="playerNft.name">
-          <template #trigger>
-            <img
-              :src="playerNft.image_url"
-              :alt="playerNft.name"
-              width="512"
-              height="512"
-            />
-          </template>
-
-          <BaseNFT :nft="playerNft" />
-
-          <div class="battle-ground-nft-attributes">
-            <ul>
-              <li
-                v-for="attribute in playerNft.attributes"
-                :key="attribute.trait_type"
-              >
-                {{ attribute.trait_type }} =>
-                {{ attribute.value }}
-              </li>
-            </ul>
-          </div>
-        </BaseDialog>
+        <img
+          :src="playerNft.image_url"
+          :alt="playerNft.name"
+          width="512"
+          height="512"
+        />
       </div>
 
       <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
@@ -84,7 +66,7 @@
               <FontAwesomeIcon icon="star" />
             </span>
           </dd>
-          <dt class="battle-ground-nft-status-list-title">ATTACK</dt>
+          <dt class="battle-ground-nft-status-list-title">ATK</dt>
           <dd class="battle-ground-nft-status-list-data">
             {{ playerStatus.attack }}
             <span
@@ -94,7 +76,7 @@
               <FontAwesomeIcon icon="star" />
             </span>
           </dd>
-          <dt class="battle-ground-nft-status-list-title">DEFENSE</dt>
+          <dt class="battle-ground-nft-status-list-title">DEF</dt>
           <dd class="battle-ground-nft-status-list-data">
             {{ playerStatus.defense }}
             <span
@@ -104,7 +86,7 @@
               <FontAwesomeIcon icon="star" />
             </span>
           </dd>
-          <dt class="battle-ground-nft-status-list-title">SPEED</dt>
+          <dt class="battle-ground-nft-status-list-title">SPD</dt>
           <dd class="battle-ground-nft-status-list-data">
             {{ playerStatus.speed }}
             <span
@@ -116,6 +98,18 @@
           </dd>
         </dl>
       </div>
+
+      <!-- <div class="battle-ground-nft-attributes">
+        <ul>
+          <li
+            v-for="attribute in playerNft.attributes"
+            :key="attribute.trait_type"
+          >
+            {{ attribute.trait_type }} =>
+            {{ attribute.value }}
+          </li>
+        </ul>
+      </div> -->
     </div>
   </div>
 </template>

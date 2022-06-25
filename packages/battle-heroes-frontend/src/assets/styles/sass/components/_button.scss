@@ -5,6 +5,10 @@
   border-radius: 3px;
   cursor: pointer;
 
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
   &.is-type {
     &-default {
       border-color: palette(grey, 500);

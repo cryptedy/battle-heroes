@@ -1,6 +1,6 @@
 <template>
   <BaseButton v-if="canDeleteBattle" type="danger" @click="deleteBattle">
-    DELETE
+    バトル削除
   </BaseButton>
 </template>
 

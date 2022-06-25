@@ -12,7 +12,7 @@
       </div>
 
       <div class="battle-status-primary">
-        <p>=== TURN {{ game.turn }} ===</p>
+        <p>=== ターン {{ game.turn }} ===</p>
 
         <template v-if="aborted">
           <p style="font-weight: bold; color: #4caf50">YOU WINI!</p>
@@ -47,7 +47,7 @@
             style="font-weight: bold; color: #2196f3"
           >
             <FontAwesomeIcon icon="arrow-left" />
-            BACK
+            戻る
           </router-link>
         </template>
 
@@ -61,16 +61,16 @@
 
           <template v-if="playable">
             <p v-if="canMove" style="font-weight: bold; color: #2196f3">
-              SELECT YOUR MOVE
+              {{ player.name }} のターン
             </p>
             <p v-else style="color: rgba(255, 255, 255, 0.5)">
-              {{ currentPlayer.name }} THINKING...
+              {{ currentPlayer.name }} のターン
             </p>
           </template>
 
           <template v-else>
             <p style="color: rgba(255, 255, 255, 0.5)">
-              {{ currentPlayer.name }} THINKING...
+              {{ currentPlayer.name }} のターン.
             </p>
           </template>
         </template>
@@ -121,12 +121,12 @@
 
     <div class="battle-controls">
       <template v-if="playable">
-        <button :disabled="!canAttack" @click="attack">ATTACK</button>
+        <button :disabled="!canAttack" @click="attack">攻撃</button>
         <button :disabled="!canHeal" @click="heal">
-          HEAL ({{ playerStatus.heal }})
+          回復({{ playerStatus.heal }})
         </button>
-        <button :disabled="true">DEFFENCE</button>
-        <button :disabled="true">RUN</button>
+        <button :disabled="true">防御</button>
+        <button :disabled="true">必殺技</button>
       </template>
 
       <template v-else> WATCH MODE </template>

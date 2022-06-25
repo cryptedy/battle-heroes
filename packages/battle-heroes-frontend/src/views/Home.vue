@@ -1,7 +1,7 @@
 <template>
   <div class="view-home">
     <BaseGrid>
-      <BaseCard title="HOW TO PLAY">
+      <BaseCard title="遊び方">
         <div class="how-to-play">
           <section>
             <p>
@@ -28,7 +28,7 @@
               <router-link :to="{ name: 'battles' }"> バトル一覧 </router-link>
               の
               <strong class="how-to-play-monster-battle">
-                MOSTER BATTLE - VS CPU
+                1人モード - モンスターバトル
               </strong>
               ボタンを押すことでモンスターとバトルすることができます。
             </p>
@@ -39,13 +39,13 @@
           <section>
             <h1>1. 自分のバトルを作成</h1>
             <p>
-              <strong class="how-to-play-create">CREATE</strong>
+              <strong class="how-to-play-create">バトル作成</strong>
               ボタンを押してバトルに使用するヒーローを選択すると自分のバトルを作成することができます。
             </p>
             <p>他のプレイヤーがバトルに参加するとバトル開始となります。</p>
             <p>
               他のプレイヤーがいない場合や別のヒーローでバトルを作成しなおす場合などは
-              <strong class="how-to-play-delete">DELETE</strong>
+              <strong class="how-to-play-delete">バトル削除</strong>
               ボタンで削除することができます。
             </p>
           </section>
@@ -53,7 +53,7 @@
             <h1>2. 他プレイヤーのバトルに参加</h1>
             <p>
               他のプレイヤーが作成したバトルに
-              <strong class="how-to-play-join">JOIN</strong>
+              <strong class="how-to-play-join">バトルを挑む</strong>
               ボタンを押すことでバトルに参加することができます。
             </p>
             <p>
@@ -75,27 +75,27 @@
             </p>
             <p>
               現在選べるコマンドは
-              <strong class="how-to-play-attack">ATTACK</strong>
+              <strong class="how-to-play-attack">攻撃</strong>
               または
-              <strong class="how-to-play-heal">HEAL</strong>
+              <strong class="how-to-play-heal">回復</strong>
               の2種類です。
             </p>
           </section>
           <section>
             <h1>3-2. バトルコマンド</h1>
-            <h2>1. ATTACK = 攻撃</h2>
+            <h2>1. 攻撃</h2>
             <p>相手の HP を減らすことができます。</p>
             <p>
               与えるダメージはプレイヤーの
-              <span class="how-to-play-status">ATTTACK = 攻撃力</span>
+              <span class="how-to-play-status">ATK = 攻撃力</span>
               と相手の
-              <span class="how-to-play-status">DEFENCE = 防御力</span>
+              <span class="how-to-play-status">DEF = 防御力</span>
               によって決まります。
             </p>
             <p>
               また、一定確率でクリティカルヒット（大ダメージ）やミス（ダメージを与えられない）が発生することがあります。
             </p>
-            <h2>2. HEAL = 回復</h2>
+            <h2>2. 回復</h2>
             <p>自分の HP を 0 ～ 100 回復することができます。</p>
             <p>
               回復は1バトル中に1回のみ使用可能なので双方の残り HP
@@ -115,14 +115,14 @@
               ステータスはヒーロー毎の固定値ではなくバトルごとに都度決定されます。
             </p>
             <ul>
-              <li>HP</li>
-              <li>ATTTACK</li>
-              <li>DEFENCE</li>
-              <li>SPEED</li>
+              <li>HP - 体力</li>
+              <li>ATK - 攻撃力</li>
+              <li>DEF - 防御力</li>
+              <li>SPD - 素早さ</li>
             </ul>
             <h2>先攻・後攻</h2>
             <p>
-              <span class="how-to-play-status">SPEED = 素早さ</span>
+              <span class="how-to-play-status">SPD = 素早さ</span>
               ステータスが高いほうが先攻、同じ場合はランダムに決定されます。
             </p>
           </section>

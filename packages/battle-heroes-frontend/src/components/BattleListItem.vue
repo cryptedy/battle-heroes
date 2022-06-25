@@ -16,8 +16,8 @@
           width="64"
           height="64"
         />
-        <p>Opponent</p>
-        <p>Wanted⚔️</p>
+        <p>？？？</p>
+        <p>挑戦者募集中</p>
       </template>
 
       <template v-else>

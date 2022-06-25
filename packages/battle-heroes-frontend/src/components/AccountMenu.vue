@@ -16,7 +16,7 @@
           class="account-menu-list-item-link"
         >
           <FontAwesomeIcon icon="arrow-right-from-bracket" />
-          LOGOUT
+          ログアウト
         </router-link>
       </BaseListItem>
     </BaseList>

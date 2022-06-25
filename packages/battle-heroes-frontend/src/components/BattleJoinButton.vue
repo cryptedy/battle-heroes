@@ -2,13 +2,13 @@
   <div v-if="canJoinBattle" class="battle-join-button">
     <BaseDialog
       :open="dialogShown"
-      title="Select a NFT to use in battle"
+      title="バトルに使用する NFT を選択"
       @close="onCloseDialog"
     >
       <SelectNFTs :player="player" @select="onSelectNFT" />
     </BaseDialog>
 
-    <BaseButton type="primary" @click="joinBattle"> JOIN </BaseButton>
+    <BaseButton type="primary" @click="joinBattle"> バトルを挑む </BaseButton>
   </div>
 </template>
 

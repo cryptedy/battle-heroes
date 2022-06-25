@@ -5,14 +5,18 @@
 
       <BaseDialog
         :open="dialogShown"
-        title="Select a NFT to use in battle"
+        title="バトルに使用する NFT を選択"
         @close="onCloseDialog"
       >
         <SelectNFTs :player="player" @select="onSelectNFT" />
       </BaseDialog>
 
-      <BaseButton type="primary" @click="handleCreatePracticeBattle">
-        MOSTER BATTLE - VS CPU
+      <BaseButton
+        :disabled="!canCreatePracticeBattle"
+        type="primary"
+        @click="handleCreatePracticeBattle"
+      >
+        1人モード - モンスターバトル
       </BaseButton>
     </div>
 
@@ -25,6 +29,7 @@ import { mapGetters } from 'vuex'
 import BattleList from '@/components/BattleList'
 import BattleCreateButton from '@/components/BattleCreateButton'
 import SelectNFTs from '@/components/SelectNFTs'
+import { PLAYER_STATE } from '@/utils/constants'
 
 export default {
   name: 'Battles',
@@ -45,8 +50,13 @@ export default {
   computed: {
     ...mapGetters({
       battles: 'battle/all',
-      player: 'game/player'
-    })
+      player: 'game/player',
+      playerBattle: 'game/playerBattle'
+    }),
+
+    canCreatePracticeBattle() {
+      return !this.playerBattle && this.player.state === PLAYER_STATE.IDLE
+    }
   },
 
   methods: {
