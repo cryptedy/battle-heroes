@@ -22,16 +22,14 @@ const createBattleCreatedData = (player, battle) => {
 
   return {
     username: USERNAME,
-    // content: `${player.name} created a new battle`,
     embeds: [
       {
-        title: `${player.name} created a new battle`,
+        title: `${player.name} がバトル挑戦者募集中！`,
         description: player.name,
         url: `${FRONTEND_URL}/battles/${battle.id}`,
         color: 5025360,
         author: {
           name: player.name,
-          // url: `${FRONTEND_URL}/players/${player.id}`,
           icon_url: player.avatar_url
         },
         image: {
@@ -65,16 +63,14 @@ const createBattleMatchedData = (player1, player2, battle) => {
 
   return {
     username: USERNAME,
-    // content: `${player1.name} challenged ${player2.name}`,
     embeds: [
       {
-        title: `${player1.name} challenged ${player2.name}`,
+        title: `${player1.name} が ${player2.name} にバトルを挑んだ！`,
         description: player1.name,
         url: `${FRONTEND_URL}/battles/${battle.id}`,
         color: 16750592,
         author: {
           name: player1.name,
-          // url: `${FRONTEND_URL}/players/${player1.id}`,
           icon_url: player1.avatar_url
         },
         image: {
@@ -114,10 +110,9 @@ const createBattleEndedData = (winnerPlayer, loserPlayer, battle, game) => {
 
   return {
     username: USERNAME,
-    // content: `${winnerPlayer.name} beats ${loserPlayer.name}`,
     embeds: [
       {
-        title: `${winnerPlayer.name} beat ${loserPlayer.name}`,
+        title: `${winnerPlayer.name} が ${loserPlayer.name} に勝利した！`,
         color: 2201331,
         image: {
           url: winnerNFT.image_url
