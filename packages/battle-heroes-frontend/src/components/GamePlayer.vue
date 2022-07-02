@@ -96,6 +96,10 @@
               <FontAwesomeIcon icon="star" />
             </span>
           </dd>
+          <dt class="battle-ground-nft-status-list-title">種族</dt>
+          <dd class="battle-ground-nft-status-list-data">
+            {{ body(playerNft.attributes) }}
+          </dd>
         </dl>
       </div>
 
@@ -191,6 +195,11 @@ export default {
 
     isLose() {
       return this.finished && this.playerStatus.hp < this.opponentStatus.hp
+    },
+
+    body() {
+      return attributes =>
+        attributes.find(attribute => attribute.trait_type === 'body').value
     }
   },
 
