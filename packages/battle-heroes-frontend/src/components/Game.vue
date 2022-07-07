@@ -88,6 +88,7 @@
     </div>
 
     <div class="battle-ground">
+      {{ game }}
       <GamePlayer
         :player="opponentPlayer"
         :player-nft="opponentNFT"
@@ -316,14 +317,14 @@ export default {
 
       // let text = ''
       // text += '🔥NFT COLLECTION IN OSAKA 出展中🔥\n'
-      // text += 'Pixel Heroes のブースで自分の NFT が使える対戦ゲームを開催中⚔️'
-      // text += '\n自慢のヒーローで対戦してきたよ‼\n\n'
+      // text += 'PixelHeroesブースで自分のNFTが使える対戦ゲーム開催中⚔️\n\n'
       // text += '🔷気になる結果は…\n\n'
       // text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
       // text += '⬇️詳しくは\n'
-      // text += 'https://www.pixelheroes-dao.com/nft-color7-9-10/\n'
+      // text += 'https://t.co/AL7Pr15STT\n'
       // text +=
-      //   '#Nコレ大阪 #PixelHeroes #BattleHeroes @Nftcolor22 @pixelheroes_nft'
+      //   '#Nコレ大阪 #PixelHeroes #BattleHeroes @Nftcolor22 @pixelheroes_nft\n'
+      // text += `ID:${this.game.id}`
 
       let text = ''
       text += '⚔️BATTLE HEROES⚔️\n'
@@ -332,7 +333,8 @@ export default {
       text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
       text += '⬇️自分のヒーローでバトルに挑もう\n'
       text += 'https://game.pixelheroes-dao.com/\n\n'
-      text += '#PixelHeroes #BattleHeroes @pixelheroes_nft'
+      text += '#PixelHeroes #BattleHeroes @pixelheroes_nft\n'
+      text += `ID:${this.game.id}`
 
       const link = `${baseURL}?text=${encodeURIComponent(text)}`
 
