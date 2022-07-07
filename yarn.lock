@@ -1374,12 +1374,24 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.1.0.tgz#5a9468da0e5c2a3ccc161882ef5ffafbd3d4882f"
   integrity sha512-lFIJ5opxOKG9q88xOsuJJAdRZ+2WRldsZwUR/7MJoOMUMhF/LkHUjwWACIEPTa5Wo6uTDHvGRIX+XutdN7zYxA==
 
+"@fortawesome/fontawesome-common-types@6.1.1":
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.1.1.tgz#7dc996042d21fc1ae850e3173b5c67b0549f9105"
+  integrity sha512-wVn5WJPirFTnzN6tR95abCx+ocH+3IFLXAgyavnf9hUmN0CfWoDjPT/BAWsUVwSlYYVBeCLJxaqi7ZGe4uSjBA==
+
 "@fortawesome/fontawesome-svg-core@^6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.1.0.tgz#b78a43df315a6b1568d803ee48a9f1edea0714aa"
   integrity sha512-racj+/EDnMZN0jcuHePOa+9kdHHOCpCAbBvVRnEi4G4DA5SWQiT/uXJ8WcfVEbLN51vPJjhukP4o+zH0cfYplg==
   dependencies:
     "@fortawesome/fontawesome-common-types" "6.1.0"
+
+"@fortawesome/free-brands-svg-icons@^6.1.1":
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@fortawesome/free-brands-svg-icons/-/free-brands-svg-icons-6.1.1.tgz#3580961d4f42bd51dc171842402f23a18a5480b1"
+  integrity sha512-mFbI/czjBZ+paUtw5NPr2IXjun5KAC8eFqh1hnxowjA4mMZxWz4GCIksq6j9ZSa6Uxj9JhjjDVEd77p2LN2Blg==
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "6.1.1"
 
 "@fortawesome/free-regular-svg-icons@^6.1.0":
   version "6.1.0"
@@ -6811,10 +6823,10 @@ moment@^2.29.1:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
 
-moralis@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/moralis/-/moralis-1.8.0.tgz#fc0aee2fdccde195e04e9395fa78bac97c1b133f"
-  integrity sha512-p8V5Ur4oLymweySUh+TBuYmQVDeqnNO3+Lk+VfPorGJsmbcer6xVy6MHHNinl1zhhWiCJNpc+XWot5wAcMb4QA==
+moralis@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/moralis/-/moralis-1.8.1.tgz#4f39772d983f4c0a5727469d603f288e24cb5b76"
+  integrity sha512-qjkVhe3/EBgGiSrf6hIJ5epvcP5ds1ZIHGR8TbfS58npCNEMBtd+u+Z99WVyRyWxmMXI6pETKEmufTj/lG7a9w==
   dependencies:
     "@babel/runtime" "7.16.7"
     "@babel/runtime-corejs3" "7.16.8"

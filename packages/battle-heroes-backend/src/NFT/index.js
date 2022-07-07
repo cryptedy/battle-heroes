@@ -57,8 +57,6 @@ const getNFTIdsForAddress = async address => {
   const tokenIds = await getTokenIdsForAddress(address)
 
   for (const collection of collections) {
-    console.log(collection)
-
     tokenIds[collection.id].forEach(tokenId => {
       const NFT = NFTs.find(
         NFT => NFT.collection_id === collection.id && NFT.token_id === tokenId

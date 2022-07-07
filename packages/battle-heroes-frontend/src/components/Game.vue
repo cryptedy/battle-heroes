@@ -121,12 +121,27 @@
 
     <div class="battle-controls">
       <template v-if="playable">
-        <button :disabled="!canAttack" @click="attack">攻撃</button>
-        <button :disabled="!canHeal" @click="heal">
-          回復({{ playerStatus.heal }})
-        </button>
-        <button :disabled="true">防御</button>
-        <button :disabled="true">必殺技</button>
+        <template v-if="isGameFinished">
+          <a
+            class="twitter-share-button"
+            :href="twitterLink"
+            rel="nofollow"
+            target="_blank"
+            title="結果を Twitter でシェア"
+          >
+            <FontAwesomeIcon :icon="['fab', 'twitter']" />
+            結果を Twitter でシェア
+          </a>
+        </template>
+
+        <template v-else>
+          <button :disabled="!canAttack" @click="attack">攻撃</button>
+          <button :disabled="!canHeal" @click="heal">
+            回復({{ playerStatus.heal }})
+          </button>
+          <button :disabled="true">防御</button>
+          <button :disabled="true">必殺技</button>
+        </template>
       </template>
 
       <template v-else> WATCH MODE </template>
@@ -292,6 +307,36 @@ export default {
         !this.moving &&
         this.currentPlayerKey === this.playerKey
       )
+    },
+
+    twitterLink() {
+      const isWin = this.playerStatus.hp > this.opponentStatus.hp
+
+      const baseURL = 'http://twitter.com/intent/tweet'
+
+      // let text = ''
+      // text += '🔥NFT COLLECTION IN OSAKA 出展中🔥\n'
+      // text += 'Pixel Heroes のブースで自分の NFT が使える対戦ゲームを開催中⚔️'
+      // text += '\n自慢のヒーローで対戦してきたよ‼\n\n'
+      // text += '🔷気になる結果は…\n\n'
+      // text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
+      // text += '⬇️詳しくは\n'
+      // text += 'https://www.pixelheroes-dao.com/nft-color7-9-10/\n'
+      // text +=
+      //   '#Nコレ大阪 #PixelHeroes #BattleHeroes @Nftcolor22 @pixelheroes_nft'
+
+      let text = ''
+      text += '⚔️BATTLE HEROES⚔️\n'
+      text += 'Pixel Heroes のバトルゲームで対戦したよ‼\n\n'
+      text += '🔷気になる結果は・・・\n\n'
+      text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
+      text += '⬇️自分のヒーローでバトルに挑もう\n'
+      text += 'https://game.pixelheroes-dao.com/\n\n'
+      text += '#PixelHeroes #BattleHeroes @pixelheroes_nft'
+
+      const link = `${baseURL}?text=${encodeURIComponent(text)}`
+
+      return link
     }
   },
 

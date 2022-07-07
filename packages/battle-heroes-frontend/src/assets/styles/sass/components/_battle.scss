@@ -181,12 +181,26 @@
     justify-content: space-between;
     column-gap: 8px;
 
+    .twitter-share-button {
+      width: 100%;
+      border: 1px solid #289aeb;
+      border-radius: 3px;
+      background-color: #289aeb;
+      padding: 16px 8px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      text-align: center;
+      color: palette(grey, 0);
+      user-select: none;
+    }
+
     > button {
       width: 100%;
       border: 1px solid palette(blue, 900);
       border-radius: 3px;
       background-color: palette(blue, 800);
-      padding: 8px;
+      padding: 12px 8px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;

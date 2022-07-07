@@ -15,6 +15,8 @@ import {
   faArrowRightFromBracket
 } from '@fortawesome/free-solid-svg-icons'
 
+import { faTwitter } from '@fortawesome/free-brands-svg-icons'
+
 export default {
   install(app) {
     library.add(
@@ -25,6 +27,7 @@ export default {
       faUsers,
       faXmark,
       faMessage,
+      faTwitter,
       faArrowLeft,
       faLayerGroup,
       faVolumeHigh,
