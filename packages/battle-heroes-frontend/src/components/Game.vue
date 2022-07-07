@@ -88,7 +88,6 @@
     </div>
 
     <div class="battle-ground">
-      {{ game }}
       <GamePlayer
         :player="opponentPlayer"
         :player-nft="opponentNFT"
