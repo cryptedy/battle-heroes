@@ -314,26 +314,26 @@ export default {
 
       const baseURL = 'http://twitter.com/intent/tweet'
 
-      // let text = ''
-      // text += '🔥NFT COLLECTION IN OSAKA 出展中🔥\n'
-      // text += 'PixelHeroesブースで自分のNFTが使える対戦ゲーム開催中⚔️\n\n'
-      // text += '🔷気になる結果は…\n\n'
-      // text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
-      // text += '⬇️詳しくは\n'
-      // text += 'https://t.co/AL7Pr15STT\n'
-      // text +=
-      //   '#Nコレ大阪 #PixelHeroes #BattleHeroes @Nftcolor22 @pixelheroes_nft\n'
-      // text += `ID:${this.game.id}`
-
       let text = ''
-      text += '⚔️BATTLE HEROES⚔️\n'
-      text += 'Pixel Heroes のバトルゲームで対戦したよ‼\n\n'
-      text += '🔷気になる結果は・・・\n\n'
+      text += '🔥NFT COLLECTION IN OSAKA 出展中🔥\n'
+      text += 'PixelHeroesブースで自分のNFTが使える対戦ゲーム開催中⚔️\n\n'
+      text += '🔷気になる結果は…\n\n'
       text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
-      text += '⬇️自分のヒーローでバトルに挑もう\n'
-      text += 'https://game.pixelheroes-dao.com/\n\n'
-      text += '#PixelHeroes #BattleHeroes @pixelheroes_nft\n'
+      text += '⬇️詳しくは\n'
+      text += 'https://t.co/AL7Pr15STT\n'
+      text +=
+        '#Nコレ大阪 #PixelHeroes #BattleHeroes @Nftcolor22 @pixelheroes_nft\n'
       text += `ID:${this.game.id}`
+
+      // let text = ''
+      // text += '⚔️BATTLE HEROES⚔️\n'
+      // text += 'Pixel Heroes のバトルゲームで対戦したよ‼\n\n'
+      // text += '🔷気になる結果は・・・\n\n'
+      // text += isWin ? 'やったー！勝ち✌️\n\n' : '残念でした・・・負け😭\n\n'
+      // text += '⬇️自分のヒーローでバトルに挑もう\n'
+      // text += 'https://game.pixelheroes-dao.com/\n\n'
+      // text += '#PixelHeroes #BattleHeroes @pixelheroes_nft\n'
+      // text += `ID:${this.game.id}`
 
       const link = `${baseURL}?text=${encodeURIComponent(text)}`
 
