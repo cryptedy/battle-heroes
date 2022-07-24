@@ -143,7 +143,7 @@ class GameManager {
     if (!user) {
       return callback({
         status: false,
-        message: 'Failed to Login: The user not found'
+        message: 'Failed to login: The user not found'
       })
     }
 
@@ -168,7 +168,7 @@ class GameManager {
       } catch (error) {
         return callback({
           status: false,
-          message: `Failed to Login: ${error.message}`
+          message: `Failed to login: ${error.message}`
         })
       }
     }
@@ -864,6 +864,43 @@ class GameManager {
     this.io.emit('message:delete', message.id)
   }
 
+  async updatePlayer(user, callback) {
+    console.log('updatePlayer', this.socket.id, user)
+
+    if (!user) {
+      return callback({
+        status: false,
+        message: 'Failed to update player: The user not found'
+      })
+    }
+
+    try {
+      const updatedUser = await findUser(user.id)
+      const updatedPlayer = await createPlayer(updatedUser)
+
+      updatePlayer({
+        playerId: updatedPlayer.id,
+        payload: { ...updatedPlayer }
+      })
+
+      callback({
+        status: true,
+        message: 'The player updated',
+        player: updatedPlayer
+      })
+
+      this.socket.broadcast.emit(
+        'player:update',
+        selectPlayer(updatedPlayer.id)
+      )
+    } catch (error) {
+      return callback({
+        status: false,
+        message: `Failed to update player: ${error.message}`
+      })
+    }
+  }
+
   socketDisconnecting() {
     console.log('socketDisconnecting', this.socket.id)
 
@@ -1081,6 +1118,13 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    'player:update': (...args) => {
+      try {
+        this.updatePlayer(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
     'socket:disconnecting': (...args) => {
       try {
         this.socketDisconnecting(...args)
@@ -1128,6 +1172,7 @@ class GameManager {
     this.socket.on('battle:random', this.eventListeners['battle:random'])
     this.socket.on('message:create', this.eventListeners['message:create'])
     this.socket.on('message:delete', this.eventListeners['message:delete'])
+    this.socket.on('player:update', this.eventListeners['player:update'])
     this.socket.on('disconnecting', this.eventListeners['socket:disconnecting'])
     this.socket.on('disconnect', this.eventListeners['socket:disconnect'])
     this.io
@@ -1151,6 +1196,7 @@ class GameManager {
     this.socket.off('battle:join', this.eventListeners['battle:join'])
     this.socket.off('battle:leave', this.eventListeners['battle:leave'])
     this.socket.off('battle:random', this.eventListeners['battle:random'])
+    this.socket.off('player:update', this.eventListeners['player:update'])
     this.socket.off('message:create', this.eventListeners['message:create'])
     this.socket.off('message:delete', this.eventListeners['message:delete'])
     this.socket.off(

@@ -7,7 +7,7 @@
           class="account-menu-list-item-link"
         >
           <FontAwesomeIcon icon="user" />
-          ACCOUNT
+          アカウント
         </router-link>
       </BaseListItem>
       <BaseListItem class="account-menu-list-item">
