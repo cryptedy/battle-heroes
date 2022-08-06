@@ -24,19 +24,28 @@ const createPlayer = async user => {
   const profile = await getUserProfile(user)
   const NFTIds = await getNFTIdsForAddress(user.address)
 
-  return {
-    id: user.id,
-    user_id: user.id,
-    name: profile.name,
-    avatar_url: profile.avatar_url,
-    address: user.address,
-    socket_ids: [],
-    nft_ids: NFTIds,
-    exp: user.exp,
-    win: user.win,
-    lose: user.lose,
-    state: PLAYER_STATE.IDLE
-  }
+  return await new Promise((resolve, reject) => {
+    // wait 5 second for avoid rate limit
+    setTimeout(() => {
+      try {
+        resolve({
+          id: user.id,
+          user_id: user.id,
+          name: profile.name,
+          avatar_url: profile.avatar_url,
+          address: user.address,
+          socket_ids: [],
+          nft_ids: NFTIds,
+          exp: user.exp,
+          win: user.win,
+          lose: user.lose,
+          state: PLAYER_STATE.IDLE
+        })
+      } catch (error) {
+        reject(error)
+      }
+    }, 5000)
+  })
 }
 
 const updatePlayerStats = async (playerId, payload) => {

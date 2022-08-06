@@ -250,7 +250,7 @@
         .stars {
           #{$font-awesome-icon-class} {
             padding-bottom: 1px;
-            font-size: 75%;
+            font-size: 70%;
             @include mediaQuery(xxs) {
               font-size: 80%;
             }
