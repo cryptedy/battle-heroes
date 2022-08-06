@@ -26,7 +26,7 @@
   }
 
   &-image {
-    width: 230px;
+    width: 250px;
     margin: 16px;
     background-color: palette(grey, 800);
 
@@ -42,18 +42,24 @@
     }
   }
 
-  &-attribute {
-    max-width: 230px;
+  .nft-meta {
+    max-width: 250px;
     margin: 16px;
-    text-align: left;
 
-    &-type {
+    &-key {
       color: color(secondary, light);
     }
+  }
 
-    &-value {
-      float: right;
-      color: color(primary, light);
+  &-rarity {
+    .nft-meta-value {
+      color: palette(orange, 500);
+    }
+  }
+
+  &-attributes {
+    .nft-meta-value {
+      color: palette(green, 500);
     }
   }
 }

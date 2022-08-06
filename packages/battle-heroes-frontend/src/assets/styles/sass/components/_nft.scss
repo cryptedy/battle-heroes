@@ -4,27 +4,25 @@
   }
 
   &-meta {
-    color: color(secondary, dark);
-  }
-
-  &-rarity {
-    color: palette(yellow, 800);
-  }
-
-  &-attribute {
-    display: flex;
-    flex-wrap: wrap;
-
     &-list {
-      //
+      &-item {
+        display: flex;
+        gap: 8px;
+      }
     }
 
-    &-type {
-      flex-grow: 1;
+    &-key {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     &-value {
-      //
+      flex-grow: 1;
+      text-align: right;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 

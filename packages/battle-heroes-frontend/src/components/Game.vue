@@ -12,7 +12,7 @@
       </div>
 
       <div class="battle-status-primary">
-        <p>=== ターン {{ game.turn }} ===</p>
+        <p class="battle-status-current-turn">=== ターン {{ game.turn }} ===</p>
 
         <template v-if="aborted">
           <p style="font-weight: bold; color: #4caf50">YOU WINI!</p>

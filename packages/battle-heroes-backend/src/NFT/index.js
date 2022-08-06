@@ -44,6 +44,8 @@ const getNFTsForCollection = async collection => {
 
   addRarity(NFTs)
   addRank(NFTs)
+  addPoint(NFTs)
+  addStars(NFTs)
 
   return NFTs
 }
@@ -211,9 +213,40 @@ const addRank = NFTs => {
   return NFTs
 }
 
+const addPoint = NFTs => {
+  const normalize = (value, max, min) => {
+    return (value - min) / (max - min)
+  }
+
+  const collectionQuantity = NFTs.length
+
+  NFTs.forEach(NFT => {
+    const point = (1 - normalize(NFT.rank, collectionQuantity, 1)) * 100
+    NFT.point = pointFormat(point)
+  })
+
+  return NFTs
+}
+
+const addStars = NFTs => {
+  const maxStars = 5
+  const maxPoint = 100
+  const block = maxPoint / maxStars
+
+  NFTs.forEach(NFT => {
+    const position = Number.parseInt(Math.round(NFT.point / block))
+    NFT.stars = Math.max(1, position)
+  })
+
+  return NFTs
+}
+
 const rarityFormat = rarity => (rarity * 100).toFixed(1)
 
-const scoreFormat = score => score.toFixed(2)
+const scoreFormat = score => Number.parseFloat(score.toFixed(2))
+
+const pointFormat = normalizedRank =>
+  Number.parseFloat(normalizedRank.toFixed(2))
 
 const getMetadata = async collection => {
   return axios.get(`${METADATA_URL}/${collection.id}/index.json`)

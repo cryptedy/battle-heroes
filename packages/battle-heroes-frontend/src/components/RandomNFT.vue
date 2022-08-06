@@ -6,12 +6,11 @@
           {{ randomNFT.name }}
         </p>
 
-        <p>
-          <FontAwesomeIcon icon="star" />
-          <FontAwesomeIcon icon="star" />
-          <FontAwesomeIcon icon="star" />
-          RANK: {{ randomNFT.rank }} - SCORE: {{ randomNFT.score }}
-        </p>
+        <div class="random-nft-rarity">
+          <Stars :stars="randomNFT.stars" />
+
+          <BaseNFTRarity :nft="randomNFT" />
+        </div>
 
         <div class="random-nft-image" :class="{ 'is-loaded': imageLoaded }">
           <img
@@ -23,19 +22,9 @@
           />
         </div>
 
-        <ul class="random-nft-attribute">
-          <li
-            v-for="attribute in randomNFT.attributes"
-            :key="attribute.trait_type"
-          >
-            <span class="random-nft-attribute-type">
-              {{ attribute.trait_type }}
-            </span>
-            <span class="random-nft-attribute-value">
-              {{ attribute.value }}
-            </span>
-          </li>
-        </ul>
+        <div class="random-nft-attributes">
+          <BaseNFTAttributes :nft="randomNFT" />
+        </div>
       </div>
     </transition>
   </div>
@@ -43,6 +32,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Stars from '@/components/Stars'
+import BaseNFTRarity from '@/components/BaseNFTRarity'
+import BaseNFTAttributes from '@/components/BaseNFTAttributes'
 
 const getRandomArbitrary = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min)
@@ -50,6 +42,12 @@ const getRandomArbitrary = (min, max) => {
 
 export default {
   name: 'RandomNFT',
+
+  components: {
+    Stars,
+    BaseNFTRarity,
+    BaseNFTAttributes
+  },
 
   intervalId: null,
 

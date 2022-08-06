@@ -10,15 +10,8 @@
           {{ nft.name }}
         </h1>
 
-        <div class="nft-meta">
-          <span class="nft-rarity">
-            <FontAwesomeIcon icon="star" />
-            <FontAwesomeIcon icon="star" />
-            <FontAwesomeIcon icon="star" />
-          </span>
-
-          {{ nft.rank }}
-        </div>
+        <Stars :stars="nft.stars" />
+        {{ nft.rank }}
       </div>
     </template>
 
@@ -31,29 +24,9 @@
         {{ nft.name }}
       </h1>
 
-      <div class="nft-meta">
-        <span class="nft-rarity">
-          <FontAwesomeIcon icon="star" />
-          <FontAwesomeIcon icon="star" />
-          <FontAwesomeIcon icon="star" />
-        </span>
-
-        <p>RANK: {{ nft.rank }}</p>
-        <p>SCORE: {{ nft.score }}</p>
-      </div>
-
-      <ul class="nft-attribute-list">
-        <li
-          v-for="attribute in nft.attributes"
-          :key="attribute.trait_type"
-          class="nft-attribute-list-item"
-        >
-          <dl class="nft-attribute">
-            <dt class="nft-attribute-type">{{ attribute.trait_type }}</dt>
-            <dd class="nft-attribute-value">{{ attribute.value }}</dd>
-          </dl>
-        </li>
-      </ul>
+      <Stars :stars="nft.stars" />
+      <BaseNFTRarity :nft="nft" />
+      <BaseNFTAttributes :nft="nft" />
 
       <BattleCreateButton :nft="nft" />
     </div>
@@ -61,12 +34,18 @@
 </template>
 
 <script>
+import Stars from '@/components/Stars'
+import BaseNFTRarity from '@/components/BaseNFTRarity'
+import BaseNFTAttributes from '@/components/BaseNFTAttributes'
 import BattleCreateButton from '@/components/BattleCreateButton'
 
 export default {
   name: 'BaseNFT',
 
   components: {
+    Stars,
+    BaseNFTRarity,
+    BaseNFTAttributes,
     BattleCreateButton
   },
 

@@ -84,6 +84,36 @@ export default {
             message,
             type: NOTIFICATION_TYPE.SUCCESS
           })
+
+          setTimeout(() => {
+            // start a CPU battle if not matched any opponents within 15 seconds.
+            if (
+              this.player.state === PLAYER_STATE.STANDBY &&
+              this.playerBattle
+            ) {
+              this.$socket.emit(
+                'battle:delete',
+                this.playerBattle.id,
+                // eslint-disable-next-line no-unused-vars
+                ({ status, message }) => {
+                  if (status) {
+                    return this.$router.push(
+                      {
+                        name: 'battle-practice',
+                        params: {
+                          monsterId: 1,
+                          NFTId: NFT.id
+                        }
+                      },
+                      () => {}
+                    )
+                  } else {
+                    //
+                  }
+                }
+              )
+            }
+          }, 15000)
         } else {
           this.addNotification({
             message,

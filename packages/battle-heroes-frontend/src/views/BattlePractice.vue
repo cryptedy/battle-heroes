@@ -95,8 +95,9 @@ const monster = {
       score: '0'
     }
   ],
-  score: '0',
-  rank: 0
+  score: 0,
+  rank: 0,
+  stars: 1
 }
 
 const getRandomValue = (min, max) =>
