@@ -68,7 +68,7 @@ const monster = {
     },
     {
       trait_type: 'clothe',
-      value: 'none',
+      value: 'gymnastics pants',
       quantity: 0,
       rarity: '0',
       score: '0'
