@@ -901,6 +901,34 @@ class GameManager {
     }
   }
 
+  async updatePlayerStats(stats) {
+    console.log('updatePlayerStats', this.socket.id, stats)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      throw new Error('Failed to update player stats : The player not found')
+    }
+
+    try {
+      await updatePlayerStats(player.id, {
+        exp: player.exp + stats.exp,
+        win: player.win + stats.win,
+        lose: player.lose + stats.lose
+      })
+
+      const updatedPlayer = selectPlayer(player.id)
+
+      this.io.emit('player:update', updatedPlayer)
+
+      this.socket.broadcast.emit('player:update', updatedPlayer)
+    } catch (error) {
+      throw new Error(
+        `Failed to update player stats: ${error.message}: ${error.stack}`
+      )
+    }
+  }
+
   socketDisconnecting() {
     console.log('socketDisconnecting', this.socket.id)
 
@@ -1125,6 +1153,13 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    'player:updateStats': (...args) => {
+      try {
+        this.updatePlayerStats(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
     'socket:disconnecting': (...args) => {
       try {
         this.socketDisconnecting(...args)
@@ -1173,6 +1208,10 @@ class GameManager {
     this.socket.on('message:create', this.eventListeners['message:create'])
     this.socket.on('message:delete', this.eventListeners['message:delete'])
     this.socket.on('player:update', this.eventListeners['player:update'])
+    this.socket.on(
+      'player:updateStats',
+      this.eventListeners['player:updateStats']
+    )
     this.socket.on('disconnecting', this.eventListeners['socket:disconnecting'])
     this.socket.on('disconnect', this.eventListeners['socket:disconnect'])
     this.io
@@ -1197,6 +1236,10 @@ class GameManager {
     this.socket.off('battle:leave', this.eventListeners['battle:leave'])
     this.socket.off('battle:random', this.eventListeners['battle:random'])
     this.socket.off('player:update', this.eventListeners['player:update'])
+    this.socket.off(
+      'player:updateStats',
+      this.eventListeners['player:updateStats']
+    )
     this.socket.off('message:create', this.eventListeners['message:create'])
     this.socket.off('message:delete', this.eventListeners['message:delete'])
     this.socket.off(

@@ -454,6 +454,24 @@ export default {
             `${this.currentOpponentPlayer.name} は気絶してしまった！`
           )
           this.game.messages.push(`${this.currentPlayer.name} の勝利！`)
+
+          console.log(this.currentPlayer)
+
+          if (this.currentPlayer.id === this.player.id) {
+            // player wins
+            this.$socket.emit('player:updateStats', {
+              exp: 3,
+              win: 1,
+              lose: 0
+            })
+          } else {
+            // playe lose
+            this.$socket.emit('player:updateStats', {
+              exp: 1,
+              win: 0,
+              lose: 1
+            })
+          }
         } else {
           if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
             nextOpponentStatus.criticalRate = 0.15
