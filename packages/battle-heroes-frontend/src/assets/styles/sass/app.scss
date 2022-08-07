@@ -149,6 +149,24 @@ body {
       overflow: hidden;
     }
 
+    .information {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      background-color: palette(green, 500);
+      text-align: center;
+
+      &-content {
+        height: 100%;
+        max-width: 1024px;
+        margin: 0 auto;
+
+        padding: 0 16px;
+        @include mediaQuery(md) {
+          padding: 0 24px;
+        }
+      }
+    }
+
     .view {
       &-actions {
         display: flex;

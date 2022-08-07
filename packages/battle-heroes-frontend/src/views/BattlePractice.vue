@@ -54,49 +54,49 @@ const monster = {
   attributes: [
     {
       trait_type: 'background',
-      value: 'unknown',
+      value: 'moonlit night',
       quantity: 0,
       rarity: '0',
       score: '0'
     },
     {
       trait_type: 'body',
-      value: 'unknown',
+      value: 'wolf body',
       quantity: 0,
-      rarity: '0',
+      rarity: 'wolf body',
       score: '0'
     },
     {
       trait_type: 'clothe',
-      value: 'unknown',
+      value: 'none',
       quantity: 0,
       rarity: '0',
       score: '0'
     },
     {
       trait_type: 'head',
-      value: 'unknown',
+      value: 'wolf head',
       quantity: 0,
       rarity: '0',
       score: '0'
     },
     {
       trait_type: 'leftarm',
-      value: 'unknown',
+      value: 'none',
       quantity: 0,
       rarity: '0',
       score: '0'
     },
     {
       trait_type: 'rightarm',
-      value: 'unknown',
+      value: 'none',
       quantity: 0,
       rarity: '0',
       score: '0'
     }
   ],
-  score: 0,
-  rank: 0,
+  score: 50,
+  rank: 100,
   stars: 1
 }
 

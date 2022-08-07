@@ -39,6 +39,13 @@
     </header>
 
     <main class="game-main" role="main">
+      <div v-if="isPlayerStateStandby" class="information">
+        <p class="information-content">
+          <BaseSpinner />
+          対戦相手の参加を待っています...
+        </p>
+      </div>
+
       <slot />
     </main>
 
@@ -55,7 +62,11 @@ import RandomNFT from '@/components/RandomNFT'
 import ErrorScreen from '@/components/ErrorScreen'
 import SplashScreen from '@/components/SplashScreen'
 import TheBottomNav from '@/components/TheBottomNav'
-import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
+import {
+  BATTLE_STATE,
+  PLAYER_STATE,
+  NOTIFICATION_TYPE
+} from '@/utils/constants'
 
 export default {
   name: 'GameLayout',
@@ -85,6 +96,10 @@ export default {
       playerBattle: 'game/playerBattle',
       notifications: 'notification/all'
     }),
+
+    isPlayerStateStandby() {
+      return this.player.state === PLAYER_STATE.STANDBY && this.playerBattle
+    },
 
     isBattleView() {
       return this.$route.name === 'battle'
