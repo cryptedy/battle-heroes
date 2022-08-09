@@ -61,7 +61,7 @@ const woldman = {
     },
     {
       trait_type: 'body',
-      value: 'wolf body',
+      value: 'werewolf',
       quantity: 0,
       rarity: 0,
       score: 0
@@ -214,19 +214,19 @@ const snake = {
   id: 4,
   token_id: 4,
   collection_id: 0,
-  name: 'Snake',
+  name: 'Worm',
   image_url: '/images/monsters/4.png',
   attributes: [
     {
       trait_type: 'background',
-      value: 'mplain',
+      value: 'plain',
       quantity: 0,
       rarity: 0,
       score: 0
     },
     {
       trait_type: 'body',
-      value: 'snake body',
+      value: 'insect',
       quantity: 0,
       rarity: 0,
       score: 0
@@ -281,7 +281,7 @@ const dragon = {
     },
     {
       trait_type: 'body',
-      value: 'dragon body',
+      value: 'dragon',
       quantity: 0,
       rarity: 0,
       score: 0
