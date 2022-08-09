@@ -91,29 +91,40 @@ export default {
               this.player.state === PLAYER_STATE.STANDBY &&
               this.playerBattle
             ) {
-              this.$socket.emit(
-                'battle:delete',
-                this.playerBattle.id,
-                // eslint-disable-next-line no-unused-vars
-                ({ status, message }) => {
-                  if (status) {
-                    return this.$router.push(
-                      {
-                        name: 'battle-practice',
-                        params: {
-                          monsterId: 1,
-                          NFTId: NFT.id
-                        }
-                      },
-                      () => {}
-                    )
-                  } else {
-                    //
-                  }
+              this.$dialog.open({
+                title: '対戦相手が見つかりません',
+                message: `
+                  <p>現在対戦相手が見つかりません。</p>
+                  <p>1人用モードの CPU バトルを開始しますか？</p>
+                `,
+                confirmLabel: 'CPU バトルを開始',
+                cancelLabel: '対戦相手を待つ',
+                onConfirm: () => {
+                  return this.$socket.emit(
+                    'battle:delete',
+                    this.playerBattle.id,
+                    // eslint-disable-next-line no-unused-vars
+                    ({ status, message }) => {
+                      if (status) {
+                        return this.$router.push(
+                          {
+                            name: 'battle-practice',
+                            params: {
+                              monsterId: 1,
+                              NFTId: NFT.id
+                            }
+                          },
+                          () => {}
+                        )
+                      } else {
+                        //
+                      }
+                    }
+                  )
                 }
-              )
+              })
             }
-          }, 15000)
+          }, 30000)
         } else {
           this.addNotification({
             message,

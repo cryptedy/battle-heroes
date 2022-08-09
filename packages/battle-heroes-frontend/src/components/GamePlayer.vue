@@ -114,12 +114,10 @@
 
               <div v-else class="battle-ground-nft-meta">
                 <div class="battle-ground-nft-rarity">
-                  <p>レアリティ</p>
                   <BaseNFTRarity :nft="playerNft" />
                 </div>
 
                 <div class="battle-ground-nft-attributes">
-                  <p>プロパティ</p>
                   <BaseNFTAttributes :nft="playerNft" />
                 </div>
               </div>

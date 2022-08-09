@@ -29,12 +29,17 @@
             </div>
           </header>
 
-          <main class="drawer-body">
-            <slot />
+          <main class="dialog-body">
+            <template v-if="message">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="message" />
+            </template>
+
+            <slot v-else />
           </main>
 
-          <footer v-if="programmatic" class="drawer-footer">
-            <BaseButton @click="cancelDialog"> CANCEL </BaseButton>
+          <footer v-if="programmatic" class="dialog-footer">
+            <BaseButton @click="cancelDialog"> {{ cancelLabel }} </BaseButton>
 
             <BaseButton
               :disabled="confirmLoading"
@@ -42,7 +47,7 @@
               @click="confirmDialog"
             >
               <BaseSpinner v-if="confirmLoading" />
-              OK
+              {{ confirmLabel }}
             </BaseButton>
           </footer>
         </div>
@@ -67,6 +72,12 @@ export default {
       required: true
     },
 
+    message: {
+      type: String,
+      default: '',
+      required: false
+    },
+
     width: {
       type: String,
       required: false,
@@ -89,6 +100,18 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+
+    confirmLabel: {
+      type: String,
+      required: false,
+      default: 'OK'
+    },
+
+    cancelLabel: {
+      type: String,
+      required: false,
+      default: 'CANCEL'
     },
 
     onConfirm: {

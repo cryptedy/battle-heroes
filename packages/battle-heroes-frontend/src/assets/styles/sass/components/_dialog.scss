@@ -25,6 +25,8 @@
 
     @include mediaQuery(md) {
       max-width: 1024px;
+      margin-right: 24px;
+      margin-left: 24px;
     }
 
     &-enter-active,
@@ -81,5 +83,20 @@
     background-color: palette(grey, 0);
     padding: 16px;
     color: color(primary, dark);
+  }
+
+  &-footer {
+    overflow: auto;
+    display: flex;
+    gap: 12px;
+    background-color: palette(grey, 0);
+    padding: 10px 16px;
+    border-top: 1px solid color(divider, dark);
+    // text-align: right;
+    color: color(primary, dark);
+
+    // > .button + .button {
+    //   margin-left: 12px;
+    // }
   }
 }
