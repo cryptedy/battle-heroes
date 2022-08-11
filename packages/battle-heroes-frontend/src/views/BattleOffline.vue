@@ -53,8 +53,6 @@ const CPU = {
   state: 'IDLE'
 }
 
-const monsters = [Wolfman, Ghost, Beans, Worm, Dragon]
-
 const getRandomValue = (min, max) =>
   Math.floor(Math.random() * (max - min) + min)
 
@@ -134,7 +132,8 @@ export default {
       game: null,
       gameAborting: false,
       gameAborted: false,
-      gameFinished: false
+      gameFinished: false,
+      monsters: [Wolfman, Ghost, Beans, Worm, Dragon]
     }
   },
 
@@ -206,7 +205,7 @@ export default {
     },
 
     NFT2() {
-      return monsters[Math.floor(Math.random() * monsters.length)]
+      return this.monsters[0]
     },
 
     playerKey() {
@@ -298,6 +297,8 @@ export default {
     if (this.$route.params.NFTId) {
       this.NFTId = this.$route.params.NFTId
 
+      this.shuffleMonsters()
+
       this.game = createGame(0)
     }
   },
@@ -320,6 +321,10 @@ export default {
     ...mapActions({
       addNotification: 'notification/add'
     }),
+
+    shuffleMonsters() {
+      return this.monsters.sort(() => Math.random() - 0.5)
+    },
 
     leaveBattle() {
       console.log('leaveBattle')
@@ -356,6 +361,8 @@ export default {
 
     onContinue() {
       console.log('onContinue')
+
+      this.shuffleMonsters()
 
       this.game = createGame(0)
 
