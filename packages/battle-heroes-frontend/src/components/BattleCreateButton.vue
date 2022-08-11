@@ -100,40 +100,40 @@ export default {
                 confirmLabel: 'CPU バトルを開始',
                 cancelLabel: '対戦相手を待つ',
                 onConfirm: () => {
-                  return this.$router.push(
-                    {
-                      name: 'battle-offline',
-                      params: {
-                        NFTId: NFT.id
-                      }
-                    },
-                    () => {}
-                  )
-
-                  // return this.$socket.emit(
-                  //   'battle:delete',
-                  //   this.playerBattle.id,
-                  //   // eslint-disable-next-line no-unused-vars
-                  //   ({ status, message }) => {
-                  //     if (status) {
-                  //       return this.$router.push(
-                  //         {
-                  //           name: 'battle-offline',
-                  //           params: {
-                  //             NFTId: NFT.id
-                  //           }
-                  //         },
-                  //         () => {}
-                  //       )
-                  //     } else {
-                  //       //
+                  // return this.$router.push(
+                  //   {
+                  //     name: 'battle-offline',
+                  //     params: {
+                  //       NFTId: NFT.id
                   //     }
-                  //   }
+                  //   },
+                  //   () => {}
                   // )
+
+                  return this.$socket.emit(
+                    'battle:delete',
+                    this.playerBattle.id,
+                    // eslint-disable-next-line no-unused-vars
+                    ({ status, message }) => {
+                      if (status) {
+                        return this.$router.push(
+                          {
+                            name: 'battle-offline',
+                            params: {
+                              NFTId: NFT.id
+                            }
+                          },
+                          () => {}
+                        )
+                      } else {
+                        //
+                      }
+                    }
+                  )
                 }
               })
             }
-          }, 1000)
+          }, 30000)
         } else {
           this.addNotification({
             message,
