@@ -25,16 +25,14 @@
     <template v-if="isBattleReady || isBattleStarted || isBattleEnded">
       <template v-if="!game">
         <template v-if="actualBattle">
-          <SplashScreen
+          <BattleSplashScreen
             v-if="isPlayerBattle && (isBattleStarted || isBattleReady)"
-            message="Loading game..."
-          >
-            <div style="text-align: center">
-              <p>{{ player1.name }}'s {{ NFT1.name }}</p>
-              <p>⚔️</p>
-              <p>{{ player2.name }}'s {{ NFT2.name }}</p>
-            </div>
-          </SplashScreen>
+            :type="splash"
+            :player1="player1"
+            :player2="player2"
+            :nft1="NFT1"
+            :nft2="NFT2"
+          />
 
           <ErrorScreen v-else message="The battle already started">
             <p>The battle has already started by the other players</p>
@@ -78,8 +76,8 @@
 import Game from '@/components/Game'
 import { mapGetters, mapActions } from 'vuex'
 import ErrorScreen from '@/components/ErrorScreen'
-import SplashScreen from '@/components/SplashScreen'
 import BattleJoinButton from '@/components/BattleJoinButton'
+import BattleSplashScreen from '@/components/BattleSplashScreen'
 import { PLAYER_MOVE, BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
@@ -88,8 +86,8 @@ export default {
   components: {
     Game,
     ErrorScreen,
-    SplashScreen,
-    BattleJoinButton
+    BattleJoinButton,
+    BattleSplashScreen
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -196,6 +194,8 @@ export default {
     console.log('Battle:created')
 
     this.$socket.on('game:aborted', gameId => this.onGameAborted(gameId))
+
+    this.splash = this.$route.params.splash || 'reload'
   },
 
   mounted() {
@@ -235,25 +235,29 @@ export default {
     onGameStart({ status, message, game }) {
       console.log('onGameStart', status, message, game)
 
-      if (status) {
-        this.cachedBattle = this.battle
-        this.playable = this.isPlayerBattle
+      const timeout = this.$splash === 'challenger' ? 3000 : 1000
 
-        this.game = game
+      setTimeout(() => {
+        if (status) {
+          this.cachedBattle = this.battle
+          this.playable = this.isPlayerBattle
 
-        this.$socket.on('game:update', this.onGameUpdate)
+          this.game = game
 
-        this.addNotification({
-          message,
-          type: NOTIFICATION_TYPE.SUCCESS
-        })
-      } else {
-        this.addNotification({
-          message,
-          type: NOTIFICATION_TYPE.ERROR,
-          timeout: 0
-        })
-      }
+          this.$socket.on('game:update', this.onGameUpdate)
+
+          this.addNotification({
+            message,
+            type: NOTIFICATION_TYPE.SUCCESS
+          })
+        } else {
+          this.addNotification({
+            message,
+            type: NOTIFICATION_TYPE.ERROR,
+            timeout: 0
+          })
+        }
+      }, timeout)
     },
 
     onGameUpdate(game) {

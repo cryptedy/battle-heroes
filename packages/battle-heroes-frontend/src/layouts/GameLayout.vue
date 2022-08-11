@@ -39,7 +39,7 @@
     </header>
 
     <main class="game-main" role="main">
-      <div v-if="isPlayerStateStandby" class="information">
+      <div v-if="isPlayerStateStandby && showNotification" class="information">
         <p class="information-content">
           <BaseSpinner />
           対戦相手の参加を待っています...
@@ -98,6 +98,14 @@ export default {
     }),
 
     showHeader() {
+      if (this.$route.name === 'battle-offline') {
+        return false
+      }
+
+      return true
+    },
+
+    showNotification() {
       if (this.$route.name === 'battle-offline') {
         return false
       }
@@ -235,7 +243,8 @@ export default {
               {
                 name: 'battle',
                 params: {
-                  battleId: battleId
+                  battleId: battleId,
+                  splash: 'reload'
                 }
               },
               () => {}
@@ -243,15 +252,29 @@ export default {
             .then(() => this.reloadBattleView())
         }
       } else {
-        this.$router.push(
-          {
-            name: 'battle',
-            params: {
-              battleId: battleId
-            }
-          },
-          () => {}
-        )
+        if (this.$route.name === 'battle-offline') {
+          this.$router.push(
+            {
+              name: 'battle',
+              params: {
+                battleId: battleId,
+                splash: 'challenger'
+              }
+            },
+            () => {}
+          )
+        } else {
+          this.$router.push(
+            {
+              name: 'battle',
+              params: {
+                battleId: battleId,
+                splash: 'matched'
+              }
+            },
+            () => {}
+          )
+        }
       }
     },
 
