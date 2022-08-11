@@ -12,9 +12,9 @@
       </BaseDialog>
 
       <BaseButton
-        :disabled="!canCreatePracticeBattle"
+        :disabled="!canCreateOfflineBattle"
         type="primary"
-        @click="handleCreatePracticeBattle"
+        @click="handleCreateOfflineBattle"
       >
         1人モード - モンスターバトル
       </BaseButton>
@@ -36,7 +36,6 @@ export default {
 
   components: {
     SelectNFTs,
-
     BattleList,
     BattleCreateButton
   },
@@ -54,7 +53,7 @@ export default {
       playerBattle: 'game/playerBattle'
     }),
 
-    canCreatePracticeBattle() {
+    canCreateOfflineBattle() {
       return !this.playerBattle && this.player.state === PLAYER_STATE.IDLE
     }
   },
@@ -67,17 +66,17 @@ export default {
     onSelectNFT(NFT) {
       this.dialogShown = false
 
-      this.createPracticeBattle(NFT)
+      this.createOfflineBattle(NFT)
     },
 
-    handleCreatePracticeBattle() {
+    handleCreateOfflineBattle() {
       this.dialogShown = true
     },
 
-    createPracticeBattle(NFT) {
+    createOfflineBattle(NFT) {
       return this.$router.push(
         {
-          name: 'battle-practice',
+          name: 'battle-offline',
           params: {
             monsterId: 1,
             NFTId: NFT.id

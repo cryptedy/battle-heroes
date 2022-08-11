@@ -57,6 +57,7 @@
       <Game
         v-else
         :game="game"
+        :allow-continue="false"
         :aborted="gameAborted"
         :playable="playable"
         :player1="player1"
@@ -67,6 +68,7 @@
         @heal="onHeal"
         @finish="onGameFinished"
         @abort="onGameAbort"
+        @continue="onContinue"
       />
     </template>
   </template>
@@ -295,6 +297,10 @@ export default {
       this.gameFinished = true
 
       this.$socket.emit('game:finish', this.game.id)
+    },
+
+    onContinue() {
+      console.log('onContinue')
     },
 
     onAttack() {

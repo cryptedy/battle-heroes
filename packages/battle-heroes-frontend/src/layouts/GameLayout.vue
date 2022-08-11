@@ -34,7 +34,7 @@
   </template>
 
   <div v-else class="game">
-    <header class="game-header" role="banner">
+    <header v-if="showHeader" class="game-header" role="banner">
       <TheAppBar />
     </header>
 
@@ -49,7 +49,7 @@
       <slot />
     </main>
 
-    <footer class="game-footer">
+    <footer v-if="showFooter" class="game-footer">
       <TheBottomNav />
     </footer>
   </div>
@@ -96,6 +96,22 @@ export default {
       playerBattle: 'game/playerBattle',
       notifications: 'notification/all'
     }),
+
+    showHeader() {
+      if (this.$route.name === 'battle-offline') {
+        return false
+      }
+
+      return true
+    },
+
+    showFooter() {
+      if (this.$route.name === 'battle-offline') {
+        return false
+      }
+
+      return true
+    },
 
     isPlayerStateStandby() {
       return this.player.state === PLAYER_STATE.STANDBY && this.playerBattle

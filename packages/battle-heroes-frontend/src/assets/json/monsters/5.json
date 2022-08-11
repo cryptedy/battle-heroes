@@ -1,0 +1,54 @@
+{
+  "id": 5,
+  "token_id": 5,
+  "collection_id": 0,
+  "name": "Dragon",
+  "image_url": "/images/monsters/5.png",
+  "attributes": [
+    {
+      "trait_type": "background",
+      "value": "dark",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "body",
+      "value": "dragon",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "clothe",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "head",
+      "value": "dragon head",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "leftarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "rightarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    }
+  ],
+  "score": 300,
+  "rank": 20,
+  "stars": 5
+}

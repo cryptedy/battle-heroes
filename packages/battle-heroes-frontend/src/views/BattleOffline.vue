@@ -12,6 +12,7 @@
   <Game
     v-else
     :game="game"
+    :allow-continue="true"
     :aborted="gameAborted"
     :playable="playable"
     :player1="player1"
@@ -22,6 +23,7 @@
     @heal="onHeal"
     @finish="onGameFinished"
     @abort="onGameAbort"
+    @continue="onContinue"
   />
 </template>
 
@@ -30,6 +32,12 @@ import Game from '@/components/Game'
 import { mapGetters, mapActions } from 'vuex'
 import { BATTLE_STATE } from '@/utils/constants'
 import ErrorScreen from '@/components/ErrorScreen'
+
+import Wolfman from '@/assets/json/monsters/1.json'
+import Ghost from '@/assets/json/monsters/2.json'
+import Beans from '@/assets/json/monsters/3.json'
+import Worm from '@/assets/json/monsters/4.json'
+import Dragon from '@/assets/json/monsters/5.json'
 
 const CPU = {
   id: 0,
@@ -45,282 +53,7 @@ const CPU = {
   state: 'IDLE'
 }
 
-const woldman = {
-  id: 1,
-  token_id: 1,
-  collection_id: 0,
-  name: 'Wolfman',
-  image_url: '/images/monsters/1.png',
-  attributes: [
-    {
-      trait_type: 'background',
-      value: 'moonlit night',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'body',
-      value: 'werewolf',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'clothe',
-      value: 'gymnastics pants',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'head',
-      value: 'wolf head',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'leftarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'rightarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    }
-  ],
-  score: 50,
-  rank: 100,
-  stars: 1
-}
-
-const ghost = {
-  id: 2,
-  token_id: 2,
-  collection_id: 0,
-  name: 'Ghost',
-  image_url: '/images/monsters/2.png',
-  attributes: [
-    {
-      trait_type: 'background',
-      value: 'moonlit night',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'body',
-      value: 'undead',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'clothe',
-      value: 'curtain',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'head',
-      value: 'ghost head',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'leftarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'rightarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    }
-  ],
-  score: 100,
-  rank: 80,
-  stars: 2
-}
-
-const beans = {
-  id: 3,
-  token_id: 3,
-  collection_id: 0,
-  name: 'Beans',
-  image_url: '/images/monsters/3.png',
-  attributes: [
-    {
-      trait_type: 'background',
-      value: 'plain',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'body',
-      value: 'plant',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'clothe',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'head',
-      value: 'beans head',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'leftarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'rightarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    }
-  ],
-  score: 150,
-  rank: 60,
-  stars: 3
-}
-
-const snake = {
-  id: 4,
-  token_id: 4,
-  collection_id: 0,
-  name: 'Worm',
-  image_url: '/images/monsters/4.png',
-  attributes: [
-    {
-      trait_type: 'background',
-      value: 'plain',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'body',
-      value: 'insect',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'clothe',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'head',
-      value: 'snake head',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'leftarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'rightarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    }
-  ],
-  score: 200,
-  rank: 40,
-  stars: 4
-}
-
-const dragon = {
-  id: 5,
-  token_id: 5,
-  collection_id: 0,
-  name: 'Dragon',
-  image_url: '/images/monsters/5.png',
-  attributes: [
-    {
-      trait_type: 'background',
-      value: 'dark',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'body',
-      value: 'dragon',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'clothe',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'head',
-      value: 'dragon head',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'leftarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    },
-    {
-      trait_type: 'rightarm',
-      value: 'none',
-      quantity: 0,
-      rarity: 0,
-      score: 0
-    }
-  ],
-  score: 300,
-  rank: 20,
-  stars: 5
-}
-
-const monsters = [woldman, ghost, beans, snake, dragon]
+const monsters = [Wolfman, Ghost, Beans, Worm, Dragon]
 
 const getRandomValue = (min, max) =>
   Math.floor(Math.random() * (max - min) + min)
@@ -386,7 +119,7 @@ const createGame = battleId => {
 }
 
 export default {
-  name: 'BattlePractice',
+  name: 'BattleOffline',
 
   components: {
     Game,
@@ -619,6 +352,22 @@ export default {
       console.log('onGameFinished')
 
       this.gameFinished = true
+    },
+
+    onContinue() {
+      console.log('onContinue')
+
+      this.game = createGame(0)
+
+      this.gameAborting = false
+      this.gameAborted = false
+      this.gameFinished = false
+
+      if (this.game && this.game.current_player === 2) {
+        setTimeout(() => {
+          this.onAttack()
+        }, 1500)
+      }
     },
 
     onAttack() {

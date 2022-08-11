@@ -122,6 +122,8 @@
     <div class="battle-controls">
       <template v-if="playable">
         <template v-if="isGameFinished">
+          <button v-if="allowContinue" @click="onContinue">続けてバトル</button>
+
           <a
             class="twitter-share-button"
             :href="twitterLink"
@@ -168,6 +170,12 @@ export default {
       required: true
     },
 
+    allowContinue: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
     aborted: {
       type: Boolean,
       required: true
@@ -200,7 +208,7 @@ export default {
     }
   },
 
-  emits: ['attack', 'heal', 'abort', 'finish'],
+  emits: ['attack', 'heal', 'abort', 'finish', 'continue'],
 
   data() {
     return {
@@ -428,6 +436,12 @@ export default {
       console.log('onGameFinished')
 
       this.$emit('finish')
+    },
+
+    onContinue() {
+      console.log('onContinue')
+
+      this.$emit('continue')
     },
 
     toggleSound() {

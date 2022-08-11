@@ -1,0 +1,54 @@
+{
+  "id": 3,
+  "token_id": 3,
+  "collection_id": 0,
+  "name": "Beans",
+  "image_url": "/images/monsters/3.png",
+  "attributes": [
+    {
+      "trait_type": "background",
+      "value": "plain",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "body",
+      "value": "plant",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "clothe",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "head",
+      "value": "beans head",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "leftarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "rightarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    }
+  ],
+  "score": 150,
+  "rank": 60,
+  "stars": 3
+}

@@ -1,0 +1,54 @@
+{
+  "id": 1,
+  "token_id": 1,
+  "collection_id": 0,
+  "name": "Wolfman",
+  "image_url": "/images/monsters/1.png",
+  "attributes": [
+    {
+      "trait_type": "background",
+      "value": "moonlit night",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "body",
+      "value": "werewolf",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "clothe",
+      "value": "gymnastics pants",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "head",
+      "value": "wolf head",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "leftarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "rightarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    }
+  ],
+  "score": 50,
+  "rank": 100,
+  "stars": 1
+}

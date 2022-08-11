@@ -32,16 +32,16 @@
     font-size: 14px;
   }
   @include mediaQuery(sm) {
-    font-size: 15px;
-  }
-  @include mediaQuery(md) {
     font-size: 16px;
   }
-  @include mediaQuery(lg) {
+  @include mediaQuery(md) {
     font-size: 17px;
   }
+  @include mediaQuery(lg) {
+    font-size: 19px;
+  }
   @include mediaQuery(xl) {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   a {
@@ -108,6 +108,7 @@
         margin: 0 auto;
         white-space: nowrap;
         text-overflow: ellipsis;
+        font-size: 90%;
 
         &.is-online {
           color: palette(green, 500);
@@ -268,6 +269,8 @@
       }
 
       &-status {
+        font-size: 110%;
+
         &-list {
           display: flex;
           flex-wrap: wrap;
@@ -365,31 +368,28 @@
     justify-content: space-between;
     column-gap: 8px;
 
-    .twitter-share-button {
+    .twitter-share-button,
+    > button {
       width: 100%;
-      border: 1px solid #289aeb;
       border-radius: 3px;
-      background-color: #289aeb;
       padding: 16px 8px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       text-align: center;
-      color: palette(grey, 0);
       user-select: none;
     }
 
-    > button {
-      width: 100%;
-      border: 1px solid palette(blue, 900);
-      border-radius: 3px;
-      background-color: palette(blue, 800);
-      padding: 8px 12px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+    .twitter-share-button {
+      border: 1px solid #289aeb;
+      background-color: #289aeb;
       color: palette(grey, 0);
-      user-select: none;
+    }
+
+    > button {
+      border: 1px solid palette(blue, 900);
+      background-color: palette(blue, 800);
+      color: palette(grey, 0);
 
       &:disabled {
         border: 1px solid palette(grey, 800);

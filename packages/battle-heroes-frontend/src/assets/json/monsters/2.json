@@ -1,0 +1,54 @@
+{
+  "id": 2,
+  "token_id": 2,
+  "collection_id": 0,
+  "name": "Ghost",
+  "image_url": "/images/monsters/2.png",
+  "attributes": [
+    {
+      "trait_type": "background",
+      "value": "moonlit night",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "body",
+      "value": "undead",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "clothe",
+      "value": "curtain",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "head",
+      "value": "ghost head",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "leftarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    },
+    {
+      "trait_type": "rightarm",
+      "value": "none",
+      "quantity": 0,
+      "rarity": 0,
+      "score": 0
+    }
+  ],
+  "score": 100,
+  "rank": 80,
+  "stars": 2
+}

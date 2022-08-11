@@ -77,12 +77,13 @@ export default [
     component: view('Battle')
   },
   {
-    path: '/battles/practice/:monsterId',
-    name: 'battle-practice',
+    path: '/battles/offline',
+    name: 'battle-offline',
     meta: {
+      layout: 'game',
       middleware: ['auth', 'game']
     },
-    component: view('BattlePractice')
+    component: view('BattleOffline')
   },
   {
     path: '/settings',
