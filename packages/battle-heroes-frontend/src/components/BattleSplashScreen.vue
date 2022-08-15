@@ -2,7 +2,7 @@
   <div class="battle-splash-screen">
     <div class="battle-splash-screen-content">
       <transition name="battle-splash-screen-message">
-        <h1 v-if="showMessage" class="battle-splash-screen-message">
+        <h1 v-show="showMessage" class="battle-splash-screen-message">
           <BaseSpinner v-if="type === 'reload'" />
           {{ message }}
         </h1>
@@ -10,7 +10,7 @@
 
       <div v-if="type === 'challenger'" class="battle-splash-screen-challenger">
         <transition name="battle-splash-screen-nft">
-          <div v-if="showNFTs" class="battle-splash-screen-nft">
+          <div v-show="showNFTs" class="battle-splash-screen-nft">
             <div class="battle-splash-screen-nft-image">
               <img
                 src="@/assets/images/challenger.png"
@@ -26,7 +26,7 @@
       <div v-else class="battle-splash-screen-versus">
         <div class="battle-splash-screen-versus-primary">
           <transition name="battle-splash-screen-nft">
-            <div v-if="showNFTs" class="battle-splash-screen-nft">
+            <div v-show="showNFTs" class="battle-splash-screen-nft">
               <div class="battle-splash-screen-nft-image">
                 <img
                   :src="nft1.image_url"
@@ -39,13 +39,11 @@
           </transition>
         </div>
 
-        <div v-if="showMessage" class="battle-splash-screen-versus-symbol">
-          VS
-        </div>
+        <div class="battle-splash-screen-versus-symbol">VS</div>
 
         <div class="battle-splash-screen-versus-secondary">
           <transition name="battle-splash-screen-nft">
-            <div v-if="showNFTs" class="battle-splash-screen-nft">
+            <div v-show="showNFTs" class="battle-splash-screen-nft">
               <div class="battle-splash-screen-nft-image">
                 <img
                   :src="nft2.image_url"
