@@ -235,10 +235,10 @@ export default {
     onGameStart({ status, message, game }) {
       console.log('onGameStart', status, message, game)
 
-      const timeout = this.$splash === 'challenger' ? 3000 : 1000
+      if (status) {
+        const timeout = this.$splash === 'challenger' ? 4000 : 2000
 
-      setTimeout(() => {
-        if (status) {
+        setTimeout(() => {
           this.cachedBattle = this.battle
           this.playable = this.isPlayerBattle
 
@@ -250,14 +250,14 @@ export default {
             message,
             type: NOTIFICATION_TYPE.SUCCESS
           })
-        } else {
-          this.addNotification({
-            message,
-            type: NOTIFICATION_TYPE.ERROR,
-            timeout: 0
-          })
-        }
-      }, timeout)
+        }, timeout)
+      } else {
+        this.addNotification({
+          message,
+          type: NOTIFICATION_TYPE.ERROR,
+          timeout: 0
+        })
+      }
     },
 
     onGameUpdate(game) {

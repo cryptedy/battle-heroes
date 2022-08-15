@@ -49,49 +49,86 @@
   }
 
   &-splash-screen {
+    font-family: PixelMplus;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
+    font-size: 14px;
 
     &-content {
-      background-color: palette(grey, 800);
+      position: relative;
       width: 100%;
-      padding: 24px;
-      border-top: 5px solid palette(yellow, 500);
-      border-bottom: 5px solid palette(yellow, 500);
+      min-height: 250px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+      border-top: 12px solid palette(yellow, 500);
+      border-bottom: 12px solid palette(yellow, 500);
+      transition: height 230ms ease;
+
+      background: repeating-conic-gradient(
+          transparent,
+          transparent 12deg,
+          palette(grey, 800) 12deg 15deg
+        ),
+        repeating-conic-gradient(
+          transparent,
+          transparent 19deg,
+          palette(grey, 800) 19deg 22deg
+        ),
+        repeating-conic-gradient(
+          transparent,
+          transparent 6deg,
+          palette(grey, 800) 6deg 8deg
+        );
     }
 
     &-message {
+      position: absolute;
+      top: 16px;
+      width: 100%;
       text-align: center;
-      font-size: 160%;
-      @include mediaQuery(xxs) {
-        font-size: 200%;
-      }
-      @include mediaQuery(xs) {
-        font-size: 250%;
-      }
-      @include mediaQuery(sm) {
-        font-size: 280%;
-      }
-      @include mediaQuery(md) {
-        font-size: 300%;
-      }
-      color: palette(yellow, 500);
+      font-size: 230%;
+      color: palette(grey, 0);
+      text-shadow: 3px 3px 3px palette(grey, 1000);
+      z-index: 2;
 
-      .spinner {
-        &-circle {
-          stroke: palette(yellow, 500);
+      &-enter-active,
+      &-leave-active {
+        transition: all 230ms ease;
+      }
+      &-enter-from,
+      &-leave-to {
+        opacity: 0;
+        transform: translateY(-24px);
+      }
+    }
+
+    &-nft {
+      &-image {
+        margin: 0 auto;
+        padding: 16px;
+        max-width: 250px;
+        > img {
+          width: 100%;
+          height: auto;
         }
       }
     }
 
     &-challenger {
-      .nft {
-        &-image {
-          margin: 0 auto;
-          max-width: 300px;
+      .battle-splash-screen-nft {
+        padding-top: 32px;
+
+        &-enter-active,
+        &-leave-active {
+          transition: all 230ms ease;
+        }
+        &-enter-from,
+        &-leave-to {
+          opacity: 0;
+          transform: translateY(24px);
         }
       }
     }
@@ -102,23 +139,46 @@
       gap: 12px;
       max-width: 1024px;
       margin: 0 auto;
-      margin-top: 28px;
-      margin-bottom: 8px;
 
-      .nft {
-        &-image {
-          max-width: 300px;
+      &-primary {
+        .battle-splash-screen-nft {
+          &-enter-active,
+          &-leave-active {
+            transition: all 500ms ease;
+          }
+          &-enter-from,
+          &-leave-to {
+            opacity: 0;
+            transform: translateX(-32px);
+          }
         }
       }
 
-      &-primary,
       &-secondary {
-        //
+        .battle-splash-screen-nft {
+          &-enter-active,
+          &-leave-active {
+            transition: all 500ms ease;
+          }
+          &-enter-from,
+          &-leave-to {
+            opacity: 0;
+            transform: translateX(32px);
+          }
+        }
+      }
+
+      .battle-splash-screen-nft-image {
+        > img {
+          border: 6px solid palette(grey, 900);
+        }
       }
 
       &-symbol {
         align-self: center;
         font-size: 160%;
+        color: palette(grey, 0);
+        text-shadow: 3px 3px 3px palette(grey, 1000);
         @include mediaQuery(xxs) {
           font-size: 200%;
         }
