@@ -320,19 +320,13 @@ export default {
     onAttack() {
       console.log('attack')
 
-      this.playAudio(SOUND_EFFECT.ATTACK)
-
       this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
-
-      this.playAudio(SOUND_EFFECT.DAMAGE)
     },
 
     onHeal() {
       console.log('heal')
 
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
-
-      this.playAudio(SOUND_EFFECT.HEAL)
     }
   }
 }
