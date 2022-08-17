@@ -88,7 +88,7 @@ export const mutations = {
     const audioContext = new AudioContext()
 
     const track = audioContext.createMediaElementSource(
-      new Audio(state.sounds[sound].source)
+      state.sounds[sound].audioElement
     )
     const osc = audioContext.createOscillator()
 
@@ -158,11 +158,11 @@ export const mutations = {
 }
 
 export const actions = {
-  reset({ commit }) {
-    console.log('audio/reset')
+  init({ commit }) {
+    console.log('audio/init')
 
     Object.keys(state.sounds).forEach(sound => {
-      if (!state.sounds[sound].state.CREATED) {
+      if (state.sounds[sound].state.CREATED) {
         commit(INIT_AUDIO, { sound })
 
         // stop when sound has ended

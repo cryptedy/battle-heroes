@@ -425,6 +425,12 @@ export default {
           this.playAudio(SOUND_EFFECT.ATTACK)
         }
 
+        if (damage > 0) {
+          setTimeout(() => {
+            this.playAudio(SOUND_EFFECT.DAMAGE)
+          }, 100)
+        }
+
         const oldOpponentHp = this.currentOpponentStatus.hp
         const oldOpponentHpRate =
           oldOpponentHp / this.currentOpponentStatus.max_hp
@@ -481,10 +487,6 @@ export default {
       }
 
       this.nextTurn()
-
-      if (damage > 0) {
-        this.playAudio(SOUND_EFFECT.DAMAGE)
-      }
     },
 
     onHeal() {

@@ -83,7 +83,7 @@ export default {
   },
 
   created() {
-    this.resetAudio()
+    this.initAudio()
 
     window.addEventListener('load', this.onWindowLoad)
     window.addEventListener('resize', this.onWindowResize)
@@ -121,7 +121,7 @@ export default {
 
   methods: {
     ...mapActions({
-      resetAudio: 'audio/reset',
+      initAudio: 'audio/init',
       setScrollbar: 'scrollbar/set',
       setWindowSize: 'window/setSize',
       addNotification: 'notification/add',
