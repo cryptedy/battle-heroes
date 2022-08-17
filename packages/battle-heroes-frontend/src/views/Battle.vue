@@ -243,7 +243,7 @@ export default {
       if (status) {
         this.playAudio(SOUND_EFFECT.ENCOUNTER)
 
-        const timeout = this.$splash === 'challenger' ? 4000 : 2000
+        const timeout = this.$splash === 'challenger' ? 4500 : 3000
 
         setTimeout(() => {
           this.cachedBattle = this.battle
@@ -258,7 +258,6 @@ export default {
             type: NOTIFICATION_TYPE.SUCCESS
           })
 
-          // this.stopAudio(SOUND_EFFECT.ENCOUNTER)
           this.playAudio(MUSIC.BATTLE)
         }, timeout)
       } else {
@@ -319,6 +318,8 @@ export default {
 
     onAttack() {
       console.log('attack')
+      this.stopAudio(SOUND_EFFECT.ATTACK)
+      this.stopAudio(SOUND_EFFECT.DAMAGE)
 
       this.playAudio(SOUND_EFFECT.ATTACK)
 
@@ -329,6 +330,8 @@ export default {
 
     onHeal() {
       console.log('heal')
+
+      this.stopAudio(SOUND_EFFECT.HEAL)
 
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
 

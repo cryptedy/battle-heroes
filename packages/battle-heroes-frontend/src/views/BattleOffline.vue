@@ -389,6 +389,10 @@ export default {
 
       if (this.gameAborting || this.gameAborted || this.gameFinished) return
 
+      this.stopAudio(SOUND_EFFECT.ATTACK)
+      this.stopAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+      this.stopAudio(SOUND_EFFECT.DAMAGE)
+
       const nextOpponentStatus = {}
       let damage = 0
 
@@ -491,6 +495,8 @@ export default {
       if (this.currentPlayerStatus.heal <= 0) {
         throw new Error('Failed to move: Can not use heal')
       }
+
+      this.stopAudio(SOUND_EFFECT.HEAL)
 
       const nextPlayerStatus = {}
 
