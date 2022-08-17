@@ -9,6 +9,15 @@
     </p>
   </ErrorScreen>
 
+  <BattleSplashScreen
+    v-else-if="!game"
+    type="start"
+    :player1="player1"
+    :player2="player2"
+    :nft1="NFT1"
+    :nft2="NFT2"
+  />
+
   <Game
     v-else
     :game="game"
@@ -33,6 +42,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { BATTLE_STATE } from '@/utils/constants'
 import ErrorScreen from '@/components/ErrorScreen'
 import { MUSIC, SOUND_EFFECT } from '@/utils/constants'
+import BattleSplashScreen from '@/components/BattleSplashScreen'
 
 import Wolfman from '@/assets/json/monsters/1.json'
 import Ghost from '@/assets/json/monsters/2.json'
@@ -97,7 +107,7 @@ const createGame = battleId => {
   const secondPlayer = fisrtPlayer === 1 ? 2 : 1
 
   const secondPlayerMaxHp = Math.floor(status[secondPlayer].hp * 1.05)
-  const secondPlayerAttack = Math.floor(status[secondPlayer].attack * 1.05)
+  const secondPlayerAttack = Math.floor(status[secondPlayer].attack * 100.05)
   const secondPlayerDefence = Math.floor(status[secondPlayer].defense * 1.05)
 
   status[secondPlayer].max_hp = secondPlayerMaxHp
@@ -122,7 +132,8 @@ export default {
 
   components: {
     Game,
-    ErrorScreen
+    ErrorScreen,
+    BattleSplashScreen
   },
 
   data() {
@@ -300,20 +311,24 @@ export default {
 
       this.shuffleMonsters()
 
-      this.game = createGame(0)
+      this.playAudio(SOUND_EFFECT.ENCOUNTER)
 
-      this.playAudio(MUSIC.BATTLE)
+      setTimeout(() => {
+        this.game = createGame(0)
+
+        this.playAudio(MUSIC.BATTLE)
+
+        if (this.game && this.game.current_player === 2) {
+          setTimeout(() => {
+            this.onAttack()
+          }, 1500)
+        }
+      }, 3000)
     }
   },
 
   mounted() {
     console.log('Battle:mounted')
-
-    if (this.game && this.game.current_player === 2) {
-      setTimeout(() => {
-        this.onAttack()
-      }, 1500)
-    }
   },
 
   beforeUnmount() {
@@ -369,19 +384,28 @@ export default {
     onContinue() {
       console.log('onContinue')
 
+      this.stopAudio(MUSIC.BATTLE)
+
       this.shuffleMonsters()
 
-      this.game = createGame(0)
+      this.playAudio(SOUND_EFFECT.ENCOUNTER)
 
+      this.game = null
       this.gameAborting = false
       this.gameAborted = false
       this.gameFinished = false
 
-      if (this.game && this.game.current_player === 2) {
-        setTimeout(() => {
-          this.onAttack()
-        }, 1500)
-      }
+      setTimeout(() => {
+        this.game = createGame(0)
+
+        this.playAudio(MUSIC.BATTLE)
+
+        if (this.game && this.game.current_player === 2) {
+          setTimeout(() => {
+            this.onAttack()
+          }, 1500)
+        }
+      }, 3000)
     },
 
     onAttack() {
