@@ -74,6 +74,7 @@
 
 <script>
 import Game from '@/components/Game'
+import { MUSIC, SOUND_EFFECT } from '@/utils/constants'
 import { mapGetters, mapActions } from 'vuex'
 import ErrorScreen from '@/components/ErrorScreen'
 import BattleJoinButton from '@/components/BattleJoinButton'
@@ -213,10 +214,14 @@ export default {
 
     this.$socket.off('game:update')
     this.$socket.off('game:aborted')
+
+    this.stopAudio(MUSIC.BATTLE)
   },
 
   methods: {
     ...mapActions({
+      playAudio: 'audio/play',
+      stopAudio: 'audio/stop',
       addNotification: 'notification/add'
     }),
 
@@ -236,6 +241,8 @@ export default {
       console.log('onGameStart', status, message, game)
 
       if (status) {
+        this.playAudio(SOUND_EFFECT.ENCOUNTER)
+
         const timeout = this.$splash === 'challenger' ? 4000 : 2000
 
         setTimeout(() => {
@@ -250,6 +257,9 @@ export default {
             message,
             type: NOTIFICATION_TYPE.SUCCESS
           })
+
+          this.stopAudio(SOUND_EFFECT.ENCOUNTER)
+          this.playAudio(MUSIC.BATTLE)
         }, timeout)
       } else {
         this.addNotification({
@@ -310,13 +320,19 @@ export default {
     onAttack() {
       console.log('attack')
 
+      this.playAudio(SOUND_EFFECT.ATTACK)
+
       this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
+
+      this.playAudio(SOUND_EFFECT.DAMAGE)
     },
 
     onHeal() {
       console.log('heal')
 
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
+
+      this.playAudio(SOUND_EFFECT.HEAL)
     }
   }
 }

@@ -77,13 +77,7 @@
       </div>
 
       <div class="battle-status-actions">
-        <BaseButton
-          :type="soundPaused ? 'default' : 'primary'"
-          @click="toggleSound"
-        >
-          <FontAwesomeIcon v-if="soundPaused" icon="volume-xmark" />
-          <FontAwesomeIcon v-else icon="volume-high" />
-        </BaseButton>
+        <ToggleAudio />
       </div>
     </div>
 
@@ -152,16 +146,17 @@
 </template>
 
 <script>
-import BGM from '@/assets/audio/battle.mp3'
 import { mapGetters, mapActions } from 'vuex'
 import GamePlayer from '@/components/GamePlayer'
 import { scrollToBottom } from '@/utils/helpers'
+import ToggleAudio from '@/components/ToggleAudio'
 
 export default {
   name: 'Game',
 
   components: {
-    GamePlayer
+    GamePlayer,
+    ToggleAudio
   },
 
   props: {
@@ -212,9 +207,7 @@ export default {
 
   data() {
     return {
-      moving: false,
-      audio: new Audio(BGM),
-      soundPaused: true
+      moving: false
     }
   },
 
@@ -368,14 +361,10 @@ export default {
 
   created() {
     console.log('Game:created')
-
-    this.audio.currentTime = 0
   },
 
   beforeUnmount() {
     console.log('Game:beforeUnmount')
-
-    this.audio.pause()
   },
 
   methods: {
@@ -442,16 +431,6 @@ export default {
       console.log('onContinue')
 
       this.$emit('continue')
-    },
-
-    toggleSound() {
-      if (this.soundPaused) {
-        this.audio.play()
-        this.soundPaused = false
-      } else {
-        this.audio.pause()
-        this.soundPaused = true
-      }
     }
   }
 }

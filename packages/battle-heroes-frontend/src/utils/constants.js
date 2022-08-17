@@ -20,6 +20,19 @@ export const NOTIFICATION_TYPE = Object.freeze({
 })
 export const DATETIME_FORMAT = 'MM-DD HH:mm:ss'
 
+export const MUSIC = Object.freeze({
+  STANDBY: 'STANDBY',
+  BATTLE: 'BATTLE'
+})
+
+export const SOUND_EFFECT = Object.freeze({
+  ATTACK: 'ATTACK',
+  ATTACK_CRITICAL: 'ATTACK_CRITICAL',
+  HEAL: 'HEAL',
+  DAMAGE: 'DAMAGE',
+  ENCOUNTER: 'ENCOUNTER'
+})
+
 export default Object.freeze({
   ...constants,
   BACKEND_URL,

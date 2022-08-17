@@ -32,6 +32,7 @@ import Game from '@/components/Game'
 import { mapGetters, mapActions } from 'vuex'
 import { BATTLE_STATE } from '@/utils/constants'
 import ErrorScreen from '@/components/ErrorScreen'
+import { MUSIC, SOUND_EFFECT } from '@/utils/constants'
 
 import Wolfman from '@/assets/json/monsters/1.json'
 import Ghost from '@/assets/json/monsters/2.json'
@@ -300,6 +301,8 @@ export default {
       this.shuffleMonsters()
 
       this.game = createGame(0)
+
+      this.playAudio(MUSIC.BATTLE)
     }
   },
 
@@ -315,10 +318,14 @@ export default {
 
   beforeUnmount() {
     console.log('Battle:beforeUnmount')
+
+    this.stopAudio(MUSIC.BATTLE)
   },
 
   methods: {
     ...mapActions({
+      playAudio: 'audio/play',
+      stopAudio: 'audio/stop',
       addNotification: 'notification/add'
     }),
 
@@ -383,6 +390,7 @@ export default {
       if (this.gameAborting || this.gameAborted || this.gameFinished) return
 
       const nextOpponentStatus = {}
+      let damage = 0
 
       this.game.messages.push(`${this.currentPlayer.name} の攻撃！`)
 
@@ -395,7 +403,7 @@ export default {
           `${this.currentOpponentPlayer.name} にダメージを与えられない`
         )
       } else {
-        let damage = Math.floor(
+        damage = Math.floor(
           (this.currentPlayerStatus.attack * 100) /
             (100 + this.currentOpponentStatus.defense)
         )
@@ -404,9 +412,13 @@ export default {
           this.game.messages.push('クリティカルヒット！')
 
           damage = Math.floor(damage * 1.5)
+
+          this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
         } else {
           const adjustDamage = getRandomValue(-2, 2)
           damage = damage + adjustDamage
+
+          this.playAudio(SOUND_EFFECT.ATTACK)
         }
 
         const oldOpponentHp = this.currentOpponentStatus.hp
@@ -465,6 +477,10 @@ export default {
       }
 
       this.nextTurn()
+
+      if (damage > 0) {
+        this.playAudio(SOUND_EFFECT.DAMAGE)
+      }
     },
 
     onHeal() {
@@ -529,6 +545,10 @@ export default {
       }
 
       this.nextTurn()
+
+      if (recoveryAmount > 0) {
+        this.playAudio(SOUND_EFFECT.HEAL)
+      }
     },
 
     nextTurn() {

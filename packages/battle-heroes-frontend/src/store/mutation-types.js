@@ -50,3 +50,12 @@ export const SET_SCROLLBAR_WIDTH = 'SET_SCROLLBAR_WIDTH'
 
 // network
 export const SET_NETWORK_CONNECTED = 'SET_NETWORK_CONNECTED'
+
+// audio
+export const INIT_AUDIO = 'INIT_AUDIO'
+export const SET_AUDIO = 'SET_AUDIO'
+export const PLAY_AUDIO = 'PLAY_AUDIO'
+export const PAUSE_AUDIO = 'PAUSE_AUDIO'
+export const RESUME_AUDIO = 'RESUME_AUDIO'
+export const STOP_AUDIO = 'STOP_AUDIO'
+export const STOP_AUDIO_ALL = 'STOP_AUDIO_ALL'
