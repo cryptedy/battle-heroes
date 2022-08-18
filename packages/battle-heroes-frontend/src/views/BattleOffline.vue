@@ -333,7 +333,9 @@ export default {
 
         this.messages.push('バトルスタート！')
 
-        this.playAudio(MUSIC.BATTLE)
+        setTimeout(() => {
+          this.playAudio(MUSIC.BATTLE)
+        }, 500)
 
         if (this.game && this.game.current_player === 2) {
           setTimeout(() => {
@@ -396,6 +398,8 @@ export default {
       console.log('onGameFinished')
 
       this.gameFinished = true
+
+      this.playAudio(MUSIC.BATTLE)
     },
 
     onContinue() {
@@ -416,7 +420,9 @@ export default {
       setTimeout(() => {
         this.game = createGame(this.battle)
 
-        this.playAudio(MUSIC.BATTLE)
+        setTimeout(() => {
+          this.playAudio(MUSIC.BATTLE)
+        }, 500)
 
         if (this.game && this.game.current_player === 2) {
           setTimeout(() => {

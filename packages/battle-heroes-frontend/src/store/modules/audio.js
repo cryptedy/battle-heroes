@@ -254,6 +254,12 @@ export const actions = {
     }
 
     if (state.audio) {
+      if (state.sounds[sound].state === STATE.PLAYING) {
+        console.log(`audio ${sound} already playing...`)
+        state.sounds[sound].audioElement.pause()
+        commit(STOP_AUDIO, { sound })
+      }
+
       return state.sounds[sound].audioElement.play().then(() => {
         commit(PLAY_AUDIO, { sound })
       })
