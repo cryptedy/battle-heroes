@@ -351,7 +351,9 @@ export default {
         }
       }
 
-      this.game = game
+      setTimeout(() => {
+        this.game = game
+      }, 200)
     },
 
     onGameAbort() {
