@@ -411,6 +411,7 @@ export default {
       this.gameAborting = false
       this.gameAborted = false
       this.gameFinished = false
+      this.messages = []
 
       setTimeout(() => {
         this.game = createGame(this.battle)
@@ -479,22 +480,6 @@ export default {
 
         if (newOpponentHp === 0) {
           move.payload.isFinish = true
-
-          if (this.currentPlayer.id === this.player.id) {
-            // player wins
-            this.$socket.emit('player:updateStats', {
-              exp: 3,
-              win: 1,
-              lose: 0
-            })
-          } else {
-            // playe lose
-            this.$socket.emit('player:updateStats', {
-              exp: 1,
-              win: 0,
-              lose: 1
-            })
-          }
         } else {
           if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
             nextOpponentStatus.criticalRate = 0.15
@@ -577,7 +562,7 @@ export default {
       this.nextTurn()
     },
 
-    nextTurn() {
+    async nextTurn() {
       const nextPlayer = this.game.current_player === 1 ? 2 : 1
 
       if (this.game.moves.length > 0) {
@@ -609,16 +594,15 @@ export default {
             )
           } else {
             if (isCritical) {
-              this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+              await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
               this.messages.push('クリティカルヒット！')
             } else {
               this.playAudio(SOUND_EFFECT.ATTACK)
             }
 
             if (damage > 0) {
-              setTimeout(() => {
-                this.playAudio(SOUND_EFFECT.DAMAGE)
-              }, 100)
+              await new Promise(resolve => setTimeout(resolve, 100))
+              await this.playAudio(SOUND_EFFECT.DAMAGE)
             }
 
             this.messages.push(
@@ -630,9 +614,31 @@ export default {
               this.messages.push(`${player.name} の勝利！`)
 
               if (player.id === this.player.id) {
-                this.playAudio(SOUND_EFFECT.WIN)
+                // player wins
+                await this.playAudio(SOUND_EFFECT.WIN)
+
+                this.messages.push('3 ポイントの経験値を得た！')
+
+                this.$nextTick(() => {
+                  this.$socket.emit('player:updateStats', {
+                    exp: 3,
+                    win: 1,
+                    lose: 0
+                  })
+                })
               } else {
-                this.playAudio(SOUND_EFFECT.LOSE)
+                // playe lose
+                await this.playAudio(SOUND_EFFECT.LOSE)
+
+                this.messages.push('1 ポイントの経験値を得た！')
+
+                this.$nextTick(() => {
+                  this.$socket.emit('player:updateStats', {
+                    exp: 1,
+                    win: 0,
+                    lose: 1
+                  })
+                })
               }
             }
           }
@@ -649,7 +655,7 @@ export default {
             this.messages.push('ミス')
             this.messages.push(`${player.name} は HP を回復できなかった！`)
           } else {
-            this.playAudio(SOUND_EFFECT.HEAL)
+            await this.playAudio(SOUND_EFFECT.HEAL)
 
             this.messages.push(
               `${player.name} の HP が ${recoveryAmount} 回復した！`

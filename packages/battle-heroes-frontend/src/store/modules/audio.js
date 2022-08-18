@@ -180,52 +180,24 @@ export const mutations = {
   },
 
   [PLAY_AUDIO](state, { sound }) {
-    if (state.sounds[sound].state === 'suspended') {
-      state.sounds[sound].audioContext.resume()
-    }
-
-    if (state.audio) {
-      state.sounds[sound].audioElement
-        .play()
-        .then(() => {
-          state.sounds[sound].state = STATE.PLAYING
-          console.log('audio:play success')
-        })
-        .catch(error => {
-          // retry once
-          state.sounds[sound].audioElement.play()
-          console.log('audio:play error', error)
-        })
-    } else {
-      if (state.sounds[sound].type === TYPE.SOUND_EFFECT) {
-        state.sounds[sound].state = STATE.STOPPED
-      } else {
-        state.sounds[sound].state = STATE.PAUSED
-      }
-    }
+    state.sounds[sound].state = STATE.PLAYING
   },
 
   [PAUSE_AUDIO](state, { sound }) {
-    state.sounds[sound].audioElement.pause()
     state.sounds[sound].state = STATE.PAUSED
   },
 
   [RESUME_AUDIO](state, { sound }) {
-    if (state.sounds[sound].state === STATE.PAUSED) {
-      state.sounds[sound].audioElement.play()
-      state.sounds[sound].state = STATE.PLAYING
-    }
+    state.sounds[sound].state = STATE.PLAYING
   },
 
   [STOP_AUDIO](state, { sound }) {
-    state.sounds[sound].audioElement.pause()
     state.sounds[sound].audioElement.currentTime = 0
     state.sounds[sound].state = STATE.STOPPED
   },
 
   [STOP_AUDIO_ALL](state) {
     Object.keys(state.sounds).forEach(sound => {
-      state.sounds[sound].audioElement.pause()
       state.sounds[sound].audioElement.currentTime = 0
       state.sounds[sound].state = STATE.STOPPED
     })
@@ -233,16 +205,16 @@ export const mutations = {
 }
 
 export const actions = {
-  setAudio({ commit, state }, audio) {
+  setAudio({ commit, dispatch, state }, audio) {
     console.log('app/setAudio', audio)
 
     commit(SET_AUDIO, { audio })
 
-    if (state.audio) {
+    if (audio) {
       // resume all paused sounds
       Object.keys(state.sounds).forEach(sound => {
         if (state.sounds[sound].state === STATE.PAUSED) {
-          commit(PLAY_AUDIO, { sound })
+          dispatch('play', sound)
         }
       })
     } else {
@@ -262,7 +234,7 @@ export const actions = {
     }
   },
 
-  play({ commit }, sound) {
+  async play({ commit }, sound) {
     console.log('audio/play', sound)
 
     if (state.sounds[sound].state === STATE.CREATED) {
@@ -281,23 +253,54 @@ export const actions = {
       )
     }
 
-    commit(PLAY_AUDIO, { sound })
+    if (state.sounds[sound].audioContext.state === 'suspended') {
+      state.sounds[sound].audioContext.resume()
+    }
+
+    if (state.audio) {
+      return state.sounds[sound].audioElement.play().then(() => {
+        commit(PLAY_AUDIO, { sound })
+      })
+    } else {
+      if (state.sounds[sound].type === TYPE.SOUND_EFFECT) {
+        commit(STOP_AUDIO, { sound })
+      } else {
+        commit(PAUSE_AUDIO, { sound })
+      }
+    }
   },
 
   pause({ commit }, sound) {
     console.log('audio/pause', sound)
 
+    state.sounds[sound].audioElement.pause()
+
     commit(PAUSE_AUDIO, { sound })
+  },
+
+  resume({ commit }, sound) {
+    console.log('audio/stop', sound)
+
+    if (state.sounds[sound].state === STATE.PAUSED) {
+      state.sounds[sound].audioElement.play()
+      commit(RESUME_AUDIO, { sound })
+    }
   },
 
   stop({ commit }, sound) {
     console.log('audio/stop', sound)
+
+    state.sounds[sound].audioElement.pause()
 
     commit(STOP_AUDIO, { sound })
   },
 
   stopAll({ commit }) {
     console.log('audio/stopAll')
+
+    Object.keys(state.sounds).forEach(sound => {
+      state.sounds[sound].audioElement.pause()
+    })
 
     commit(STOP_AUDIO_ALL)
   }

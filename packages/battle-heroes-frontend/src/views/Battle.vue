@@ -277,7 +277,7 @@ export default {
       }
     },
 
-    onGameUpdate(game) {
+    async onGameUpdate(game) {
       console.log('onGameUpdate', game)
 
       if (game.id !== this.game.id) {
@@ -310,16 +310,15 @@ export default {
             )
           } else {
             if (isCritical) {
-              this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+              await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
               this.messages.push('クリティカルヒット！')
             } else {
-              this.playAudio(SOUND_EFFECT.ATTACK)
+              await this.playAudio(SOUND_EFFECT.ATTACK)
             }
 
             if (damage > 0) {
-              setTimeout(() => {
-                this.playAudio(SOUND_EFFECT.DAMAGE)
-              }, 100)
+              await new Promise(resolve => setTimeout(resolve, 100))
+              await this.playAudio(SOUND_EFFECT.DAMAGE)
             }
 
             this.messages.push(
@@ -331,9 +330,13 @@ export default {
               this.messages.push(`${player.name} の勝利！`)
 
               if (player.id === this.player.id) {
-                this.playAudio(SOUND_EFFECT.WIN)
+                await this.playAudio(SOUND_EFFECT.WIN)
+
+                this.messages.push('3 ポイントの経験値を得た！')
               } else {
-                this.playAudio(SOUND_EFFECT.LOSE)
+                await this.playAudio(SOUND_EFFECT.LOSE)
+
+                this.messages.push('1 ポイントの経験値を得た！')
               }
             }
           }
@@ -350,7 +353,7 @@ export default {
             this.messages.push('ミス')
             this.messages.push(`${player.name} は HP を回復できなかった！`)
           } else {
-            this.playAudio(SOUND_EFFECT.HEAL)
+            await this.playAudio(SOUND_EFFECT.HEAL)
 
             this.messages.push(
               `${player.name} の HP が ${recoveryAmount} 回復した！`
