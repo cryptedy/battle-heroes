@@ -76,9 +76,7 @@ const createStatus = () => {
   }
 }
 
-const createGame = battleId => {
-  const message = 'バトルスタート！'
-
+const createGame = battle => {
   const status = {
     1: createStatus(),
     2: createStatus()
@@ -108,14 +106,14 @@ const createGame = battleId => {
 
   return {
     id: uuidv4(),
-    battle_id: battleId,
+    battle_id: battle.id,
     turn: 1,
     current_player: currentPlayer,
     players: {
-      1: { ...status[1] },
-      2: { ...status[2] }
+      1: { ...battle.players[1], ...status[1] },
+      2: { ...battle.players[2], ...status[2] }
     },
-    messages: [message]
+    moves: []
   }
 }
 
@@ -236,7 +234,7 @@ class GameManager {
         game
       })
     } else {
-      const newGame = createGame(battle.id)
+      const newGame = createGame(battle)
 
       addGame(newGame)
 
@@ -373,8 +371,6 @@ class GameManager {
   async moveGame(move) {
     console.log('moveGame', this.socket.id, move)
 
-    const localMessages = []
-
     const player = this.findSocketPlayer(this.socket.id)
 
     if (!player) {
@@ -414,7 +410,20 @@ class GameManager {
     const opponentNFT = selectNFT(battle.players[opponentPlayerKey].NFT_id)
     const opponentStatus = game.players[opponentPlayerKey]
 
+    const localMove = {
+      playerKey: playerKey,
+      move: move,
+      payload: {}
+    }
+
     if (move === PLAYER_MOVE.ATTACK) {
+      localMove.payload = {
+        isMiss: false,
+        isCritical: false,
+        isFinish: false,
+        damage: 0
+      }
+
       this.attack({
         battle,
         game,
@@ -426,9 +435,13 @@ class GameManager {
         opponentPlayerKey,
         opponentNFT,
         opponentStatus,
-        localMessages
+        localMove
       })
     } else if (move === PLAYER_MOVE.HEAL) {
+      localMove.payload = {
+        recoveryAmount: 0
+      }
+
       this.heal({
         battle,
         game,
@@ -440,7 +453,7 @@ class GameManager {
         opponentPlayerKey,
         opponentNFT,
         opponentStatus,
-        localMessages
+        localMove
       })
     } else {
       throw new Error('Failed to move: Invalid move type')
@@ -448,14 +461,14 @@ class GameManager {
 
     const currentPlayer = game.current_player === 1 ? 2 : 1
     const turn = game.turn + 1
-    const messages = game.messages.concat(localMessages)
+    const moves = game.moves.concat(localMove)
 
     updateGame({
       gameId: game.id,
       payload: {
         current_player: currentPlayer,
         turn,
-        messages
+        moves
       }
     })
 
@@ -473,24 +486,22 @@ class GameManager {
       opponentPlayer,
       opponentPlayerKey,
       opponentStatus,
-      localMessages
+      localMove
     } = payload
 
+    let damage = 0
     // const nextPlayerStatus = {}
     const nextOpponentStatus = {}
 
-    localMessages.push(`${player.name} の攻撃！`)
-
     if (Math.random() < playerStatus.missRate) {
-      localMessages.push('ミス！')
-      localMessages.push(`${opponentPlayer.name} にダメージを与えられない`)
+      localMove.payload.isMiss = true
     } else {
-      let damage = Math.floor(
+      damage = Math.floor(
         (playerStatus.attack * 100) / (100 + opponentStatus.defense)
       )
 
       if (Math.random() < playerStatus.criticalRate) {
-        localMessages.push('クリティカルヒット！')
+        localMove.payload.isCritical = true
 
         damage = Math.floor(damage * 1.5)
       } else {
@@ -504,7 +515,7 @@ class GameManager {
       let newOpponentHp = oldOpponentHp - damage
       const newOpponentHpRate = newOpponentHp / opponentStatus.max_hp
 
-      localMessages.push(`${opponentPlayer.name} に ${damage} のダメージ！`)
+      localMove.payload.damage = damage
 
       if (newOpponentHp < 0) {
         newOpponentHp = 0
@@ -513,8 +524,7 @@ class GameManager {
       nextOpponentStatus.hp = newOpponentHp
 
       if (newOpponentHp === 0) {
-        localMessages.push(`${opponentPlayer.name} は気絶してしまった！`)
-        localMessages.push(`${player.name} の勝利！`)
+        localMove.payload.isFinish = true
 
         updatePlayer({
           playerId: player.id,
@@ -592,15 +602,13 @@ class GameManager {
   heal(payload) {
     console.log('heal')
 
-    const { game, player, playerKey, playerStatus, localMessages } = payload
+    const { game, playerKey, playerStatus, localMove } = payload
 
     if (playerStatus.heal <= 0) {
       throw new Error('Failed to move: Can not use heal')
     }
 
     const nextPlayerStatus = {}
-
-    localMessages.push(`${player.name} の回復！`)
 
     let recoveryAmount = 0
 
@@ -634,12 +642,7 @@ class GameManager {
     nextPlayerStatus.hp = newPlayerHp
     nextPlayerStatus.heal = playerStatus.heal - 1
 
-    if (recoveryAmount === 0) {
-      localMessages.push('ミス！')
-      localMessages.push(`${player.name} は HP を回復できなかった！`)
-    } else {
-      localMessages.push(`${player.name} の HP が ${recoveryAmount} 回復した！`)
-    }
+    localMove.payload.recoveryAmount = recoveryAmount
 
     updateGamePlayer({
       gameId: game.id,

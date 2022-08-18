@@ -55,6 +55,7 @@
       <Game
         v-else
         :game="game"
+        :messages="messages"
         :allow-continue="false"
         :aborted="gameAborted"
         :playable="playable"
@@ -107,7 +108,8 @@ export default {
       game: null,
       gameAborting: false,
       gameAborted: false,
-      gameFinished: false
+      gameFinished: false,
+      messages: []
     }
   },
 
@@ -249,6 +251,12 @@ export default {
           this.cachedBattle = this.battle
           this.playable = this.isPlayerBattle
 
+          if (game.moves.length > 0) {
+            this.messages.push('バトル再開！')
+          } else {
+            this.messages.push('バトルスタート！')
+          }
+
           this.game = game
 
           this.$socket.on('game:update', this.onGameUpdate)
@@ -272,8 +280,81 @@ export default {
     onGameUpdate(game) {
       console.log('onGameUpdate', game)
 
-      if (game.id === this.game.id) {
-        this.game = game
+      if (game.id !== this.game.id) {
+        this.messages.push('ゲームエラーが発生しました')
+
+        return
+      }
+
+      this.game = game
+
+      if (game.moves.length > 0) {
+        const lastMove = game.moves[game.moves.length - 1]
+
+        console.log(lastMove)
+
+        const playerId = game.players[lastMove.playerKey].id
+        const opponentPlayerId =
+          game.players[lastMove.playerKey === 1 ? 2 : 1].id
+
+        const player = this.findPlayer(playerId)
+        const opponentPlayer = this.findPlayer(opponentPlayerId)
+
+        if (lastMove.move === PLAYER_MOVE.ATTACK) {
+          this.messages.push(`${player.name} の攻撃！`)
+
+          const { isMiss, isCritical, isFinish, damage } = {
+            ...lastMove.payload
+          }
+
+          if (isMiss) {
+            this.messages.push('ミス！')
+            this.messages.push(
+              `${opponentPlayer.name} にダメージを与えられない`
+            )
+          } else {
+            if (isCritical) {
+              this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+              this.messages.push('クリティカルヒット！')
+            } else {
+              this.playAudio(SOUND_EFFECT.ATTACK)
+            }
+
+            if (damage > 0) {
+              setTimeout(() => {
+                this.playAudio(SOUND_EFFECT.DAMAGE)
+              }, 100)
+            }
+
+            this.messages.push(
+              `${opponentPlayer.name} に ${damage} のダメージを与えた！`
+            )
+
+            if (isFinish) {
+              this.messages.push(`${opponentPlayer.name} は気絶してしまった！`)
+              this.messages.push(`${player.name} の勝利！`)
+            }
+          }
+        }
+
+        if (lastMove.move === PLAYER_MOVE.HEAL) {
+          this.messages.push(`${player.name} の回復！`)
+
+          const { recoveryAmount } = {
+            ...lastMove.payload
+          }
+
+          if (recoveryAmount === 0) {
+            this.messages.push('ミス')
+            this.messages.push(`${player.name} は HP を回復できなかった！`)
+          } else {
+            this.playAudio(SOUND_EFFECT.HEAL)
+
+            this.messages.push(
+              `${player.name} の HP が ${recoveryAmount} 回復した！`
+            )
+          }
+        }
       }
     },
 
@@ -318,24 +399,14 @@ export default {
 
     onAttack() {
       console.log('attack')
-      this.stopAudio(SOUND_EFFECT.ATTACK)
-      this.stopAudio(SOUND_EFFECT.DAMAGE)
-
-      this.playAudio(SOUND_EFFECT.ATTACK)
 
       this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
-
-      this.playAudio(SOUND_EFFECT.DAMAGE)
     },
 
     onHeal() {
       console.log('heal')
 
-      this.stopAudio(SOUND_EFFECT.HEAL)
-
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
-
-      this.playAudio(SOUND_EFFECT.HEAL)
     }
   }
 }

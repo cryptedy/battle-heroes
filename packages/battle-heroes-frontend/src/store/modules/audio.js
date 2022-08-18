@@ -16,6 +16,64 @@ import SoundEffectHeal from '@/assets/audio/effects/heal.mp3'
 import SoundEffectDamage from '@/assets/audio/effects/damage.mp3'
 import SoundEffectEncounter from '@/assets/audio/effects/encounter.mp3'
 
+// An array of all contexts to resume on the page
+const audioContextList = []
+
+// An array of various user interaction events we should listen for
+const userInputEventNames = [
+  'click',
+  'contextmenu',
+  'auxclick',
+  'dblclick',
+  'mousedown',
+  'mouseup',
+  'pointerup',
+  'touchend',
+  'keydown',
+  'keyup'
+]
+
+// A proxy object to intercept AudioContexts and
+// add them to the array for tracking and resuming later
+window.AudioContext = new Proxy(window.AudioContext, {
+  construct(target, args) {
+    console.log('audio:AudioContext instanciate!')
+    const result = new target(...args)
+    audioContextList.push(result)
+    return result
+  }
+})
+
+// To resume all AudioContexts being tracked
+// eslint-disable-next-line no-unused-vars
+function resumeAllContexts(event) {
+  console.log('audio:resumeAllContexts')
+  let count = 0
+
+  audioContextList.forEach(context => {
+    if (context.state !== 'running') {
+      context.resume()
+    } else {
+      count++
+    }
+  })
+
+  // If all the AudioContexts have now resumed then we
+  // unbind all the event listeners from the page to prevent
+  // unnecessary resume attempts
+  if (count == audioContextList.length) {
+    userInputEventNames.forEach(eventName => {
+      document.removeEventListener(eventName, resumeAllContexts)
+    })
+  }
+}
+
+// We bind the resume function for each user interaction
+// event on the page
+userInputEventNames.forEach(eventName => {
+  document.addEventListener(eventName, resumeAllContexts)
+})
+
 const AudioContext = window.AudioContext || window.webkitAudioContext
 
 const TYPE = {
@@ -87,18 +145,22 @@ export const mutations = {
   [INIT_AUDIO](state, { sound }) {
     const audioContext = new AudioContext()
 
-    const track = audioContext.createMediaElementSource(
-      state.sounds[sound].audioElement
-    )
-    const osc = audioContext.createOscillator()
+    // const track = audioContext.createMediaElementSource(
+    //   state.sounds[sound].audioElement
+    // )
+    // const osc = audioContext.createOscillator()
 
-    track.connect(audioContext.destination)
-    osc.connect(audioContext.destination)
+    // track.connect(audioContext.destination)
+    // osc.connect(audioContext.destination)
 
     state.sounds[sound].audioContext = audioContext
-    state.sounds[sound].track = track
-    state.sounds[sound].osc = osc
+    // state.sounds[sound].track = track
+    // state.sounds[sound].osc = osc
     state.sounds[sound].state = STATE.STOPPED
+
+    if (state.sounds[sound].type === TYPE.MUSIC) {
+      state.sounds[sound].audioElement.loop = true
+    }
   },
 
   [SET_AUDIO](state, { audio }) {
@@ -158,26 +220,6 @@ export const mutations = {
 }
 
 export const actions = {
-  init({ commit }) {
-    console.log('audio/init')
-
-    Object.keys(state.sounds).forEach(sound => {
-      if (state.sounds[sound].state.CREATED) {
-        commit(INIT_AUDIO, { sound })
-
-        // stop when sound has ended
-        state.sounds[sound].audioElement.addEventListener(
-          'ended',
-          () => {
-            console.log('ended', sound)
-            commit(STOP_AUDIO, { sound })
-          },
-          false
-        )
-      }
-    })
-  },
-
   setAudio({ commit, state }, audio) {
     console.log('app/setAudio', audio)
 
@@ -208,18 +250,42 @@ export const actions = {
   },
 
   play({ commit }, sound) {
+    console.log('audio/play', sound)
+
+    if (state.sounds[sound].state === STATE.CREATED) {
+      console.log('audio:init', sound)
+
+      commit(INIT_AUDIO, { sound })
+
+      // stop when sound has ended
+      state.sounds[sound].audioElement.addEventListener(
+        'ended',
+        () => {
+          console.log('audio:ended', sound)
+          commit(STOP_AUDIO, { sound })
+        },
+        false
+      )
+    }
+
     commit(PLAY_AUDIO, { sound })
   },
 
   pause({ commit }, sound) {
+    console.log('audio/pause', sound)
+
     commit(PAUSE_AUDIO, { sound })
   },
 
   stop({ commit }, sound) {
+    console.log('audio/stop', sound)
+
     commit(STOP_AUDIO, { sound })
   },
 
   stopAll({ commit }) {
+    console.log('audio/stopAll')
+
     commit(STOP_AUDIO_ALL)
   }
 }

@@ -107,7 +107,7 @@
 
     <div ref="messages" class="battle-messages">
       <ul>
-        <li v-for="(message, index) in game.messages" :key="index">
+        <li v-for="(message, index) in messages" :key="index">
           {{ message }}
         </li>
       </ul>
@@ -162,6 +162,11 @@ export default {
   props: {
     game: {
       type: Object,
+      required: true
+    },
+
+    messages: {
+      type: Array,
       required: true
     },
 
@@ -262,10 +267,6 @@ export default {
 
     opponentStatus() {
       return this.status[this.opponentPlayerKey]
-    },
-
-    messages() {
-      return this.game.messages
     },
 
     currentPlayerKey() {
