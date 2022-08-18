@@ -286,12 +286,8 @@ export default {
         return
       }
 
-      this.game = game
-
       if (game.moves.length > 0) {
         const lastMove = game.moves[game.moves.length - 1]
-
-        console.log(lastMove)
 
         const playerId = game.players[lastMove.playerKey].id
         const opponentPlayerId =
@@ -356,6 +352,8 @@ export default {
           }
         }
       }
+
+      this.game = game
     },
 
     onGameAbort() {
