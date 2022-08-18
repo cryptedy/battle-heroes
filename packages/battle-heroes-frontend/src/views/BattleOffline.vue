@@ -628,6 +628,12 @@ export default {
             if (isFinish) {
               this.messages.push(`${opponentPlayer.name} は気絶してしまった！`)
               this.messages.push(`${player.name} の勝利！`)
+
+              if (player.id === this.player.id) {
+                this.playAudio(SOUND_EFFECT.WIN)
+              } else {
+                this.playAudio(SOUND_EFFECT.LOSE)
+              }
             }
           }
         }

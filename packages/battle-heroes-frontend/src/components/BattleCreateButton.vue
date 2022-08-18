@@ -9,7 +9,7 @@
     </BaseDialog>
 
     <BaseButton type="primary" @click="handleCreateBattle">
-      バトル作成
+      オンラインバトル作成
     </BaseButton>
   </template>
 </template>

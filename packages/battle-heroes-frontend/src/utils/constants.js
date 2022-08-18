@@ -30,7 +30,9 @@ export const SOUND_EFFECT = Object.freeze({
   ATTACK_CRITICAL: 'ATTACK_CRITICAL',
   HEAL: 'HEAL',
   DAMAGE: 'DAMAGE',
-  ENCOUNTER: 'ENCOUNTER'
+  ENCOUNTER: 'ENCOUNTER',
+  WIN: 'WIN',
+  LOSE: 'LOSE'
 })
 
 export default Object.freeze({

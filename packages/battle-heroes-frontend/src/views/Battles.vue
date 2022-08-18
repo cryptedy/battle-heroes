@@ -16,7 +16,7 @@
         type="primary"
         @click="handleCreateOfflineBattle"
       >
-        1人モード - モンスターバトル
+        オフラインバトル開始
       </BaseButton>
     </div>
 

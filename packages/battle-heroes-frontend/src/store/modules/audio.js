@@ -15,6 +15,8 @@ import SoundEffectAttackCritical from '@/assets/audio/effects/attack-critical.mp
 import SoundEffectHeal from '@/assets/audio/effects/heal.mp3'
 import SoundEffectDamage from '@/assets/audio/effects/damage.mp3'
 import SoundEffectEncounter from '@/assets/audio/effects/encounter.mp3'
+import SoundEffectWin from '@/assets/audio/effects/win.mp3'
+import SoundEffectLose from '@/assets/audio/effects/lose.mp3'
 
 // An array of all contexts to resume on the page
 const audioContextList = []
@@ -130,7 +132,9 @@ const initialState = () => {
       [SOUND_EFFECT.ENCOUNTER]: createAudio(
         TYPE.SOUND_EFFECT,
         SoundEffectEncounter
-      )
+      ),
+      [SOUND_EFFECT.WIN]: createAudio(TYPE.SOUND_EFFECT, SoundEffectWin),
+      [SOUND_EFFECT.LOSE]: createAudio(TYPE.SOUND_EFFECT, SoundEffectLose)
     }
   }
 }
@@ -181,8 +185,17 @@ export const mutations = {
     }
 
     if (state.audio) {
-      state.sounds[sound].audioElement.play()
-      state.sounds[sound].state = STATE.PLAYING
+      state.sounds[sound].audioElement
+        .play()
+        .then(() => {
+          state.sounds[sound].state = STATE.PLAYING
+          console.log('audio:play success')
+        })
+        .catch(error => {
+          // retry once
+          state.sounds[sound].audioElement.play()
+          console.log('audio:play error', error)
+        })
     } else {
       if (state.sounds[sound].type === TYPE.SOUND_EFFECT) {
         state.sounds[sound].state = STATE.STOPPED
