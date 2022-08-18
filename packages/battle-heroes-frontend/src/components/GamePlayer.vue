@@ -142,7 +142,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { SOUND_EFFECT } from '@/utils/constants'
 import Stars from '@/components/Stars'
 import HealthBar from '@/components/HealthBar'
 import BaseNFTRarity from '@/components/BaseNFTRarity'
@@ -271,14 +272,20 @@ export default {
       if (value < oldValue) {
         this.damageTaking = true
 
-        setTimeout(() => {
-          this.damageTaking = false
-        }, 400)
+        this.playAudio(SOUND_EFFECT.DAMAGE).then(() => {
+          setTimeout(() => {
+            this.damageTaking = false
+          }, 400)
+        })
       }
     }
   },
 
   methods: {
+    ...mapActions({
+      playAudio: 'audio/play'
+    }),
+
     toggleNFTInfoType() {
       if (this.windowWidth >= 768) {
         this.activeNFTInfoType = NFT_INFO_TYPE.STATUS

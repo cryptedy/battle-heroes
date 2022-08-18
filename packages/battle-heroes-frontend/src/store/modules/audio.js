@@ -253,16 +253,7 @@ export const actions = {
       )
     }
 
-    if (state.sounds[sound].audioContext.state === 'suspended') {
-      state.sounds[sound].audioContext.resume()
-    }
-
     if (state.audio) {
-      if (state.sounds[sound].state.PLAYING) {
-        state.sounds[sound].audioElement.pause()
-        commit(STOP_AUDIO, { sound })
-      }
-
       return state.sounds[sound].audioElement.play().then(() => {
         commit(PLAY_AUDIO, { sound })
       })
@@ -272,6 +263,9 @@ export const actions = {
       } else {
         commit(PAUSE_AUDIO, { sound })
       }
+
+      // emulate sound play if muted
+      return new Promise(resolve => setTimeout(resolve, 300))
     }
   },
 

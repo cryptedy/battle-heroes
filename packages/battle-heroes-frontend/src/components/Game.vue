@@ -146,7 +146,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import GamePlayer from '@/components/GamePlayer'
 import { scrollToBottom } from '@/utils/helpers'
 import ToggleAudio from '@/components/ToggleAudio'
@@ -369,10 +369,6 @@ export default {
   },
 
   methods: {
-    ...mapActions({
-      addNotification: 'notification/add'
-    }),
-
     onChangeTurn() {
       console.log('onChangeTurn')
       this.moving = false

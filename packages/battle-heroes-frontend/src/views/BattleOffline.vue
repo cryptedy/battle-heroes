@@ -582,6 +582,7 @@ export default {
 
         if (lastMove.move === PLAYER_MOVE.ATTACK) {
           this.messages.push(`${player.name} の攻撃！`)
+          await this.playAudio(SOUND_EFFECT.ATTACK)
 
           const { isMiss, isCritical, isFinish, damage } = {
             ...lastMove.payload
@@ -594,20 +595,15 @@ export default {
             )
           } else {
             if (isCritical) {
-              await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
               this.messages.push('クリティカルヒット！')
-            } else {
-              this.playAudio(SOUND_EFFECT.ATTACK)
+              await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
             }
 
             if (damage > 0) {
-              await new Promise(resolve => setTimeout(resolve, 100))
-              await this.playAudio(SOUND_EFFECT.DAMAGE)
+              this.messages.push(
+                `${opponentPlayer.name} に ${damage} のダメージを与えた！`
+              )
             }
-
-            this.messages.push(
-              `${opponentPlayer.name} に ${damage} のダメージを与えた！`
-            )
 
             if (isFinish) {
               this.messages.push(`${opponentPlayer.name} は気絶してしまった！`)
@@ -615,9 +611,8 @@ export default {
 
               if (player.id === this.player.id) {
                 // player wins
-                await this.playAudio(SOUND_EFFECT.WIN)
-
                 this.messages.push('3 ポイントの経験値を得た！')
+                this.playAudio(SOUND_EFFECT.WIN)
 
                 this.$nextTick(() => {
                   this.$socket.emit('player:updateStats', {
@@ -628,9 +623,8 @@ export default {
                 })
               } else {
                 // playe lose
-                await this.playAudio(SOUND_EFFECT.LOSE)
-
                 this.messages.push('1 ポイントの経験値を得た！')
+                this.playAudio(SOUND_EFFECT.LOSE)
 
                 this.$nextTick(() => {
                   this.$socket.emit('player:updateStats', {
@@ -642,9 +636,7 @@ export default {
               }
             }
           }
-        }
-
-        if (lastMove.move === PLAYER_MOVE.HEAL) {
+        } else if (lastMove.move === PLAYER_MOVE.HEAL) {
           this.messages.push(`${player.name} の回復！`)
 
           const { recoveryAmount } = {
@@ -655,11 +647,10 @@ export default {
             this.messages.push('ミス')
             this.messages.push(`${player.name} は HP を回復できなかった！`)
           } else {
-            await this.playAudio(SOUND_EFFECT.HEAL)
-
             this.messages.push(
               `${player.name} の HP が ${recoveryAmount} 回復した！`
             )
+            await this.playAudio(SOUND_EFFECT.HEAL)
           }
         }
       }
