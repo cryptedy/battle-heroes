@@ -9,6 +9,7 @@
   height: 100%;
   outline: none;
   color: color(primary);
+  z-index: 1;
 
   &-trigger {
     display: inline-block;

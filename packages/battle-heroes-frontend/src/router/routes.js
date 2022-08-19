@@ -32,6 +32,18 @@ export default [
     component: view('Logout')
   },
   {
+    path: '/collections',
+    name: 'collections',
+    component: view('collections/Index'),
+    children: [
+      {
+        path: ':collectionId',
+        name: 'collections-show',
+        component: view('collections/_CollectionId')
+      }
+    ]
+  },
+  {
     path: '/home',
     name: 'home',
     meta: {

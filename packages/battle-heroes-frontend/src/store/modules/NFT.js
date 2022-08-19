@@ -16,7 +16,9 @@ export const getters = {
   count: state => state.ids.length,
   find: state => id => state.entities[id],
   byPlayer: (state, getters) => player =>
-    player.nft_ids.map(NFTId => getters.find(NFTId))
+    player.nft_ids.map(NFTId => getters.find(NFTId)),
+  byCollection: (state, getters) => collection =>
+    getters.all.filter(NFT => NFT.collection_id === collection.id)
 }
 
 export const mutations = {

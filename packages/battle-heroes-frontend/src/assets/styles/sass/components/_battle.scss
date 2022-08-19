@@ -1,15 +1,3 @@
-@font-face {
-  font-family: 'NuAnkoMochiCt-Reg';
-  src: url('@/assets/fonts/NuAnkoMochiCt/NuAnkoMochiCt-Reg.otf')
-    format('truetype');
-}
-
-@font-face {
-  font-family: 'PixelMplus';
-  src: url('@/assets/fonts/PixelMplus/PixelMplus10-Regular.ttf')
-    format('truetype');
-}
-
 .battle {
   font-family: PixelMplus;
   display: grid;

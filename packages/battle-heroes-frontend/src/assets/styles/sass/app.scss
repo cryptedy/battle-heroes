@@ -2,6 +2,18 @@
 @import 'utils';
 @import 'components';
 
+@font-face {
+  font-family: 'NuAnkoMochiCt-Reg';
+  src: url('@/assets/fonts/NuAnkoMochiCt/NuAnkoMochiCt-Reg.otf')
+    format('truetype');
+}
+
+@font-face {
+  font-family: 'PixelMplus';
+  src: url('@/assets/fonts/PixelMplus/PixelMplus10-Regular.ttf')
+    format('truetype');
+}
+
 html {
   box-sizing: border-box;
   height: 100%;
@@ -35,6 +47,17 @@ body {
 
 #app {
   height: 100%;
+}
+
+.herodex {
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  max-width: 1024px;
+  padding: 16px;
+  @include mediaQuery(md) {
+    padding: 24px;
+  }
 }
 
 .web {

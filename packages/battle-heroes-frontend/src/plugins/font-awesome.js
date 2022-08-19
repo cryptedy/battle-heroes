@@ -13,6 +13,8 @@ import {
   faLayerGroup,
   faVolumeHigh,
   faVolumeXmark,
+  faChevronLeft,
+  faChevronRight,
   faArrowRightFromBracket
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -34,6 +36,8 @@ export default {
       faLayerGroup,
       faVolumeHigh,
       faVolumeXmark,
+      faChevronLeft,
+      faChevronRight,
       faArrowRightFromBracket
     )
 

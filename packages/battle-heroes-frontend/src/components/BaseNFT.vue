@@ -27,8 +27,6 @@
       <Stars :stars="nft.stars" />
       <BaseNFTRarity :nft="nft" />
       <BaseNFTAttributes :nft="nft" />
-
-      <BattleCreateButton :nft="nft" />
     </div>
   </BaseDialog>
 </template>
@@ -37,7 +35,6 @@
 import Stars from '@/components/Stars'
 import BaseNFTRarity from '@/components/BaseNFTRarity'
 import BaseNFTAttributes from '@/components/BaseNFTAttributes'
-import BattleCreateButton from '@/components/BattleCreateButton'
 
 export default {
   name: 'BaseNFT',
@@ -45,8 +42,7 @@ export default {
   components: {
     Stars,
     BaseNFTRarity,
-    BaseNFTAttributes,
-    BattleCreateButton
+    BaseNFTAttributes
   },
 
   props: {
