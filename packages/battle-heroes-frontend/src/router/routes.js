@@ -35,6 +35,10 @@ export default [
     path: '/collections',
     name: 'collections',
     component: view('collections/Index'),
+    // eslint-disable-next-line no-unused-vars
+    redirect: to => {
+      return { name: 'collections-show', params: { collectionId: 1 } }
+    },
     children: [
       {
         path: ':collectionId',

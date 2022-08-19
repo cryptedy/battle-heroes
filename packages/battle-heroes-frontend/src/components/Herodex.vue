@@ -4,7 +4,7 @@
   <div v-else>
     <ThePagination
       :pagination="pagination"
-      @update:page="onPageUpdate($event)"
+      @update-page="onPageUpdate($event)"
     />
 
     <BaseList class="nft-list">
@@ -13,7 +13,7 @@
 
     <ThePagination
       :pagination="pagination"
-      @update:page="onPageUpdate($event)"
+      @update-page="onPageUpdate($event)"
     />
   </div>
 </template>
@@ -92,8 +92,8 @@ export default {
     }
   },
 
-  created() {
-    this.page = this.$route.query.page || 1
+  beforeMount() {
+    this.page = Number.parseInt(this.$route.query.page) || 1
   },
 
   methods: {
