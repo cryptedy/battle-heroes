@@ -49,8 +49,6 @@ export default {
         const toPage = Number.parseInt(to.query.page) || 1
         const fromPage = Number.parseInt(from.query.page) || 1
 
-        console.log(to, from)
-
         this.transitionName =
           fromPage < toPage
             ? 'transition-page-slide-right'
