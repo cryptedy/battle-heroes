@@ -95,6 +95,16 @@
                       <FontAwesomeIcon icon="diamond" />
                     </span>
                   </dd>
+                  <dt class="battle-ground-nft-status-list-title">INT</dt>
+                  <dd class="battle-ground-nft-status-list-data">
+                    <span>{{ playerStatus.int }}</span>
+                    <span
+                      v-if="playerStatus.int > opponentStatus.int"
+                      class="has-advantage"
+                    >
+                      <FontAwesomeIcon icon="diamond" />
+                    </span>
+                  </dd>
                   <dt class="battle-ground-nft-status-list-title">SPD</dt>
                   <dd class="battle-ground-nft-status-list-data">
                     <span>{{ playerStatus.speed }}</span>

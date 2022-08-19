@@ -131,12 +131,17 @@
         </template>
 
         <template v-else>
-          <button :disabled="!canAttack" @click="attack">攻撃</button>
-          <button :disabled="!canHeal" @click="heal">
-            回復({{ playerStatus.heal }})
+          <button :disabled="!canAttack" @click="attack">
+            攻撃 {{ playerStatus.attack_remains }}
           </button>
-          <button :disabled="true">防御</button>
-          <button :disabled="true">必殺技</button>
+          <button :disabled="!canSpell" @click="spell">
+            {{ spellLabel }} {{ playerStatus.spell_remains }}
+          </button>
+          <button :disabled="!canHeal" @click="heal">
+            回復 {{ playerStatus.heal_remains }}
+          </button>
+          <button :disabled="!canDefence" @click="defence">防御 ∞</button>
+          <button :disabled="true">アイテム</button>
         </template>
       </template>
 
@@ -208,7 +213,7 @@ export default {
     }
   },
 
-  emits: ['attack', 'heal', 'abort', 'finish', 'continue'],
+  emits: ['attack', 'spell', 'heal', 'defence', 'abort', 'finish', 'continue'],
 
   data() {
     return {
@@ -286,15 +291,23 @@ export default {
     },
 
     canAttack() {
-      return this.canMove
+      return this.canMove && this.playerStatus.attack_remains > 0
+    },
+
+    canSpell() {
+      return this.canMove && this.playerStatus.spell_remains > 0
     },
 
     canHeal() {
       return (
         this.canMove &&
         this.playerStatus.hp < this.playerStatus.max_hp &&
-        this.playerStatus.heal > 0
+        this.playerStatus.heal_remains > 0
       )
+    },
+
+    canDefence() {
+      return this.canMove
     },
 
     canLeaveGame() {
@@ -309,6 +322,10 @@ export default {
         !this.moving &&
         this.currentPlayerKey === this.playerKey
       )
+    },
+
+    spellLabel() {
+      return this.playerNFT.collection_id === 3 ? '忍術' : '魔法'
     },
 
     twitterLink() {
@@ -384,6 +401,16 @@ export default {
       this.$emit('attack')
     },
 
+    spell() {
+      console.log('Game:spell')
+
+      if (!this.canSpell) return
+
+      this.moving = true
+
+      this.$emit('spell')
+    },
+
     heal() {
       console.log('Game:heal')
 
@@ -392,6 +419,16 @@ export default {
       this.moving = true
 
       this.$emit('heal')
+    },
+
+    defence() {
+      console.log('Game:defence')
+
+      if (!this.canDefence) return
+
+      this.moving = true
+
+      this.$emit('defence')
     },
 
     leaveGame() {

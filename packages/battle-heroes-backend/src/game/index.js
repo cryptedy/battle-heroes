@@ -62,6 +62,7 @@ const createStatus = () => {
   const maxHp = getRandomValue(90, 110)
   const attack = getRandomValue(15, 25)
   const defense = getRandomValue(15, 25)
+  const int = getRandomValue(20, 35)
   const speed = getRandomValue(15, 25)
 
   return {
@@ -69,10 +70,15 @@ const createStatus = () => {
     hp: maxHp,
     attack: attack,
     defense: defense,
+    int: int,
     speed: speed,
     criticalRate: 0.05,
     missRate: 0.1,
-    heal: 1
+    isDefence: false,
+    mustCritical: false,
+    attack_remains: 3,
+    spell_remains: 1,
+    heal_remains: 1
   }
 }
 
@@ -98,11 +104,13 @@ const createGame = battle => {
   const secondPlayerMaxHp = Math.floor(status[secondPlayer].hp * 1.05)
   const secondPlayerAttack = Math.floor(status[secondPlayer].attack * 1.05)
   const secondPlayerDefence = Math.floor(status[secondPlayer].defense * 1.05)
+  const secondPlayerIntelligence = Math.floor(status[secondPlayer].int * 1.05)
 
   status[secondPlayer].max_hp = secondPlayerMaxHp
   status[secondPlayer].hp = secondPlayerMaxHp
   status[secondPlayer].attack = secondPlayerAttack
   status[secondPlayer].defense = secondPlayerDefence
+  status[secondPlayer].int = secondPlayerIntelligence
 
   return {
     id: uuidv4(),
@@ -416,6 +424,20 @@ class GameManager {
       payload: {}
     }
 
+    const payload = {
+      battle,
+      game,
+      player,
+      playerKey,
+      playerNFT,
+      playerStatus,
+      opponentPlayer,
+      opponentPlayerKey,
+      opponentNFT,
+      opponentStatus,
+      localMove
+    }
+
     if (move === PLAYER_MOVE.ATTACK) {
       localMove.payload = {
         isMiss: false,
@@ -424,39 +446,87 @@ class GameManager {
         damage: 0
       }
 
-      this.attack({
-        battle,
-        game,
-        player,
-        playerKey,
-        playerNFT,
-        playerStatus,
-        opponentPlayer,
-        opponentPlayerKey,
-        opponentNFT,
-        opponentStatus,
-        localMove
-      })
+      this.attack(payload)
+    } else if (move === PLAYER_MOVE.SPELL) {
+      localMove.payload = {
+        isFinish: false,
+        damage: 0
+      }
+
+      this.spell(payload)
     } else if (move === PLAYER_MOVE.HEAL) {
       localMove.payload = {
         recoveryAmount: 0
       }
 
-      this.heal({
-        battle,
-        game,
-        player,
-        playerKey,
-        playerNFT,
-        playerStatus,
-        opponentPlayer,
-        opponentPlayerKey,
-        opponentNFT,
-        opponentStatus,
-        localMove
-      })
+      this.heal(payload)
+    } else if (move === PLAYER_MOVE.DEFENCE) {
+      localMove.payload = {
+        recoveryAmount: 0,
+        mustCritical: false
+      }
+
+      this.defence(payload)
     } else {
       throw new Error('Failed to move: Invalid move type')
+    }
+
+    if (localMove.payload.isFinish) {
+      updatePlayer({
+        playerId: player.id,
+        payload: { state: PLAYER_STATE.IDLE }
+      })
+
+      updatePlayer({
+        playerId: opponentPlayer.id,
+        payload: { state: PLAYER_STATE.IDLE }
+      })
+
+      updatePlayerStats(player.id, {
+        exp: player.exp + 3,
+        win: player.win + 1
+      })
+        .then(() => {
+          this.io.emit('player:update', selectPlayer(player.id))
+        })
+        .catch(error => {
+          throw new Error(
+            `Failed to update player stats: ${error.message}: ${error.stack}`
+          )
+        })
+
+      updatePlayerStats(opponentPlayer.id, {
+        exp: opponentPlayer.exp + 1,
+        lose: opponentPlayer.lose + 1
+      })
+        .then(() => {
+          this.io.emit('player:update', selectPlayer(opponentPlayer.id))
+        })
+        .catch(error => {
+          const { message, stack } = error
+          // send to ooponent player
+          this.io.to(opponentPlayer.id).emit('game:error', {
+            message: `Failed to update player status: ${message}`,
+            stack: stack
+          })
+        })
+
+      updateBattle({
+        battleId: battle.id,
+        payload: { state: BATTLE_STATE.ENDED }
+      })
+
+      this.io.emit('battle:update', selectBattle(battle.id))
+
+      postDiscord({
+        type: DISCORD_POST_TYPE.BATTLE_ENDED,
+        payload: {
+          winnerPlayer: selectPlayer(player.id),
+          loserPlayer: selectPlayer(opponentPlayer.id),
+          battle: selectBattle(battle.id),
+          game: selectGame(game.id)
+        }
+      })
     }
 
     const currentPlayer = game.current_player === 1 ? 2 : 1
@@ -479,30 +549,41 @@ class GameManager {
     console.log('attack')
 
     const {
-      battle,
       game,
-      player,
+      playerKey,
       playerStatus,
-      opponentPlayer,
       opponentPlayerKey,
       opponentStatus,
       localMove
     } = payload
 
-    let damage = 0
-    // const nextPlayerStatus = {}
+    if (playerStatus.attack_remains <= 0) {
+      throw new Error('Failed to move: Can not use attack')
+    }
+
+    const nextPlayerStatus = {}
     const nextOpponentStatus = {}
 
-    if (Math.random() < playerStatus.missRate) {
+    let isFinish = false
+    let damage = 0
+
+    if (!playerStatus.mustCritical && Math.random() < playerStatus.missRate) {
       localMove.payload.isMiss = true
     } else {
       damage = Math.floor(
         (playerStatus.attack * 100) / (100 + opponentStatus.defense)
       )
 
-      if (Math.random() < playerStatus.criticalRate) {
-        localMove.payload.isCritical = true
+      if (opponentStatus.isDefence) {
+        damage = Math.floor(damage * 0.6)
+      }
 
+      if (playerStatus.mustCritical) {
+        localMove.payload.isCritical = true
+        damage = Math.floor(damage * 1.5)
+        nextPlayerStatus.mustCritical = false
+      } else if (Math.random() < playerStatus.criticalRate) {
+        localMove.payload.isCritical = true
         damage = Math.floor(damage * 1.5)
       } else {
         const adjustDamage = getRandomValue(-2, 2)
@@ -524,65 +605,7 @@ class GameManager {
       nextOpponentStatus.hp = newOpponentHp
 
       if (newOpponentHp === 0) {
-        localMove.payload.isFinish = true
-
-        updatePlayer({
-          playerId: player.id,
-          payload: { state: PLAYER_STATE.IDLE }
-        })
-
-        updatePlayer({
-          playerId: opponentPlayer.id,
-          payload: { state: PLAYER_STATE.IDLE }
-        })
-
-        updatePlayerStats(player.id, {
-          exp: player.exp + 3,
-          win: player.win + 1
-        })
-          .then(() => {
-            this.io.emit('player:update', selectPlayer(player.id))
-          })
-          .catch(error => {
-            throw new Error(
-              `Failed to update player stats: ${error.message}: ${error.stack}`
-            )
-          })
-
-        updatePlayerStats(opponentPlayer.id, {
-          exp: opponentPlayer.exp + 1,
-          lose: opponentPlayer.lose + 1
-        })
-          .then(() => {
-            this.io.emit('player:update', selectPlayer(opponentPlayer.id))
-          })
-          .catch(error => {
-            const { message, stack } = error
-            // send to ooponent player
-            this.io.to(opponentPlayer.id).emit('game:error', {
-              message: `Failed to update player status: ${message}`,
-              stack: stack
-            })
-          })
-
-        updateBattle({
-          battleId: battle.id,
-          payload: { state: BATTLE_STATE.ENDED }
-        })
-
-        this.io.emit('player:update', selectPlayer(player.id))
-        this.io.emit('player:update', selectPlayer(opponentPlayer.id))
-        this.io.emit('battle:update', selectBattle(battle.id))
-
-        postDiscord({
-          type: DISCORD_POST_TYPE.BATTLE_ENDED,
-          payload: {
-            winnerPlayer: selectPlayer(player.id),
-            loserPlayer: selectPlayer(opponentPlayer.id),
-            battle: selectBattle(battle.id),
-            game: selectGame(game.id)
-          }
-        })
+        isFinish = true
       } else {
         if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
           nextOpponentStatus.criticalRate = 0.15
@@ -590,6 +613,20 @@ class GameManager {
           nextOpponentStatus.criticalRate = 0.25
         }
       }
+
+      localMove.payload.isFinish = isFinish
+
+      nextPlayerStatus.attack_remains = playerStatus.attack_remains - 1
+
+      if (opponentStatus.isDefence) {
+        nextOpponentStatus.isDefence = false
+      }
+
+      updateGamePlayer({
+        gameId: game.id,
+        playerKey: playerKey,
+        payload: nextPlayerStatus
+      })
 
       updateGamePlayer({
         gameId: game.id,
@@ -599,16 +636,82 @@ class GameManager {
     }
   }
 
+  spell(payload) {
+    console.log('spell')
+
+    const {
+      game,
+      playerKey,
+      playerStatus,
+      opponentPlayerKey,
+      opponentStatus,
+      localMove
+    } = payload
+
+    if (playerStatus.spell_remains <= 0) {
+      throw new Error('Failed to move: Can not use spell')
+    }
+
+    const nextPlayerStatus = {}
+    const nextOpponentStatus = {}
+
+    let isFinish = false
+    let damage = Math.floor(
+      (playerStatus.int * 100) / (100 + opponentStatus.defense)
+    )
+
+    let nextOpponentHp = opponentStatus.hp - damage
+
+    if (nextOpponentHp < 0) {
+      nextOpponentHp = 0
+    }
+
+    nextOpponentStatus.hp = nextOpponentHp
+
+    if (nextOpponentHp === 0) {
+      isFinish = true
+    }
+
+    localMove.payload.isFinish = isFinish
+    localMove.payload.damage = damage
+
+    nextPlayerStatus.spell_remains = playerStatus.spell_remains - 1
+
+    if (opponentStatus.isDefence) {
+      nextOpponentStatus.isDefence = false
+    }
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: playerKey,
+      payload: nextPlayerStatus
+    })
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: opponentPlayerKey,
+      payload: nextOpponentStatus
+    })
+  }
+
   heal(payload) {
     console.log('heal')
 
-    const { game, playerKey, playerStatus, localMove } = payload
+    const {
+      game,
+      playerKey,
+      playerStatus,
+      opponentPlayerKey,
+      opponentStatus,
+      localMove
+    } = payload
 
-    if (playerStatus.heal <= 0) {
+    if (playerStatus.heal_remains <= 0) {
       throw new Error('Failed to move: Can not use heal')
     }
 
     const nextPlayerStatus = {}
+    const nextOpponentStatus = {}
 
     let recoveryAmount = 0
 
@@ -639,15 +742,84 @@ class GameManager {
       newPlayerHp = playerStatus.max_hp
     }
 
-    nextPlayerStatus.hp = newPlayerHp
-    nextPlayerStatus.heal = playerStatus.heal - 1
-
     localMove.payload.recoveryAmount = recoveryAmount
+
+    nextPlayerStatus.hp = newPlayerHp
+    nextPlayerStatus.heal_remains = playerStatus.heal_remains - 1
+
+    if (opponentStatus.isDefence) {
+      nextOpponentStatus.isDefence = false
+    }
 
     updateGamePlayer({
       gameId: game.id,
       playerKey: playerKey,
       payload: nextPlayerStatus
+    })
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: opponentPlayerKey,
+      payload: nextOpponentStatus
+    })
+  }
+
+  defence(payload) {
+    console.log('defence')
+
+    const {
+      game,
+      playerKey,
+      playerStatus,
+      opponentPlayerKey,
+      opponentStatus,
+      localMove
+    } = payload
+
+    const nextPlayerStatus = {}
+    const nextOpponentStatus = {}
+
+    let recoveryAmount = 0
+    let mustCritical = false
+
+    const rand = Math.random()
+
+    if (rand < 0.02) {
+      recoveryAmount = 4
+    } else if (rand < 0.1) {
+      recoveryAmount = 2
+    } else if (rand < 0.5) {
+      recoveryAmount = 1
+    } else {
+      recoveryAmount = 2
+    }
+
+    if (Math.random() < 0.1) {
+      mustCritical = true
+    }
+
+    localMove.payload.recoveryAmount = recoveryAmount
+    localMove.payload.mustCritical = mustCritical
+
+    nextPlayerStatus.attack_remains =
+      playerStatus.attack_remains + recoveryAmount
+    nextPlayerStatus.mustCritical = mustCritical
+    nextPlayerStatus.isDefence = true
+
+    if (opponentStatus.isDefence) {
+      nextOpponentStatus.isDefence = false
+    }
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: playerKey,
+      payload: nextPlayerStatus
+    })
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: opponentPlayerKey,
+      payload: nextOpponentStatus
     })
   }
 

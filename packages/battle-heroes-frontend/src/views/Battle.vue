@@ -64,7 +64,9 @@
         :nft1="NFT1"
         :nft2="NFT2"
         @attack="onAttack"
+        @spell="onSpell"
         @heal="onHeal"
+        @defence="onDefence"
         @finish="onGameFinished"
         @abort="onGameAbort"
         @continue="onContinue"
@@ -331,6 +333,32 @@ export default {
               }
             }
           }
+        } else if (lastMove.move === PLAYER_MOVE.SPELL) {
+          this.messages.push(`${player.name} の魔法攻撃！`)
+
+          const { isFinish, damage } = {
+            ...lastMove.payload
+          }
+
+          if (damage > 0) {
+            this.messages.push(
+              `${opponentPlayer.name} に ${damage} のダメージを与えた！`
+            )
+            await this.playAudio(SOUND_EFFECT.SPELL)
+          }
+
+          if (isFinish) {
+            this.messages.push(`${opponentPlayer.name} は気絶してしまった！`)
+            this.messages.push(`${player.name} の勝利！`)
+
+            if (player.id === this.player.id) {
+              this.messages.push('3 ポイントの経験値を得た！')
+              this.playAudio(SOUND_EFFECT.WIN)
+            } else {
+              this.messages.push('1 ポイントの経験値を得た！')
+              this.playAudio(SOUND_EFFECT.LOSE)
+            }
+          }
         } else if (lastMove.move === PLAYER_MOVE.HEAL) {
           this.messages.push(`${player.name} の回復！`)
 
@@ -346,6 +374,28 @@ export default {
 
             this.messages.push(
               `${player.name} の HP が ${recoveryAmount} 回復した！`
+            )
+          }
+        } else if (lastMove.move === PLAYER_MOVE.DEFENCE) {
+          this.messages.push(
+            `${player.name} は防御態勢を取って力をためている・・・！`
+          )
+          await this.playAudio(SOUND_EFFECT.DEFENCE)
+
+          const { recoveryAmount, mustCritical } = {
+            ...lastMove.payload
+          }
+
+          if (recoveryAmount > 0) {
+            this.messages.push(
+              `${player.name} の攻撃回数が ${recoveryAmount} 回復した！`
+            )
+          }
+
+          if (mustCritical) {
+            this.messages.push(`${player.name} に力がみなぎってきた！`)
+            this.messages.push(
+              `${player.name} の次ターンの攻撃は必ずクリティカルヒットになる予感・・・！`
             )
           }
         }
@@ -394,15 +444,27 @@ export default {
     },
 
     onAttack() {
-      console.log('attack')
+      console.log('onAttack')
 
       this.$socket.emit('game:move', PLAYER_MOVE.ATTACK)
     },
 
+    onSpell() {
+      console.log('onSpell')
+
+      this.$socket.emit('game:move', PLAYER_MOVE.SPELL)
+    },
+
     onHeal() {
-      console.log('heal')
+      console.log('onHeal')
 
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
+    },
+
+    onDefence() {
+      console.log('onDefence')
+
+      this.$socket.emit('game:move', PLAYER_MOVE.DEFENCE)
     }
   }
 }

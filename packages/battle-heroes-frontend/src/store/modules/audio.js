@@ -14,6 +14,8 @@ import SoundEffectAttack from '@/assets/audio/effects/attack.mp3'
 import SoundEffectAttackCritical from '@/assets/audio/effects/attack-critical.mp3'
 import SoundEffectHeal from '@/assets/audio/effects/heal.mp3'
 import SoundEffectDamage from '@/assets/audio/effects/damage.mp3'
+import SoundEffectSpell from '@/assets/audio/effects/spell.mp3'
+import SoundEffectDefence from '@/assets/audio/effects/defence.mp3'
 import SoundEffectEncounter from '@/assets/audio/effects/encounter.mp3'
 import SoundEffectWin from '@/assets/audio/effects/win.mp3'
 import SoundEffectLose from '@/assets/audio/effects/lose.mp3'
@@ -127,7 +129,12 @@ const initialState = () => {
         TYPE.SOUND_EFFECT,
         SoundEffectAttackCritical
       ),
+      [SOUND_EFFECT.SPELL]: createAudio(TYPE.SOUND_EFFECT, SoundEffectSpell),
       [SOUND_EFFECT.HEAL]: createAudio(TYPE.SOUND_EFFECT, SoundEffectHeal),
+      [SOUND_EFFECT.DEFENCE]: createAudio(
+        TYPE.SOUND_EFFECT,
+        SoundEffectDefence
+      ),
       [SOUND_EFFECT.DAMAGE]: createAudio(TYPE.SOUND_EFFECT, SoundEffectDamage),
       [SOUND_EFFECT.ENCOUNTER]: createAudio(
         TYPE.SOUND_EFFECT,

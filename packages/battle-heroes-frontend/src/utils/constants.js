@@ -28,7 +28,9 @@ export const MUSIC = Object.freeze({
 export const SOUND_EFFECT = Object.freeze({
   ATTACK: 'ATTACK',
   ATTACK_CRITICAL: 'ATTACK_CRITICAL',
+  SPELL: 'SPELL',
   HEAL: 'HEAL',
+  DEFENCE: 'DEFENCE',
   DAMAGE: 'DAMAGE',
   ENCOUNTER: 'ENCOUNTER',
   WIN: 'WIN',

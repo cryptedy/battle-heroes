@@ -57,7 +57,9 @@
   &-create,
   &-join,
   &-attack,
-  &-heal {
+  &-spell,
+  &-heal,
+  &-defence {
     border-radius: 4px;
     background-color: palette(blue, 500);
     padding-right: 8px;
