@@ -115,6 +115,11 @@ export default [
         path: 'account',
         name: 'settings.account',
         component: view('settings/Account')
+      },
+      {
+        path: 'labs',
+        name: 'settings.labs',
+        component: view('settings/Labs')
       }
     ]
   }

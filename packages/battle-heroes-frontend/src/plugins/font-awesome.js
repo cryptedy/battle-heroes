@@ -2,6 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
   faFire,
+  faPlus,
   faStar,
   faUser,
   faHouse,
@@ -10,6 +11,7 @@ import {
   faDiamond,
   faMessage,
   faArrowLeft,
+  faFlaskVial,
   faLayerGroup,
   faVolumeHigh,
   faVolumeXmark,
@@ -24,6 +26,7 @@ export default {
   install(app) {
     library.add(
       faFire,
+      faPlus,
       faStar,
       faUser,
       faHouse,
@@ -33,6 +36,7 @@ export default {
       faMessage,
       faTwitter,
       faArrowLeft,
+      faFlaskVial,
       faLayerGroup,
       faVolumeHigh,
       faVolumeXmark,

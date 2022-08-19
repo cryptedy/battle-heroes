@@ -12,6 +12,15 @@
       </BaseListItem>
       <BaseListItem class="account-menu-list-item">
         <router-link
+          :to="{ name: 'settings.labs' }"
+          class="account-menu-list-item-link"
+        >
+          <FontAwesomeIcon icon="flask-vial" />
+          Labs
+        </router-link>
+      </BaseListItem>
+      <BaseListItem class="account-menu-list-item">
+        <router-link
           :to="{ name: 'logout' }"
           class="account-menu-list-item-link"
         >

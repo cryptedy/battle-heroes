@@ -152,11 +152,9 @@ export default {
 
         this.menuContentShown = false
 
-        setTimeout(() => {
-          this.overlayShown = false
-          this.menuShown = false
-          this.attemptingToClose = false
-        }, 225)
+        this.overlayShown = false
+        this.menuShown = false
+        this.attemptingToClose = false
       }
     },
 
@@ -167,6 +165,16 @@ export default {
       },
       deep: true
     }
+  },
+
+  created() {
+    this.$router.beforeEach((to, from, next) => {
+      if (to.name !== from.name) {
+        this.closeMenu()
+      }
+
+      next()
+    })
   },
 
   mounted() {

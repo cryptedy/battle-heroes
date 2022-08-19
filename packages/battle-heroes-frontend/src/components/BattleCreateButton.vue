@@ -9,7 +9,11 @@
     </BaseDialog>
 
     <BaseButton type="primary" @click="handleCreateBattle">
-      オンラインバトル作成
+      <template v-if="type === 'simple'">
+        <FontAwesomeIcon icon="plus" />
+        バトル
+      </template>
+      <template v-else> オンラインバトル作成 </template>
     </BaseButton>
   </template>
 </template>
@@ -27,6 +31,13 @@ export default {
   },
 
   props: {
+    type: {
+      type: String,
+      required: false,
+      default: 'default',
+      validator: value => ['default', 'simple'].indexOf(value) !== -1
+    },
+
     nft: {
       type: Object,
       required: false,

@@ -1,4 +1,6 @@
 .account-menu {
+  min-width: 160px;
+
   &-list {
     display: flex;
     flex-direction: column;
@@ -8,10 +10,26 @@
         display: inline-block;
         width: 100%;
         padding: 8px 16px;
+        background-color: palette(grey, 0);
         color: color(primary);
+
         #{$font-awesome-icon-class} {
           margin-right: 16px;
           color: color(active-icon, dark);
+        }
+
+        &:hover {
+          background-color: palette(blue, 50);
+        }
+
+        &.router-link-exact-active {
+          background-color: palette(blue, 500);
+          color: color(primary, light);
+
+          #{$font-awesome-icon-class} {
+            margin-right: 16px;
+            color: color(primary, light);
+          }
         }
       }
     }

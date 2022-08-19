@@ -22,7 +22,7 @@ import ToggleAudio from '@/components/ToggleAudio'
 import PlayerUpdateButton from '@/components/PlayerUpdateButton.vue'
 
 export default {
-  name: 'AccountSettings',
+  name: 'SettingsAccount',
 
   components: {
     ToggleAudio,

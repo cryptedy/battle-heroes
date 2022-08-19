@@ -1,6 +1,10 @@
 <template>
   <BaseButton v-if="canDeleteBattle" type="danger" @click="deleteBattle">
-    バトル削除
+    <template v-if="type === 'simple'">
+      <FontAwesomeIcon icon="xmark" />
+      バトル
+    </template>
+    <template v-else> バトル削除 </template>
   </BaseButton>
 </template>
 
@@ -12,6 +16,13 @@ export default {
   name: 'BattleDeleteButton',
 
   props: {
+    type: {
+      type: String,
+      required: false,
+      default: 'default',
+      validator: value => ['default', 'simple'].indexOf(value) !== -1
+    },
+
     battle: {
       type: Object,
       required: true

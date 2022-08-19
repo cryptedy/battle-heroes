@@ -110,22 +110,13 @@
           </span>
         </li>
         <li class="app-bar-content-list-item">
-          <div
-            v-if="playerNFT"
-            style="margin-right: 12px; width: 32px; height: 32px"
-          >
-            <img
-              style="width: 100%; height: auto; border-radius: 2px"
-              :src="playerNFT.image_url"
-              :alt="playerNFT.name"
-              width="512"
-              height="512"
-            />
-          </div>
+          <BattleCreateButton type="simple" />
 
-          <BattleCreateButton />
-
-          <BattleDeleteButton v-if="playerBattle" :battle="playerBattle" />
+          <BattleDeleteButton
+            v-if="playerBattle"
+            :battle="playerBattle"
+            type="simple"
+          />
         </li>
       </ul>
     </div>
