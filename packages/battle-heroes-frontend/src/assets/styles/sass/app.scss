@@ -60,15 +60,17 @@ body {
   font-size: 14px;
 
   &-title {
-    margin-top: 24px;
     margin-bottom: 16px;
     text-align: center;
-    font-size: 160%;
+    margin-top: 24px;
+    font-size: 200%;
     @include mediaQuery(sm) {
-      font-size: 180%;
+      margin-top: 32px;
+      font-size: 240%;
     }
     @include mediaQuery(md) {
-      font-size: 200%;
+      margin-top: 38px;
+      font-size: 280%;
     }
   }
 
