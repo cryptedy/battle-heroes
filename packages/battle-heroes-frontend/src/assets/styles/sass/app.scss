@@ -37,8 +37,9 @@ body {
   color: color(primary, light);
 
   &.has-dialog,
-  &.has-drawer,
-  &.has-transition-page {
+  &.has-drawer
+  // &.has-transition-page {
+  {
     overflow: hidden;
   }
 }
