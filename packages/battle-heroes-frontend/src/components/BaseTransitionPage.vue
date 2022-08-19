@@ -3,9 +3,9 @@
     :name="transitionName"
     :mode="transitionMode"
     :enter-active-class="transitionEnterActiveClass"
-    @before-leave="beforeLeave"
-    @enter="enter"
-    @after-enter="afterEnter"
+    @before-leave="onBeforeLeave"
+    @enter="onEnter"
+    @after-enter="onAfterEnter"
   >
     <slot />
   </transition>
@@ -14,6 +14,17 @@
 <script>
 export default {
   name: 'BaseTransitionPage',
+
+  props: {
+    type: {
+      type: String,
+      required: false,
+      default: 'route',
+      validator(value) {
+        return ['route', 'page'].indexOf(value) !== -1
+      }
+    }
+  },
 
   data() {
     return {
@@ -25,15 +36,27 @@ export default {
   },
 
   created() {
-    // https://router.vuejs.org/guide/advanced/transitions.html#per-route-transition
     this.$router.beforeEach((to, from, next) => {
-      const toDepth = to.path.split('/').length
-      const fromDepth = from.path.split('/').length
+      if (this.type === 'route') {
+        const toDepth = to.path.split('/').length
+        const fromDepth = from.path.split('/').length
 
-      this.transitionName =
-        toDepth < fromDepth
-          ? 'transition-page-slide-right'
-          : 'transition-page-slide-left'
+        this.transitionName =
+          toDepth < fromDepth
+            ? 'transition-page-slide-right'
+            : 'transition-page-slide-left'
+      } else if (this.type === 'page') {
+        const toPage = Number.parseInt(to.query.page) || 1
+        const fromPage = Number.parseInt(from.query.page) || 1
+
+        console.log(to, from)
+
+        this.transitionName =
+          fromPage < toPage
+            ? 'transition-page-slide-right'
+            : 'transition-page-slide-left'
+      }
+
       this.transitionEnterActiveClass = `${this.transitionName}-enter-active`
 
       next()
@@ -41,13 +64,13 @@ export default {
   },
 
   methods: {
-    beforeLeave(element) {
+    onBeforeLeave(element) {
       document.body.classList.add('has-transition-page')
 
       this.prevHeight = window.getComputedStyle(element).height
     },
 
-    enter(element) {
+    onEnter(element) {
       const { height } = window.getComputedStyle(element)
 
       element.style.height = this.prevHeight
@@ -57,7 +80,7 @@ export default {
       })
     },
 
-    afterEnter(element) {
+    onAfterEnter(element) {
       document.body.classList.remove('has-transition-page')
 
       element.style.height = 'auto'

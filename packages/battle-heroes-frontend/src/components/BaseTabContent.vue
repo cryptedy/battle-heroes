@@ -7,7 +7,7 @@
     </template>
 
     <template v-else-if="type === 'page'">
-      <BaseTransitionPage>
+      <BaseTransitionPage type="route">
         <slot />
       </BaseTransitionPage>
     </template>

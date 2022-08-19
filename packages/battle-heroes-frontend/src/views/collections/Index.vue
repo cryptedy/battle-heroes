@@ -1,5 +1,7 @@
 <template>
-  <div class="herodex">
+  <div class="collections">
+    <h1 class="collections-title">ヒーロー図鑑</h1>
+
     <BaseTab>
       <BaseTabList>
         <BaseTabListItem v-for="collection in collections" :key="collection.id">
@@ -16,9 +18,9 @@
     </BaseTab>
 
     <router-view v-slot="{ Component }">
-      <!-- <BaseTabContent type="page"> -->
-      <component :is="Component" />
-      <!-- </BaseTabContent> -->
+      <BaseTabContent type="page">
+        <component :is="Component" :key="$route.path" />
+      </BaseTabContent>
     </router-view>
   </div>
 </template>

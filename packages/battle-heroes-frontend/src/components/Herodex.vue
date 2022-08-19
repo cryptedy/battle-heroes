@@ -1,20 +1,24 @@
 <template>
-  <BaseEmpty v-if="!NFTs.length > 0" text="NO NFTs" />
+  <div class="herodex">
+    <BaseEmpty v-if="!NFTs.length > 0" text="NO NFTs" />
 
-  <div v-else>
-    <ThePagination
-      :pagination="pagination"
-      @update-page="onPageUpdate($event)"
-    />
+    <template v-else>
+      <ThePagination
+        :pagination="pagination"
+        @update-page="onPageUpdate($event)"
+      />
 
-    <BaseList class="nft-list">
-      <NFTListItem v-for="NFT in paginatedNFTs" :key="NFT.id" :nft="NFT" />
-    </BaseList>
+      <BaseTransitionPage type="page">
+        <BaseList :key="pagination" class="nft-list">
+          <NFTListItem v-for="NFT in paginatedNFTs" :key="NFT.id" :nft="NFT" />
+        </BaseList>
+      </BaseTransitionPage>
 
-    <ThePagination
-      :pagination="pagination"
-      @update-page="onPageUpdate($event)"
-    />
+      <ThePagination
+        :pagination="pagination"
+        @update-page="onPageUpdate($event)"
+      />
+    </template>
   </div>
 </template>
 
@@ -22,13 +26,15 @@
 import { mapGetters } from 'vuex'
 import NFTListItem from '@/components/NFTListItem'
 import ThePagination from '@/components/ThePagination'
+import BaseTransitionPage from './BaseTransitionPage.vue'
 
 export default {
   name: 'Herodex',
 
   components: {
     NFTListItem,
-    ThePagination
+    ThePagination,
+    BaseTransitionPage
   },
 
   props: {
@@ -93,10 +99,12 @@ export default {
   },
 
   created() {
-    this.$router.beforeEach((to, from) => {
+    this.$router.beforeEach((to, from, next) => {
       if (to.params.collectionId !== from.params.collectionId) {
         this.page = 1
       }
+
+      next()
     })
 
     this.page = Number.parseInt(this.$route.query.page) || 1
