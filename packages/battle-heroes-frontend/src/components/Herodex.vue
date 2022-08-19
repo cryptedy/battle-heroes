@@ -92,7 +92,13 @@ export default {
     }
   },
 
-  beforeMount() {
+  created() {
+    this.$router.beforeEach((to, from) => {
+      if (to.params.collectionId !== from.params.collectionId) {
+        this.page = 1
+      }
+    })
+
     this.page = Number.parseInt(this.$route.query.page) || 1
   },
 
