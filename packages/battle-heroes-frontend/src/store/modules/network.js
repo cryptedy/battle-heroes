@@ -17,14 +17,18 @@ export const mutations = {
 }
 
 export const actions = {
-  onOnline({ commit }) {
+  onOnline({ dispatch, commit }) {
     console.log('network/onOnline')
+
+    dispatch('audio/resumeAll', null, { root: true })
 
     commit(SET_NETWORK_CONNECTED, { connected: true })
   },
 
-  onOffline({ commit }) {
+  onOffline({ dispatch, commit }) {
     console.log('network/onOffline')
+
+    dispatch('audio/pauseAll', null, { root: true })
 
     commit(SET_NETWORK_CONNECTED, { connected: false })
   }

@@ -4,8 +4,7 @@ import {
   PLAY_AUDIO,
   STOP_AUDIO,
   PAUSE_AUDIO,
-  RESUME_AUDIO,
-  STOP_AUDIO_ALL
+  RESUME_AUDIO
 } from '../mutation-types'
 import { MUSIC, SOUND_EFFECT } from '@/utils/constants'
 import MusicBattle from '@/assets/audio/music/battle.mp3'
@@ -201,13 +200,6 @@ export const mutations = {
   [STOP_AUDIO](state, { sound }) {
     state.sounds[sound].audioElement.currentTime = 0
     state.sounds[sound].state = STATE.STOPPED
-  },
-
-  [STOP_AUDIO_ALL](state) {
-    Object.keys(state.sounds).forEach(sound => {
-      state.sounds[sound].audioElement.currentTime = 0
-      state.sounds[sound].state = STATE.STOPPED
-    })
   }
 }
 
@@ -220,22 +212,16 @@ export const actions = {
     if (audio) {
       // resume all paused sounds
       Object.keys(state.sounds).forEach(sound => {
-        if (state.sounds[sound].state === STATE.PAUSED) {
-          dispatch('play', sound)
-        }
+        dispatch('resume', sound)
       })
     } else {
       Object.keys(state.sounds).forEach(sound => {
         if (state.sounds[sound].type === TYPE.SOUND_EFFECT) {
           // stop all playing sound effects
-          if (state.sounds[sound].state === STATE.PLAYING) {
-            commit(STOP_AUDIO, { sound })
-          }
+          dispatch('stop', sound)
         } else {
           // pause all playing music
-          if (state.sounds[sound].state === STATE.PLAYING) {
-            commit(PAUSE_AUDIO, { sound })
-          }
+          dispatch('pause', sound)
         }
       })
     }
@@ -285,13 +271,14 @@ export const actions = {
   pause({ commit }, sound) {
     console.log('audio/pause', sound)
 
-    state.sounds[sound].audioElement.pause()
-
-    commit(PAUSE_AUDIO, { sound })
+    if (state.sounds[sound].state === STATE.PLAYING) {
+      state.sounds[sound].audioElement.pause()
+      commit(PAUSE_AUDIO, { sound })
+    }
   },
 
   resume({ commit }, sound) {
-    console.log('audio/stop', sound)
+    console.log('audio/resume', sound)
 
     if (state.sounds[sound].state === STATE.PAUSED) {
       state.sounds[sound].audioElement.play()
@@ -302,18 +289,36 @@ export const actions = {
   stop({ commit }, sound) {
     console.log('audio/stop', sound)
 
-    state.sounds[sound].audioElement.pause()
-
-    commit(STOP_AUDIO, { sound })
+    if (
+      state.sounds[sound].state === STATE.PLAYING ||
+      state.sounds[sound].state === STATE.PAUSED
+    ) {
+      state.sounds[sound].audioElement.pause()
+      commit(STOP_AUDIO, { sound })
+    }
   },
 
-  stopAll({ commit }) {
+  resumeAll({ dispatch }) {
+    console.log('audio/resumeAll')
+
+    Object.keys(state.sounds).forEach(sound => {
+      dispatch('resume', sound)
+    })
+  },
+
+  pauseAll({ dispatch }) {
+    console.log('audio/pauseAll')
+
+    Object.keys(state.sounds).forEach(sound => {
+      dispatch('pause', sound)
+    })
+  },
+
+  stopAll({ dispatch }) {
     console.log('audio/stopAll')
 
     Object.keys(state.sounds).forEach(sound => {
-      state.sounds[sound].audioElement.pause()
+      dispatch('stop', sound)
     })
-
-    commit(STOP_AUDIO_ALL)
   }
 }

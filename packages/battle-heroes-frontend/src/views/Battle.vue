@@ -305,11 +305,7 @@ export default {
     async onGameUpdate(game) {
       console.log('onGameUpdate', game)
 
-      if (game.id !== this.game.id) {
-        this.messages.push('ゲームエラーが発生しました')
-
-        return
-      }
+      if (game.id !== this.game.id) return
 
       this.game = game
 

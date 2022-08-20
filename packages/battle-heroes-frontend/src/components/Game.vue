@@ -145,10 +145,10 @@
             {{ $filters.spellLabel(playerNFT) }}
             {{ playerStatus.spell_remains }}
           </button>
+          <button :disabled="!canDefence" @click="defence">防御</button>
           <button :disabled="!canHeal" @click="heal">
             回復 {{ playerStatus.heal_remains }}
           </button>
-          <button :disabled="!canDefence" @click="defence">防御</button>
           <!-- <button :disabled="true">ヘルプ</button> -->
         </template>
       </template>
