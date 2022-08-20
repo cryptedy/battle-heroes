@@ -440,17 +440,20 @@ class GameManager {
 
     if (move === PLAYER_MOVE.ATTACK) {
       localMove.payload = {
+        damage: 0,
         isMiss: false,
         isCritical: false,
+        isMustCritical: false,
         isFinish: false,
-        damage: 0
+        isOpponentDefence: opponentStatus.isDefence
       }
 
       this.attack(payload)
     } else if (move === PLAYER_MOVE.SPELL) {
       localMove.payload = {
+        damage: 0,
         isFinish: false,
-        damage: 0
+        isOpponentDefence: opponentStatus.isDefence
       }
 
       this.spell(payload)
@@ -564,26 +567,29 @@ class GameManager {
     const nextPlayerStatus = {}
     const nextOpponentStatus = {}
 
-    let isFinish = false
     let damage = 0
+    let isMiss = false
+    let isCritical = false
+    let isMustCritical = false
+    let isFinish = false
 
     if (!playerStatus.mustCritical && Math.random() < playerStatus.missRate) {
-      localMove.payload.isMiss = true
+      isMiss = true
     } else {
       damage = Math.floor(
         (playerStatus.attack * 100) / (100 + opponentStatus.defense)
       )
 
-      if (opponentStatus.isDefence) {
+      if (!playerStatus.mustCritical && opponentStatus.isDefence) {
         damage = Math.floor(damage * 0.7)
       }
 
       if (playerStatus.mustCritical) {
-        localMove.payload.isCritical = true
+        isMustCritical = true
         damage = Math.floor(damage * 1.5)
         nextPlayerStatus.mustCritical = false
       } else if (Math.random() < playerStatus.criticalRate) {
-        localMove.payload.isCritical = true
+        isCritical = true
         damage = Math.floor(damage * 1.5)
       } else {
         const adjustDamage = getRandomValue(-2, 2)
@@ -614,6 +620,10 @@ class GameManager {
         }
       }
 
+      localMove.payload.damage = damage
+      localMove.payload.isMiss = isMiss
+      localMove.payload.isCritical = isCritical
+      localMove.payload.isMustCritical = isMustCritical
       localMove.payload.isFinish = isFinish
 
       nextPlayerStatus.attack_remains = playerStatus.attack_remains - 1
@@ -655,8 +665,10 @@ class GameManager {
     const nextPlayerStatus = {}
     const nextOpponentStatus = {}
 
+    let damage = 0
     let isFinish = false
-    let damage = Math.floor(
+
+    damage = Math.floor(
       (playerStatus.int * 100) / (100 + opponentStatus.defense)
     )
 
@@ -672,10 +684,69 @@ class GameManager {
       isFinish = true
     }
 
-    localMove.payload.isFinish = isFinish
     localMove.payload.damage = damage
+    localMove.payload.isFinish = isFinish
 
     nextPlayerStatus.spell_remains = playerStatus.spell_remains - 1
+
+    if (opponentStatus.isDefence) {
+      nextOpponentStatus.isDefence = false
+    }
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: playerKey,
+      payload: nextPlayerStatus
+    })
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: opponentPlayerKey,
+      payload: nextOpponentStatus
+    })
+  }
+
+  defence(payload) {
+    console.log('defence')
+
+    const {
+      game,
+      playerKey,
+      playerStatus,
+      opponentPlayerKey,
+      opponentStatus,
+      localMove
+    } = payload
+
+    const nextPlayerStatus = {}
+    const nextOpponentStatus = {}
+
+    let recoveryAmount = 0
+    let mustCritical = false
+
+    const rand = Math.random()
+
+    if (rand < 0.02) {
+      recoveryAmount = 4
+    } else if (rand < 0.1) {
+      recoveryAmount = 2
+    } else if (rand < 0.5) {
+      recoveryAmount = 1
+    } else {
+      recoveryAmount = 2
+    }
+
+    if (Math.random() < 0.1) {
+      mustCritical = true
+    }
+
+    localMove.payload.recoveryAmount = recoveryAmount
+    localMove.payload.mustCritical = mustCritical
+
+    nextPlayerStatus.attack_remains =
+      playerStatus.attack_remains + recoveryAmount
+    nextPlayerStatus.mustCritical = mustCritical
+    nextPlayerStatus.isDefence = true
 
     if (opponentStatus.isDefence) {
       nextOpponentStatus.isDefence = false
@@ -746,65 +817,6 @@ class GameManager {
 
     nextPlayerStatus.hp = newPlayerHp
     nextPlayerStatus.heal_remains = playerStatus.heal_remains - 1
-
-    if (opponentStatus.isDefence) {
-      nextOpponentStatus.isDefence = false
-    }
-
-    updateGamePlayer({
-      gameId: game.id,
-      playerKey: playerKey,
-      payload: nextPlayerStatus
-    })
-
-    updateGamePlayer({
-      gameId: game.id,
-      playerKey: opponentPlayerKey,
-      payload: nextOpponentStatus
-    })
-  }
-
-  defence(payload) {
-    console.log('defence')
-
-    const {
-      game,
-      playerKey,
-      playerStatus,
-      opponentPlayerKey,
-      opponentStatus,
-      localMove
-    } = payload
-
-    const nextPlayerStatus = {}
-    const nextOpponentStatus = {}
-
-    let recoveryAmount = 0
-    let mustCritical = false
-
-    const rand = Math.random()
-
-    if (rand < 0.02) {
-      recoveryAmount = 4
-    } else if (rand < 0.1) {
-      recoveryAmount = 2
-    } else if (rand < 0.5) {
-      recoveryAmount = 1
-    } else {
-      recoveryAmount = 2
-    }
-
-    if (Math.random() < 0.1) {
-      mustCritical = true
-    }
-
-    localMove.payload.recoveryAmount = recoveryAmount
-    localMove.payload.mustCritical = mustCritical
-
-    nextPlayerStatus.attack_remains =
-      playerStatus.attack_remains + recoveryAmount
-    nextPlayerStatus.mustCritical = mustCritical
-    nextPlayerStatus.isDefence = true
 
     if (opponentStatus.isDefence) {
       nextOpponentStatus.isDefence = false

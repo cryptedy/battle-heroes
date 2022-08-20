@@ -66,8 +66,8 @@
         @attack="onAttack"
         @spell="onSpell"
         @heal="onHeal"
-        @defence="onDefence"
         @finish="onGameFinished"
+        @defence="onDefence"
         @abort="onGameAbort"
         @continue="onContinue"
       />
@@ -363,16 +363,16 @@ export default {
       this.$socket.emit('game:move', PLAYER_MOVE.SPELL)
     },
 
-    onHeal() {
-      console.log('onHeal')
-
-      this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
-    },
-
     onDefence() {
       console.log('onDefence')
 
       this.$socket.emit('game:move', PLAYER_MOVE.DEFENCE)
+    },
+
+    onHeal() {
+      console.log('onHeal')
+
+      this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
     },
 
     async addGameMessages(game) {
@@ -397,18 +397,33 @@ export default {
       const opponentPlayerNFT = this.findNFT(opponentPlayerNFTId)
 
       if (lastMove.move === PLAYER_MOVE.ATTACK) {
-        this.messages.push(`${player.name} の攻撃！`)
-        await this.playAudio(SOUND_EFFECT.ATTACK)
-
-        const { isMiss, isCritical, isFinish, damage } = {
+        const {
+          damage,
+          isMiss,
+          isCritical,
+          isMustCritical,
+          isFinish,
+          isOpponentDefence
+        } = {
           ...lastMove.payload
         }
+
+        this.messages.push(`${player.name} の攻撃！`)
+        await this.playAudio(SOUND_EFFECT.ATTACK)
 
         if (isMiss) {
           this.messages.push('ミス！')
           this.messages.push(`${opponentPlayer.name} にダメージを与えられない`)
         } else {
-          if (isCritical) {
+          if (isMustCritical) {
+            this.messages.push('クリティカルヒット！')
+
+            if (isOpponentDefence) {
+              this.messages.push(`${opponentPlayer.name} の防御を突き抜けた！`)
+            }
+
+            await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+          } else if (isCritical) {
             this.messages.push('クリティカルヒット！')
             await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
           }
@@ -424,15 +439,19 @@ export default {
           }
         }
       } else if (lastMove.move === PLAYER_MOVE.SPELL) {
+        const { damage, isFinish, isOpponentDefence } = {
+          ...lastMove.payload
+        }
+
         const spellLabel = this.$filters.spellLabel(playerNFT)
 
         this.messages.push(`${player.name} の${spellLabel}攻撃！`)
 
-        const { isFinish, damage } = {
-          ...lastMove.payload
-        }
-
         if (damage > 0) {
+          if (isOpponentDefence) {
+            this.messages.push(`${opponentPlayer.name} の防御を突き抜けた！`)
+          }
+
           this.messages.push(
             `${opponentPlayer.name} に ${damage} のダメージを与えた！`
           )
@@ -442,32 +461,15 @@ export default {
         if (isFinish) {
           this.addGameFinishMessages(player, opponentPlayer)
         }
-      } else if (lastMove.move === PLAYER_MOVE.HEAL) {
-        this.messages.push(`${player.name} の回復！`)
-
-        const { recoveryAmount } = {
+      } else if (lastMove.move === PLAYER_MOVE.DEFENCE) {
+        const { recoveryAmount, mustCritical } = {
           ...lastMove.payload
         }
 
-        if (recoveryAmount === 0) {
-          this.messages.push('ミス')
-          this.messages.push(`${player.name} は HP を回復できなかった！`)
-        } else {
-          await this.playAudio(SOUND_EFFECT.HEAL)
-
-          this.messages.push(
-            `${player.name} の HP が ${recoveryAmount} 回復した！`
-          )
-        }
-      } else if (lastMove.move === PLAYER_MOVE.DEFENCE) {
         this.messages.push(
           `${player.name} は防御態勢を取って力をためている・・・！`
         )
         await this.playAudio(SOUND_EFFECT.DEFENCE)
-
-        const { recoveryAmount, mustCritical } = {
-          ...lastMove.payload
-        }
 
         if (recoveryAmount > 0) {
           this.messages.push(
@@ -479,6 +481,23 @@ export default {
           this.messages.push(`${player.name} に力がみなぎってきた！`)
           this.messages.push(
             `${player.name} の次ターンの攻撃は必ずクリティカルヒットになる予感・・・！`
+          )
+        }
+      } else if (lastMove.move === PLAYER_MOVE.HEAL) {
+        const { recoveryAmount } = {
+          ...lastMove.payload
+        }
+
+        this.messages.push(`${player.name} の回復！`)
+
+        if (recoveryAmount === 0) {
+          this.messages.push('ミス')
+          this.messages.push(`${player.name} は HP を回復できなかった！`)
+        } else {
+          await this.playAudio(SOUND_EFFECT.HEAL)
+
+          this.messages.push(
+            `${player.name} の HP が ${recoveryAmount} 回復した！`
           )
         }
       }

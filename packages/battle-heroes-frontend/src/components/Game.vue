@@ -221,7 +221,7 @@ export default {
     }
   },
 
-  emits: ['attack', 'spell', 'heal', 'defence', 'abort', 'finish', 'continue'],
+  emits: ['attack', 'spell', 'defence', 'heal', 'abort', 'finish', 'continue'],
 
   data() {
     return {
@@ -306,16 +306,16 @@ export default {
       return this.canMove && this.playerStatus.spell_remains > 0
     },
 
+    canDefence() {
+      return this.canMove
+    },
+
     canHeal() {
       return (
         this.canMove &&
         this.playerStatus.hp < this.playerStatus.max_hp &&
         this.playerStatus.heal_remains > 0
       )
-    },
-
-    canDefence() {
-      return this.canMove
     },
 
     canLeaveGame() {
@@ -415,16 +415,6 @@ export default {
       this.$emit('spell')
     },
 
-    heal() {
-      console.log('Game:heal')
-
-      if (!this.canHeal) return
-
-      this.moving = true
-
-      this.$emit('heal')
-    },
-
     defence() {
       console.log('Game:defence')
 
@@ -433,6 +423,16 @@ export default {
       this.moving = true
 
       this.$emit('defence')
+    },
+
+    heal() {
+      console.log('Game:heal')
+
+      if (!this.canHeal) return
+
+      this.moving = true
+
+      this.$emit('heal')
     },
 
     leaveGame() {

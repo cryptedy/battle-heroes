@@ -31,8 +31,8 @@
     :nft2="NFT2"
     @attack="onAttack"
     @spell="onSpell"
-    @heal="onHeal"
     @defence="onDefence"
+    @heal="onHeal"
     @finish="onGameFinished"
     @abort="onGameAbort"
     @continue="onContinue"
@@ -470,10 +470,12 @@ export default {
         playerKey: this.currentPlayerKey,
         move: PLAYER_MOVE.ATTACK,
         payload: {
+          damage: 0,
           isMiss: false,
           isCritical: false,
+          isMustCritical: false,
           isFinish: false,
-          damage: 0
+          isOpponentDefence: this.currentOpponentStatus.isDefence
         }
       }
 
@@ -481,35 +483,40 @@ export default {
       const nextOpponentStatus = {}
 
       let damage = 0
+      let isMiss = false
+      let isCritical = false
+      let isMustCritical = false
+      let isFinish = false
 
       if (
         !this.currentPlayerStatus.mustCritical &&
         Math.random() < this.currentPlayerStatus.missRate
       ) {
-        move.payload.isMiss = true
+        isMiss = true
       } else {
         damage = Math.floor(
           (this.currentPlayerStatus.attack * 100) /
             (100 + this.currentOpponentStatus.defense)
         )
 
-        if (this.currentOpponentStatus.isDefence) {
+        if (
+          !this.currentPlayerStatus.mustCritical &&
+          this.currentOpponentStatus.isDefence
+        ) {
           damage = Math.floor(damage * 0.7)
         }
 
         if (this.currentPlayerStatus.mustCritical) {
-          move.payload.isCritical = true
+          isMustCritical = true
           damage = Math.floor(damage * 1.5)
           nextPlayerStatus.mustCritical = false
         } else if (Math.random() < this.currentPlayerStatus.criticalRate) {
-          move.payload.isCritical = true
+          isCritical = true
           damage = Math.floor(damage * 1.5)
         } else {
           const adjustDamage = getRandomValue(-2, 2)
           damage = damage + adjustDamage
         }
-
-        move.payload.damage = damage
 
         const oldOpponentHp = this.currentOpponentStatus.hp
         const oldOpponentHpRate =
@@ -526,7 +533,7 @@ export default {
         nextOpponentStatus.hp = newOpponentHp
 
         if (newOpponentHp === 0) {
-          move.payload.isFinish = true
+          isFinish = true
         } else {
           if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
             nextOpponentStatus.criticalRate = 0.15
@@ -534,6 +541,12 @@ export default {
             nextOpponentStatus.criticalRate = 0.25
           }
         }
+
+        move.payload.damage = damage
+        move.payload.isMiss = isMiss
+        move.payload.isCritical = isCritical
+        move.payload.isMustCritical = isMustCritical
+        move.payload.isFinish = isFinish
 
         nextPlayerStatus.attack_remains =
           this.currentPlayerStatus.attack_remains - 1
@@ -569,18 +582,19 @@ export default {
         playerKey: this.currentPlayerKey,
         move: PLAYER_MOVE.SPELL,
         payload: {
-          isMiss: false,
-          isCritical: false,
+          damage: 0,
           isFinish: false,
-          damage: 0
+          isOpponentDefence: this.currentOpponentStatus.isDefence
         }
       }
 
       const nextPlayerStatus = {}
       const nextOpponentStatus = {}
 
+      let damage = 0
       let isFinish = false
-      let damage = Math.floor(
+
+      damage = Math.floor(
         (this.currentPlayerStatus.int * 100) /
           (100 + this.currentOpponentStatus.defense)
       )
@@ -602,6 +616,67 @@ export default {
 
       nextPlayerStatus.spell_remains =
         this.currentPlayerStatus.spell_remains - 1
+
+      if (this.currentOpponentStatus.isDefence) {
+        nextOpponentStatus.isDefence = false
+      }
+
+      this.game.players[this.currentPlayerKey] = {
+        ...this.game.players[this.currentPlayerKey],
+        ...nextPlayerStatus
+      }
+
+      this.game.players[this.currentOpponentKey] = {
+        ...this.game.players[this.currentOpponentKey],
+        ...nextOpponentStatus
+      }
+
+      this.nextTurn(move)
+    },
+
+    onDefence() {
+      console.log('onDefence')
+
+      if (this.gameAborting || this.gameAborted || this.gameFinished) return
+
+      const move = {
+        playerKey: this.currentPlayerKey,
+        move: PLAYER_MOVE.DEFENCE,
+        payload: {
+          recoveryAmount: 0,
+          mustCritical: false
+        }
+      }
+
+      const nextPlayerStatus = {}
+      const nextOpponentStatus = {}
+
+      let recoveryAmount = 0
+      let mustCritical = false
+
+      const rand = Math.random()
+
+      if (rand < 0.02) {
+        recoveryAmount = 4
+      } else if (rand < 0.1) {
+        recoveryAmount = 2
+      } else if (rand < 0.5) {
+        recoveryAmount = 1
+      } else {
+        recoveryAmount = 2
+      }
+
+      if (Math.random() < 0.1) {
+        mustCritical = true
+      }
+
+      move.payload.recoveryAmount = recoveryAmount
+      move.payload.mustCritical = mustCritical
+
+      nextPlayerStatus.attack_remains =
+        this.currentPlayerStatus.attack_remains + recoveryAmount
+      nextPlayerStatus.mustCritical = mustCritical
+      nextPlayerStatus.isDefence = true
 
       if (this.currentOpponentStatus.isDefence) {
         nextOpponentStatus.isDefence = false
@@ -691,67 +766,6 @@ export default {
       this.nextTurn(move)
     },
 
-    onDefence() {
-      console.log('onDefence')
-
-      if (this.gameAborting || this.gameAborted || this.gameFinished) return
-
-      const move = {
-        playerKey: this.currentPlayerKey,
-        move: PLAYER_MOVE.DEFENCE,
-        payload: {
-          recoveryAmount: 0,
-          mustCritical: false
-        }
-      }
-
-      const nextPlayerStatus = {}
-      const nextOpponentStatus = {}
-
-      let recoveryAmount = 0
-      let mustCritical = false
-
-      const rand = Math.random()
-
-      if (rand < 0.02) {
-        recoveryAmount = 4
-      } else if (rand < 0.1) {
-        recoveryAmount = 2
-      } else if (rand < 0.5) {
-        recoveryAmount = 1
-      } else {
-        recoveryAmount = 2
-      }
-
-      if (Math.random() < 0.1) {
-        mustCritical = true
-      }
-
-      move.payload.recoveryAmount = recoveryAmount
-      move.payload.mustCritical = mustCritical
-
-      nextPlayerStatus.attack_remains =
-        this.currentPlayerStatus.attack_remains + recoveryAmount
-      nextPlayerStatus.mustCritical = mustCritical
-      nextPlayerStatus.isDefence = true
-
-      if (this.currentOpponentStatus.isDefence) {
-        nextOpponentStatus.isDefence = false
-      }
-
-      this.game.players[this.currentPlayerKey] = {
-        ...this.game.players[this.currentPlayerKey],
-        ...nextPlayerStatus
-      }
-
-      this.game.players[this.currentOpponentKey] = {
-        ...this.game.players[this.currentOpponentKey],
-        ...nextOpponentStatus
-      }
-
-      this.nextTurn(move)
-    },
-
     async nextTurn(move) {
       this.game.moves.push(move)
 
@@ -807,12 +821,19 @@ export default {
         }
 
         if (lastMove.move === PLAYER_MOVE.ATTACK) {
-          this.messages.push(`${player.name} の攻撃！`)
-          await this.playAudio(SOUND_EFFECT.ATTACK)
-
-          const { isMiss, isCritical, isFinish, damage } = {
+          const {
+            damage,
+            isMiss,
+            isCritical,
+            isMustCritical,
+            isFinish,
+            isOpponentDefence
+          } = {
             ...lastMove.payload
           }
+
+          this.messages.push(`${player.name} の攻撃！`)
+          await this.playAudio(SOUND_EFFECT.ATTACK)
 
           if (isMiss) {
             this.messages.push('ミス！')
@@ -820,7 +841,17 @@ export default {
               `${opponentPlayer.name} にダメージを与えられない`
             )
           } else {
-            if (isCritical) {
+            if (isMustCritical) {
+              this.messages.push('クリティカルヒット！')
+
+              if (isOpponentDefence) {
+                this.messages.push(
+                  `${opponentPlayer.name} の防御を突き抜けた！`
+                )
+              }
+
+              await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+            } else if (isCritical) {
               this.messages.push('クリティカルヒット！')
               await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
             }
@@ -836,15 +867,19 @@ export default {
             }
           }
         } else if (lastMove.move === PLAYER_MOVE.SPELL) {
+          const { damage, isFinish, isOpponentDefence } = {
+            ...lastMove.payload
+          }
+
           const spellLabel = this.$filters.spellLabel(playerNFT)
 
           this.messages.push(`${player.name} の${spellLabel}攻撃！`)
 
-          const { isFinish, damage } = {
-            ...lastMove.payload
-          }
-
           if (damage > 0) {
+            if (isOpponentDefence) {
+              this.messages.push(`${opponentPlayer.name} の防御を突き抜けた！`)
+            }
+
             this.messages.push(
               `${opponentPlayer.name} に ${damage} のダメージを与えた！`
             )
@@ -854,31 +889,15 @@ export default {
           if (isFinish) {
             this.addGameFinishMessages(player, opponentPlayer)
           }
-        } else if (lastMove.move === PLAYER_MOVE.HEAL) {
-          this.messages.push(`${player.name} の回復！`)
-
-          const { recoveryAmount } = {
+        } else if (lastMove.move === PLAYER_MOVE.DEFENCE) {
+          const { recoveryAmount, mustCritical } = {
             ...lastMove.payload
           }
 
-          if (recoveryAmount === 0) {
-            this.messages.push('ミス')
-            this.messages.push(`${player.name} は HP を回復できなかった！`)
-          } else {
-            this.messages.push(
-              `${player.name} の HP が ${recoveryAmount} 回復した！`
-            )
-            await this.playAudio(SOUND_EFFECT.HEAL)
-          }
-        } else if (lastMove.move === PLAYER_MOVE.DEFENCE) {
           this.messages.push(
             `${player.name} は防御態勢を取って力をためている・・・！`
           )
           await this.playAudio(SOUND_EFFECT.DEFENCE)
-
-          const { recoveryAmount, mustCritical } = {
-            ...lastMove.payload
-          }
 
           if (recoveryAmount > 0) {
             this.messages.push(
@@ -891,6 +910,22 @@ export default {
             this.messages.push(
               `${player.name} の次ターンの攻撃は必ずクリティカルヒットになる予感・・・！`
             )
+          }
+        } else if (lastMove.move === PLAYER_MOVE.HEAL) {
+          const { recoveryAmount } = {
+            ...lastMove.payload
+          }
+
+          this.messages.push(`${player.name} の回復！`)
+
+          if (recoveryAmount === 0) {
+            this.messages.push('ミス')
+            this.messages.push(`${player.name} は HP を回復できなかった！`)
+          } else {
+            this.messages.push(
+              `${player.name} の HP が ${recoveryAmount} 回復した！`
+            )
+            await this.playAudio(SOUND_EFFECT.HEAL)
           }
         }
       }
