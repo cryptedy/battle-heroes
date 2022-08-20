@@ -483,6 +483,10 @@ export default {
             `${player.name} の次ターンの攻撃は必ずクリティカルヒットになる予感・・・！`
           )
         }
+
+        this.messages.push(
+          `${player.name} は攻撃に備えて防御を続けている・・・`
+        )
       } else if (lastMove.move === PLAYER_MOVE.HEAL) {
         const { recoveryAmount } = {
           ...lastMove.payload
