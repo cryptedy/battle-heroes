@@ -473,7 +473,7 @@ export default {
 
         if (recoveryAmount > 0) {
           this.messages.push(
-            `${player.name} の攻撃回数が ${recoveryAmount} 回復した！`
+            `${player.name} の攻撃回数が ${recoveryAmount} 増えた！`
           )
         }
 
