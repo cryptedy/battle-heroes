@@ -153,6 +153,8 @@ const createGame = battle => {
   }
 }
 
+import { getPlayerFullStats } from '@/utils/helpers'
+
 export default {
   name: 'BattleOffline',
 
@@ -172,7 +174,8 @@ export default {
       gameAborted: false,
       gameFinished: false,
       monsters: [Wolfman, Ghost, Beans, Worm, Dragon],
-      messages: []
+      messages: [],
+      playerFullStats: {}
     }
   },
 
@@ -341,6 +344,11 @@ export default {
       setTimeout(() => {
         this.game = createGame(this.battle)
 
+        const { exp, win, lose } = this.player
+        this.playerFullStats = getPlayerFullStats({ exp, win, lose })
+        this.addPlayerStatsMessages(this.player, this.playerFullStats)
+
+        this.messages.push('------------------')
         this.messages.push('バトルスタート！')
 
         setTimeout(() => {
@@ -430,6 +438,13 @@ export default {
       setTimeout(() => {
         this.game = createGame(this.battle)
 
+        const { exp, win, lose } = this.player
+        this.playerFullStats = getPlayerFullStats({ exp, win, lose })
+        this.addPlayerStatsMessages(this.player, this.playerFullStats)
+
+        this.messages.push('------------------')
+        this.messages.push('バトルスタート！')
+
         setTimeout(() => {
           this.playAudio(MUSIC.BATTLE)
         }, 500)
@@ -479,7 +494,7 @@ export default {
         )
 
         if (this.currentOpponentStatus.isDefence) {
-          damage = Math.floor(damage * 0.6)
+          damage = Math.floor(damage * 0.7)
         }
 
         if (this.currentPlayerStatus.mustCritical) {
@@ -538,9 +553,7 @@ export default {
         }
       }
 
-      this.game.moves.push(move)
-
-      this.nextTurn()
+      this.nextTurn(move)
     },
 
     onSpell() {
@@ -604,9 +617,7 @@ export default {
         ...nextOpponentStatus
       }
 
-      this.game.moves.push(move)
-
-      this.nextTurn()
+      this.nextTurn(move)
     },
 
     onHeal() {
@@ -677,9 +688,7 @@ export default {
         ...nextOpponentStatus
       }
 
-      this.game.moves.push(move)
-
-      this.nextTurn()
+      this.nextTurn(move)
     },
 
     onDefence() {
@@ -740,27 +749,61 @@ export default {
         ...nextOpponentStatus
       }
 
-      this.game.moves.push(move)
-
-      this.nextTurn()
+      this.nextTurn(move)
     },
 
-    async nextTurn() {
+    async nextTurn(move) {
+      this.game.moves.push(move)
+
       const nextPlayer = this.game.current_player === 1 ? 2 : 1
 
-      if (this.game.moves.length > 0) {
-        const lastMove = this.game.moves[this.game.moves.length - 1]
+      await this.addGameMessages(this.game)
+
+      this.game.current_player = nextPlayer
+      this.game.turn++
+
+      if (this.game.current_player === 2) {
+        setTimeout(() => {
+          if (
+            this.currentPlayerStatus.hp < 30 &&
+            this.currentOpponentStatus.hp > 25 &&
+            this.currentPlayerStatus.heal_remains > 0
+          ) {
+            this.onHeal()
+          } else if (
+            this.currentPlayerStatus.spell_remains > 0 &&
+            this.currentOpponentPlayer.isDefence
+          ) {
+            this.onSpell()
+          } else if (this.currentPlayerStatus.attack_remains === 0) {
+            this.onDefence()
+          } else {
+            this.onAttack()
+          }
+        }, 1200)
+      }
+    },
+
+    async addGameMessages(game) {
+      if (game.moves.length > 0) {
+        const lastMove = game.moves[game.moves.length - 1]
 
         let player, opponentPlayer
+        let playerNFT, opponentPlayerNFT
 
         if (lastMove.playerKey === 1) {
-          const playerId = this.game.players[1].id
+          const playerId = game.players[1].id
           player = this.findPlayer(playerId)
           opponentPlayer = CPU
+          playerNFT = this.NFT1
+          opponentPlayerNFT = this.NFT2
         } else {
-          const playerId = this.game.players[1].id
+          const playerId = game.players[1].id
           player = CPU
           opponentPlayer = this.findPlayer(playerId)
+          playerNFT = this.NFT2
+          // eslint-disable-next-line no-unused-vars
+          opponentPlayerNFT = this.NFT1
         }
 
         if (lastMove.move === PLAYER_MOVE.ATTACK) {
@@ -789,38 +832,13 @@ export default {
             }
 
             if (isFinish) {
-              this.messages.push(`${opponentPlayer.name} は気絶してしまった！`)
-              this.messages.push(`${player.name} の勝利！`)
-
-              if (player.id === this.player.id) {
-                // player wins
-                this.messages.push('3 ポイントの経験値を得た！')
-                this.playAudio(SOUND_EFFECT.WIN)
-
-                this.$nextTick(() => {
-                  this.$socket.emit('player:updateStats', {
-                    exp: 3,
-                    win: 1,
-                    lose: 0
-                  })
-                })
-              } else {
-                // playe lose
-                this.messages.push('1 ポイントの経験値を得た！')
-                this.playAudio(SOUND_EFFECT.LOSE)
-
-                this.$nextTick(() => {
-                  this.$socket.emit('player:updateStats', {
-                    exp: 1,
-                    win: 0,
-                    lose: 1
-                  })
-                })
-              }
+              this.addGameFinishMessages(player, opponentPlayer)
             }
           }
         } else if (lastMove.move === PLAYER_MOVE.SPELL) {
-          this.messages.push(`${player.name} の魔法攻撃！`)
+          const spellLabel = this.$filters.spellLabel(playerNFT)
+
+          this.messages.push(`${player.name} の${spellLabel}攻撃！`)
 
           const { isFinish, damage } = {
             ...lastMove.payload
@@ -834,34 +852,7 @@ export default {
           }
 
           if (isFinish) {
-            this.messages.push(`${opponentPlayer.name} は気絶してしまった！`)
-            this.messages.push(`${player.name} の勝利！`)
-
-            if (player.id === this.player.id) {
-              // player wins
-              this.messages.push('3 ポイントの経験値を得た！')
-              this.playAudio(SOUND_EFFECT.WIN)
-
-              this.$nextTick(() => {
-                this.$socket.emit('player:updateStats', {
-                  exp: 3,
-                  win: 1,
-                  lose: 0
-                })
-              })
-            } else {
-              // playe lose
-              this.messages.push('1 ポイントの経験値を得た！')
-              this.playAudio(SOUND_EFFECT.LOSE)
-
-              this.$nextTick(() => {
-                this.$socket.emit('player:updateStats', {
-                  exp: 1,
-                  win: 0,
-                  lose: 1
-                })
-              })
-            }
+            this.addGameFinishMessages(player, opponentPlayer)
           }
         } else if (lastMove.move === PLAYER_MOVE.HEAL) {
           this.messages.push(`${player.name} の回復！`)
@@ -903,30 +894,71 @@ export default {
           }
         }
       }
+    },
 
-      this.game.current_player = nextPlayer
-      this.game.turn++
+    addPlayerStatsMessages(player, playerFullStats) {
+      const { exp, win, lose, totalMatch, winRate } = playerFullStats
 
-      if (this.game.current_player === 2) {
-        setTimeout(() => {
-          if (
-            this.currentPlayerStatus.hp < 30 &&
-            this.currentOpponentStatus.hp > 25 &&
-            this.currentPlayerStatus.heal_remains > 0
-          ) {
-            this.onHeal()
-          } else if (
-            this.currentPlayerStatus.spell_remains > 0 &&
-            this.currentOpponentPlayer.isDefence
-          ) {
-            this.onSpell()
-          } else if (this.currentPlayerStatus.attack_remains === 0) {
-            this.onDefence()
-          } else {
-            this.onAttack()
-          }
-        }, 1200)
+      if (totalMatch < 0) {
+        this.messages.push(`[${player.name}] の初バトル！`)
+      } else {
+        this.messages.push(`[${player.name}] 経験値 ${exp}`)
+        this.messages.push(
+          `勝率 ${winRate}% (勝ち ${win} + 負け ${lose} = 合計 ${totalMatch})`
+        )
       }
+    },
+
+    addGameFinishMessages(winner, loser) {
+      this.messages.push(`${loser.name} は気絶してしまった！`)
+      this.messages.push(`${winner.name} の勝利！`)
+      this.messages.push('------------------')
+
+      let addExp = 0
+      let addWin = 0
+      let addLose = 0
+
+      if (winner.id === this.player.id) {
+        // player wins
+        addExp = 3
+        addWin = 1
+        addLose = 0
+
+        this.playAudio(SOUND_EFFECT.WIN)
+      } else {
+        // playe lose
+        addExp = 1
+        addWin = 0
+        addLose = 1
+
+        this.playAudio(SOUND_EFFECT.LOSE)
+      }
+
+      this.messages.push(`${addExp} ポイントの経験値を得た！`)
+      this.messages.push('------------------')
+
+      const { exp: oldExp, win: oldWin, lose: oldLose } = this.playerFullStats
+
+      const newPlayerStats = {
+        ...oldExp,
+        ...{
+          exp: oldExp + addExp,
+          win: oldWin + addWin,
+          lose: oldLose + addLose
+        }
+      }
+
+      const { exp, win, lose } = newPlayerStats
+      this.playerFullStats = getPlayerFullStats({ exp, win, lose })
+      this.addPlayerStatsMessages(this.player, this.playerFullStats)
+
+      this.$nextTick(() => {
+        this.$socket.emit('player:updateStats', {
+          exp: addExp,
+          win: addWin,
+          lose: addLose
+        })
+      })
     }
   }
 }

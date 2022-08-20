@@ -575,7 +575,7 @@ class GameManager {
       )
 
       if (opponentStatus.isDefence) {
-        damage = Math.floor(damage * 0.6)
+        damage = Math.floor(damage * 0.7)
       }
 
       if (playerStatus.mustCritical) {

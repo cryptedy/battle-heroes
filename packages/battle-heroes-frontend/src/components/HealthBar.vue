@@ -1,6 +1,10 @@
 <template>
   <div class="health-bar">
-    <div class="health-bar-progress" :style="styleObject"></div>
+    <div
+      class="health-bar-progress"
+      :class="{ 'has-damage': hasDamage }"
+      :style="styleObject"
+    ></div>
   </div>
 </template>
 
@@ -25,6 +29,10 @@ export default {
       return {
         width: `${(this.hp / this.maxHp) * 100}%`
       }
+    },
+
+    hasDamage() {
+      return this.hp < this.maxHp
     }
   }
 }

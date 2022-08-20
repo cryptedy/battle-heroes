@@ -131,17 +131,25 @@
         </template>
 
         <template v-else>
-          <button :disabled="!canAttack" @click="attack">
+          <button
+            :disabled="!canAttack"
+            :class="{
+              'is-disabled': !canAttack,
+              'is-emphasis': playerStatus.mustCritical
+            }"
+            @click="attack"
+          >
             攻撃 {{ playerStatus.attack_remains }}
           </button>
           <button :disabled="!canSpell" @click="spell">
-            {{ spellLabel }} {{ playerStatus.spell_remains }}
+            {{ $filters.spellLabel(playerNFT) }}
+            {{ playerStatus.spell_remains }}
           </button>
           <button :disabled="!canHeal" @click="heal">
             回復 {{ playerStatus.heal_remains }}
           </button>
-          <button :disabled="!canDefence" @click="defence">防御 ∞</button>
-          <button :disabled="true">アイテム</button>
+          <button :disabled="!canDefence" @click="defence">防御</button>
+          <!-- <button :disabled="true">ヘルプ</button> -->
         </template>
       </template>
 
@@ -322,10 +330,6 @@ export default {
         !this.moving &&
         this.currentPlayerKey === this.playerKey
       )
-    },
-
-    spellLabel() {
-      return this.playerNFT.collection_id === 3 ? '忍術' : '魔法'
     },
 
     twitterLink() {

@@ -2,14 +2,16 @@
   <div class="player-stats">
     <ul class="player-stats-list">
       <li class="player-stats-list-item">
-        <span class="player-stats-list-item-text"> EXP {{ player.exp }} </span>
+        <span class="player-stats-list-item-text">
+          経験値 {{ player.exp }}
+        </span>
       </li>
       <li class="player-stats-list-item">
-        <span class="player-stats-list-item-text"> WIN {{ player.win }} </span>
+        <span class="player-stats-list-item-text"> 勝ち {{ player.win }} </span>
       </li>
       <li class="player-stats-list-item">
         <span class="player-stats-list-item-text">
-          LOSE {{ player.lose }}
+          負け {{ player.lose }}
         </span>
       </li>
       <li class="player-stats-list-item">

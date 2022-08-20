@@ -90,17 +90,17 @@
       <ul class="app-bar-content-list">
         <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">
-            EXP {{ player.exp }}
+            経験値 {{ player.exp }}
           </span>
         </li>
         <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">
-            WIN {{ player.win }}
+            勝ち {{ player.win }}
           </span>
         </li>
         <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">
-            LOSE {{ player.lose }}
+            負け {{ player.lose }}
           </span>
         </li>
         <li class="app-bar-content-list-item">

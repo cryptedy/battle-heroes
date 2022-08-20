@@ -50,3 +50,28 @@ export function scrollToBottom(el, smooth = false) {
     console.log(error)
   }
 }
+
+export function getPlayerFullStats({ exp, win, lose }) {
+  exp = exp || 0
+  win = win || 0
+  lose = lose || 0
+
+  let totalMatch = 0
+  let winRate = 0
+
+  totalMatch = win + lose
+
+  if (totalMatch > 0) {
+    if (totalMatch > 0) {
+      winRate = Math.floor((win / totalMatch) * 100)
+    }
+  }
+
+  return {
+    exp,
+    win,
+    lose,
+    totalMatch,
+    winRate
+  }
+}
