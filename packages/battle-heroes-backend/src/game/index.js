@@ -595,55 +595,55 @@ class GameManager {
         const adjustDamage = getRandomValue(-2, 2)
         damage = damage + adjustDamage
       }
-
-      const oldOpponentHp = opponentStatus.hp
-      const oldOpponentHpRate = oldOpponentHp / opponentStatus.max_hp
-
-      let newOpponentHp = oldOpponentHp - damage
-      const newOpponentHpRate = newOpponentHp / opponentStatus.max_hp
-
-      localMove.payload.damage = damage
-
-      if (newOpponentHp < 0) {
-        newOpponentHp = 0
-      }
-
-      nextOpponentStatus.hp = newOpponentHp
-
-      if (newOpponentHp === 0) {
-        isFinish = true
-      } else {
-        if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
-          nextOpponentStatus.criticalRate = 0.15
-        } else if (oldOpponentHpRate >= 0.05 && newOpponentHpRate < 0.05) {
-          nextOpponentStatus.criticalRate = 0.25
-        }
-      }
-
-      localMove.payload.damage = damage
-      localMove.payload.isMiss = isMiss
-      localMove.payload.isCritical = isCritical
-      localMove.payload.isMustCritical = isMustCritical
-      localMove.payload.isFinish = isFinish
-
-      nextPlayerStatus.attack_remains = playerStatus.attack_remains - 1
-
-      if (opponentStatus.isDefence) {
-        nextOpponentStatus.isDefence = false
-      }
-
-      updateGamePlayer({
-        gameId: game.id,
-        playerKey: playerKey,
-        payload: nextPlayerStatus
-      })
-
-      updateGamePlayer({
-        gameId: game.id,
-        playerKey: opponentPlayerKey,
-        payload: nextOpponentStatus
-      })
     }
+
+    const oldOpponentHp = opponentStatus.hp
+    const oldOpponentHpRate = oldOpponentHp / opponentStatus.max_hp
+
+    let newOpponentHp = oldOpponentHp - damage
+    const newOpponentHpRate = newOpponentHp / opponentStatus.max_hp
+
+    localMove.payload.damage = damage
+
+    if (newOpponentHp < 0) {
+      newOpponentHp = 0
+    }
+
+    nextOpponentStatus.hp = newOpponentHp
+
+    if (newOpponentHp === 0) {
+      isFinish = true
+    } else {
+      if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
+        nextOpponentStatus.criticalRate = 0.15
+      } else if (oldOpponentHpRate >= 0.05 && newOpponentHpRate < 0.05) {
+        nextOpponentStatus.criticalRate = 0.25
+      }
+    }
+
+    localMove.payload.damage = damage
+    localMove.payload.isMiss = isMiss
+    localMove.payload.isCritical = isCritical
+    localMove.payload.isMustCritical = isMustCritical
+    localMove.payload.isFinish = isFinish
+
+    nextPlayerStatus.attack_remains = playerStatus.attack_remains - 1
+
+    if (opponentStatus.isDefence) {
+      nextOpponentStatus.isDefence = false
+    }
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: playerKey,
+      payload: nextPlayerStatus
+    })
+
+    updateGamePlayer({
+      gameId: game.id,
+      playerKey: opponentPlayerKey,
+      payload: nextOpponentStatus
+    })
   }
 
   spell(payload) {

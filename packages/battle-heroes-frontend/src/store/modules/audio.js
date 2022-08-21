@@ -264,7 +264,7 @@ export const actions = {
       }
 
       // emulate sound play if muted
-      return new Promise(resolve => setTimeout(resolve, 300))
+      return new Promise(resolve => setTimeout(resolve, 200))
     }
   },
 

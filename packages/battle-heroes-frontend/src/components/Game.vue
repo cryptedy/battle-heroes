@@ -106,11 +106,21 @@
     </div>
 
     <div ref="messages" class="battle-messages">
-      <ul>
-        <li v-for="(message, index) in messages" :key="index">
-          {{ message }}
-        </li>
-      </ul>
+      <p
+        v-for="(line, lineIndex) in messages"
+        :key="lineIndex"
+        :style="line.style"
+        :class="line.class"
+      >
+        <span
+          v-for="(word, wordIndex) in line.words"
+          :key="`${lineIndex}-${wordIndex}`"
+          :style="word.style"
+          :class="word.class"
+        >
+          {{ word.text }}
+        </span>
+      </p>
     </div>
 
     <div class="battle-controls">

@@ -243,7 +243,11 @@ export default {
       )
     },
 
-    onGameStart({ status, message, game }) {
+    isPlayer(player) {
+      return player.id === this.player.id
+    },
+
+    async onGameStart({ status, message, game }) {
       console.log('onGameStart', status, message, game)
 
       if (status) {
@@ -253,7 +257,7 @@ export default {
 
         const timeout = this.$splash === 'challenger' ? 4500 : 3000
 
-        setTimeout(() => {
+        setTimeout(async () => {
           this.cachedBattle = this.battle
           this.playable = this.isPlayerBattle
 
@@ -270,23 +274,24 @@ export default {
             win: this.player.win,
             lose: this.player.lose
           })
-          this.addPlayerStatsMessages(this.player, this.playerFullStats)
 
-          this.messages.push('------------------')
+          await this.addPlayerStatsMessages(this.player, this.playerFullStats)
 
           const opponetPlayerFullStats = getPlayerFullStats({
             exp: opponentPlayer.exp,
             win: opponentPlayer.win,
             lose: opponentPlayer.lose
           })
-          this.addPlayerStatsMessages(opponentPlayer, opponetPlayerFullStats)
 
-          this.messages.push('------------------')
+          await this.addPlayerStatsMessages(
+            opponentPlayer,
+            opponetPlayerFullStats
+          )
 
           if (game.moves.length > 0) {
-            this.messages.push('バトル再開！')
+            await this.addGameResumeMessages()
           } else {
-            this.messages.push('バトルスタート！')
+            await this.addGameStartMessages()
           }
 
           setTimeout(() => {
@@ -307,9 +312,9 @@ export default {
 
       if (game.id !== this.game.id) return
 
-      this.game = game
-
       await this.addGameMessages(game)
+
+      this.game = game
     },
 
     onGameAbort() {
@@ -375,6 +380,70 @@ export default {
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
     },
 
+    async wait(milliseconds) {
+      return await new Promise(resolve => setTimeout(resolve, milliseconds))
+    },
+
+    addMessage(line) {
+      this.messages.push(line)
+    },
+
+    async addGameStartMessages() {
+      this.addMessage({
+        words: [
+          {
+            text: 'バトルスタート！'
+          }
+        ]
+      })
+    },
+
+    async addGameResumeMessages() {
+      this.addMessage({
+        words: [
+          {
+            text: 'バトル再開！'
+          }
+        ]
+      })
+    },
+
+    async addPlayerStatsMessages(player, playerFullStats) {
+      const { exp, win, lose, totalMatch, winRate } = playerFullStats
+
+      if (totalMatch < 0) {
+        this.addMessage({
+          words: [
+            {
+              text: `[${player.name}] の初バトル！`
+            }
+          ]
+        })
+      } else {
+        this.addMessage({
+          words: [
+            {
+              text: player.name
+            },
+            {
+              text: '経験値'
+            },
+            {
+              text: exp
+            }
+          ]
+        })
+
+        this.addMessage({
+          words: [
+            {
+              text: `勝率 ${winRate}% (勝ち ${win} + 負け ${lose} = 合計 ${totalMatch})`
+            }
+          ]
+        })
+      }
+    },
+
     async addGameMessages(game) {
       if (!game.moves.length > 0) return
 
@@ -396,6 +465,8 @@ export default {
       // eslint-disable-next-line no-unused-vars
       const opponentPlayerNFT = this.findNFT(opponentPlayerNFTId)
 
+      let isGameFinish = false
+
       if (lastMove.move === PLAYER_MOVE.ATTACK) {
         const {
           damage,
@@ -408,145 +479,259 @@ export default {
           ...lastMove.payload
         }
 
-        this.messages.push(`${player.name} の攻撃！`)
+        this.addMessage({
+          words: [
+            {
+              text: `${player.name} の攻撃！`
+            }
+          ]
+        })
+
         await this.playAudio(SOUND_EFFECT.ATTACK)
 
         if (isMiss) {
-          this.messages.push('ミス！')
-          this.messages.push(`${opponentPlayer.name} にダメージを与えられない`)
-        } else {
-          if (isMustCritical) {
-            this.messages.push('クリティカルヒット！')
+          this.addMessage({
+            words: [
+              {
+                text: 'ミス！'
+              }
+            ]
+          })
+        } else if (isMustCritical) {
+          this.addMessage({
+            words: [
+              {
+                text: 'クリティカルヒット！'
+              }
+            ]
+          })
 
-            if (isOpponentDefence) {
-              this.messages.push(`${opponentPlayer.name} の防御を突き抜けた！`)
-            }
+          await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
 
-            await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
-          } else if (isCritical) {
-            this.messages.push('クリティカルヒット！')
-            await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
+          if (isOpponentDefence) {
+            this.addMessage({
+              words: [
+                {
+                  text: `${opponentPlayer.name} の防御を突き抜けた！`
+                }
+              ]
+            })
           }
+        } else if (isCritical) {
+          this.addMessage({
+            words: [
+              {
+                text: 'クリティカルヒット！'
+              }
+            ]
+          })
 
-          if (damage > 0) {
-            this.messages.push(
-              `${opponentPlayer.name} に ${damage} のダメージを与えた！`
-            )
-          }
-
-          if (isFinish) {
-            this.addGameFinishMessages(player, opponentPlayer)
-          }
+          await this.playAudio(SOUND_EFFECT.ATTACK_CRITICAL)
         }
+
+        await this.addTakeDamageMessages(damage, player, opponentPlayer)
+
+        isGameFinish = isFinish
       } else if (lastMove.move === PLAYER_MOVE.SPELL) {
         const { damage, isFinish, isOpponentDefence } = {
           ...lastMove.payload
         }
 
         const spellLabel = this.$filters.spellLabel(playerNFT)
+        this.addMessage({
+          words: [
+            {
+              text: `${player.name} の${spellLabel}攻撃！`
+            }
+          ]
+        })
 
-        this.messages.push(`${player.name} の${spellLabel}攻撃！`)
+        await this.playAudio(SOUND_EFFECT.SPELL)
 
         if (damage > 0) {
           if (isOpponentDefence) {
-            this.messages.push(`${opponentPlayer.name} の防御を突き抜けた！`)
+            this.addMessage({
+              words: [
+                {
+                  text: `${opponentPlayer.name} の防御を突き抜けた！`
+                }
+              ]
+            })
           }
-
-          this.messages.push(
-            `${opponentPlayer.name} に ${damage} のダメージを与えた！`
-          )
-          await this.playAudio(SOUND_EFFECT.SPELL)
         }
 
-        if (isFinish) {
-          this.addGameFinishMessages(player, opponentPlayer)
-        }
+        await this.addTakeDamageMessages(damage, player, opponentPlayer)
+
+        isGameFinish = isFinish
       } else if (lastMove.move === PLAYER_MOVE.DEFENCE) {
         const { recoveryAmount, mustCritical } = {
           ...lastMove.payload
         }
 
-        this.messages.push(
-          `${player.name} は防御態勢を取って力をためている・・・！`
-        )
+        this.addMessage({
+          words: [
+            {
+              text: `${player.name} は防御態勢を取って力をためている・・・！`
+            }
+          ]
+        })
+
         await this.playAudio(SOUND_EFFECT.DEFENCE)
 
         if (recoveryAmount > 0) {
-          this.messages.push(
-            `${player.name} の攻撃回数が ${recoveryAmount} 増えた！`
-          )
+          this.addMessage({
+            words: [
+              {
+                text: `${player.name} の攻撃回数が ${recoveryAmount} 増えた！`
+              }
+            ]
+          })
         }
 
         if (mustCritical) {
-          this.messages.push(`${player.name} に力がみなぎってきた！`)
-          this.messages.push(
-            `${player.name} の次ターンの攻撃は必ずクリティカルヒットになる予感・・・！`
-          )
+          this.addMessage({
+            words: [
+              {
+                text: `${player.name} に力がみなぎってきた！`
+              }
+            ]
+          })
+
+          this.addMessage({
+            words: [
+              {
+                text: `${player.name} の次ターンの攻撃は必ずクリティカルヒットになる予感・・・！`
+              }
+            ]
+          })
         }
 
-        this.messages.push(
-          `${player.name} は攻撃に備えて防御を続けている・・・`
-        )
+        this.addMessage({
+          words: [
+            {
+              text: `${player.name} は攻撃に備えて防御を続けている！`
+            }
+          ]
+        })
       } else if (lastMove.move === PLAYER_MOVE.HEAL) {
         const { recoveryAmount } = {
           ...lastMove.payload
         }
 
-        this.messages.push(`${player.name} の回復！`)
+        this.addMessage({
+          words: [
+            {
+              text: `${player.name} の回復！`
+            }
+          ]
+        })
 
         if (recoveryAmount === 0) {
-          this.messages.push('ミス')
-          this.messages.push(`${player.name} は HP を回復できなかった！`)
-        } else {
-          await this.playAudio(SOUND_EFFECT.HEAL)
+          this.addMessage({
+            words: [
+              {
+                text: 'ミス！'
+              }
+            ]
+          })
 
-          this.messages.push(
-            `${player.name} の HP が ${recoveryAmount} 回復した！`
-          )
+          this.addMessage({
+            words: [
+              {
+                text: `${player.name} は HP を回復できなかった！`
+              }
+            ]
+          })
+        } else {
+          this.addMessage({
+            words: [
+              {
+                text: `${player.name} の HP が ${recoveryAmount} 回復した！`
+              }
+            ]
+          })
+
+          await this.playAudio(SOUND_EFFECT.HEAL)
         }
       }
-    },
 
-    addPlayerStatsMessages(player, playerFullStats) {
-      const { exp, win, lose, totalMatch, winRate } = playerFullStats
-
-      if (totalMatch < 0) {
-        this.messages.push(`[${player.name}] の初バトル！`)
-      } else {
-        this.messages.push(`[${player.name}] 経験値 ${exp}`)
-        this.messages.push(
-          `勝率 ${winRate}% (勝ち ${win} + 負け ${lose} = 合計 ${totalMatch})`
-        )
+      if (isGameFinish) {
+        await this.addGameFinishMessages(player, opponentPlayer)
       }
     },
 
-    addGameFinishMessages(winner, loser) {
-      this.messages.push(`${loser.name} は気絶してしまった！`)
-      this.messages.push(`${winner.name} の勝利！`)
-      this.messages.push('------------------')
+    async addTakeDamageMessages(damage, attacker, defender) {
+      if (damage > 0) {
+        let text = this.isPlayer(attacker)
+          ? `${defender.name} に ${damage} のダメージを与えた！`
+          : `${defender.name} は ${damage} のダメージを受けた！`
+
+        this.addMessage({
+          words: [
+            {
+              text
+            }
+          ]
+        })
+      } else {
+        let text = this.isPlayer(attacker)
+          ? `${defender.name} にダメージを与えられなかった`
+          : `${defender.name} はダメージを受けなかった！`
+
+        this.addMessage({
+          words: [
+            {
+              text
+            }
+          ]
+        })
+      }
+    },
+
+    async addGameFinishMessages(winner, loser) {
+      this.addMessage({
+        words: [
+          {
+            text: `${loser.name} は気絶してしまった！`
+          }
+        ]
+      })
+
+      this.addMessage({
+        words: [
+          {
+            text: `${winner.name} の勝利！`
+          }
+        ]
+      })
 
       let addExp = 0
       let addWin = 0
       let addLose = 0
 
-      if (winner.id === this.player.id) {
+      if (this.isPlayer(winner)) {
         // player wins
         addExp = 3
         addWin = 1
         addLose = 0
 
-        this.playAudio(SOUND_EFFECT.WIN)
+        await this.playAudio(SOUND_EFFECT.WIN)
       } else {
         // playe lose
         addExp = 1
         addWin = 0
         addLose = 1
 
-        this.playAudio(SOUND_EFFECT.LOSE)
+        await this.playAudio(SOUND_EFFECT.LOSE)
       }
 
-      this.messages.push(`${addExp} ポイントの経験値を得た！`)
-      this.messages.push('------------------')
+      this.addMessage({
+        words: [
+          {
+            text: `${this.player.name} は ${addExp} ポイントの経験値を得た！`
+          }
+        ]
+      })
 
       const { exp: oldExp, win: oldWin, lose: oldLose } = this.playerFullStats
 
@@ -561,7 +746,7 @@ export default {
 
       const { exp, win, lose } = newPlayerStats
       this.playerFullStats = getPlayerFullStats({ exp, win, lose })
-      this.addPlayerStatsMessages(this.player, this.playerFullStats)
+      await this.addPlayerStatsMessages(this.player, this.playerFullStats)
     }
   }
 }
