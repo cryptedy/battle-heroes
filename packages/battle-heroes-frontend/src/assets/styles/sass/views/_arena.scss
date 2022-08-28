@@ -41,16 +41,17 @@
     gap: 8px;
 
     margin-top: 12px;
+    margin-right: 12px;
     margin-bottom: 12px;
+    margin-left: 12px;
     @include mediaQuery(sm) {
       margin-top: 14px;
       margin-bottom: 14px;
     }
     @include mediaQuery(md) {
+      margin-top: 16px;
       margin-right: 0;
       margin-left: 0;
-
-      margin-top: 16px;
       margin-bottom: 16px;
     }
 
