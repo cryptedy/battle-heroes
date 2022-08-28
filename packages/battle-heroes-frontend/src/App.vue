@@ -4,7 +4,7 @@
   <TheNotification />
 
   <ErrorScreen v-if="appError" :message="appError">
-    <BaseButton type="primary" @click="reload"> RELOAD </BaseButton>
+    <BaseButton type="primary" @click="reload"> リロード </BaseButton>
   </ErrorScreen>
 
   <SplashScreen v-else-if="isAppLoading">

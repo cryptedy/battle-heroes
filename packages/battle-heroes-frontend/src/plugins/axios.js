@@ -34,7 +34,7 @@ export default {
             data.message &&
             data.message === 'The server is under maintenance'
           ) {
-            return Promise.reject(data.message)
+            return Promise.reject('サーバメンテナンス中')
           }
         }
 

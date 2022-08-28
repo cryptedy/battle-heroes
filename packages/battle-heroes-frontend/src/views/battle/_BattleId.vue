@@ -1,6 +1,6 @@
 <template>
   <ErrorScreen v-if="gameError" message="エラーが発生しました">
-    <BaseButton type="primary" @click="reload"> RELOAD </BaseButton>
+    <BaseButton type="primary" @click="reload"> リロード </BaseButton>
   </ErrorScreen>
 
   <ErrorScreen v-else-if="!battle" message="バトルが見つかりません">

@@ -1,10 +1,10 @@
 <template>
   <ErrorScreen v-if="socketError" :message="socketError">
-    <BaseButton type="primary" @click="retry"> RETRY </BaseButton>
+    <BaseButton type="primary" @click="retry"> リトライ </BaseButton>
   </ErrorScreen>
 
   <ErrorScreen v-else-if="socketConnectError" :message="socketConnectError">
-    <BaseButton type="primary" @click="retry"> RETRY </BaseButton>
+    <BaseButton type="primary" @click="retry"> リトライ </BaseButton>
   </ErrorScreen>
 
   <SplashScreen
@@ -22,11 +22,11 @@
     v-else-if="!$socket.connected"
     message="Disconnected to the server"
   >
-    <BaseButton type="primary" @click="retry"> RETRY </BaseButton>
+    <BaseButton type="primary" @click="retry"> リトライ </BaseButton>
   </ErrorScreen>
 
   <ErrorScreen v-else-if="!isGameLogin" message="Could not login to the game">
-    <BaseButton type="primary" @click="retry"> RETRY </BaseButton>
+    <BaseButton type="primary" @click="retry"> リトライ </BaseButton>
   </ErrorScreen>
 
   <template v-else-if="isBattleView">
