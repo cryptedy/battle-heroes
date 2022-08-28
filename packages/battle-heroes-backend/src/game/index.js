@@ -93,7 +93,7 @@ const createGame = battle => {
 
   status[secondPlayer].max_hp = secondPlayerMaxHp
   status[secondPlayer].hp = secondPlayerMaxHp
-  status[secondPlayer].attack = secondPlayerAttack
+  status[secondPlayer].attack = secondPlayerAttack * 1000
   status[secondPlayer].defense = secondPlayerDefence
   status[secondPlayer].int = secondPlayerIntelligence
 
@@ -226,8 +226,8 @@ class GameManager {
     }
   }
 
-  createBattle(NFTId, callback) {
-    console.log('createBattle', this.socket.id, NFTId)
+  createBattle(NFTId, timeout, callback) {
+    console.log('createBattle', this.socket.id, NFTId, timeout)
 
     const player = this.findSocketPlayer(this.socket.id)
 
@@ -296,7 +296,7 @@ class GameManager {
       }
 
       clearTimeout(intervalId)
-    }, 5000)
+    }, timeout)
   }
 
   joinBattle(battleId, NFTId, callback) {
@@ -655,6 +655,29 @@ class GameManager {
     postDiscord({
       type: DISCORD_POST_TYPE.BATTLE_MATCHED,
       payload
+    })
+  }
+
+  continueBattle(opponentPlayerId, previousBattleId, nexBattleId) {
+    console.log(
+      'continueBattle',
+      this.socket.id,
+      opponentPlayerId,
+      previousBattleId,
+      nexBattleId
+    )
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      throw new Error('Failed to next battle: The player not found')
+    }
+
+    this.io.to(opponentPlayerId).emit('battle:next', {
+      opponentPlayerId: player.id,
+      playerId: opponentPlayerId,
+      previousBattleId,
+      nexBattleId
     })
   }
 
@@ -1825,6 +1848,13 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    'battle:continue': (...args) => {
+      try {
+        this.continueBattle(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
     'battle:delete': (...args) => {
       try {
         this.deleteBattle(...args)
@@ -1940,6 +1970,7 @@ class GameManager {
     this.socket.on('battle:create', this.eventListeners['battle:create'])
     this.socket.on('battle:join', this.eventListeners['battle:join'])
     this.socket.on('battle:rush', this.eventListeners['battle:rush'])
+    this.socket.on('battle:continue', this.eventListeners['battle:continue'])
     this.socket.on('battle:delete', this.eventListeners['battle:delete'])
     this.socket.on('game:start', this.eventListeners['game:start'])
     this.socket.on('game:load', this.eventListeners['game:load'])
@@ -1970,6 +2001,7 @@ class GameManager {
     this.socket.off('battle:create', this.eventListeners['battle:create'])
     this.socket.off('battle:join', this.eventListeners['battle:join'])
     this.socket.off('battle:rush', this.eventListeners['battle:rush'])
+    this.socket.off('battle:continue', this.eventListeners['battle:continue'])
     this.socket.off('battle:delete', this.eventListeners['battle:delete'])
     this.socket.off('game:start', this.eventListeners['game:start'])
     this.socket.off('game:load', this.eventListeners['game:load'])

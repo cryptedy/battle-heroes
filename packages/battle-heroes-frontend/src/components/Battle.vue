@@ -142,7 +142,11 @@
           </template>
 
           <template v-else>
-            <BattleCreateButton label="続けてバトル" />
+            <BattleCreateButton
+              label="続けてバトル"
+              :timeout="15000"
+              @created="continueBattle"
+            />
 
             <a
               class="button twitter-share-button"
@@ -246,12 +250,12 @@ export default {
       default: false
     },
 
-    aborted: {
+    finished: {
       type: Boolean,
       required: true
     },
 
-    finished: {
+    aborted: {
       type: Boolean,
       required: true
     },
@@ -296,6 +300,7 @@ export default {
     'leave',
     'abort',
     'finish',
+    'continue',
     'online-status'
   ],
 
@@ -578,6 +583,18 @@ export default {
       }, wait)
 
       this.$emit('finish')
+    },
+
+    continueBattle(battleId) {
+      console.log('continueBattle', battleId)
+
+      this.$emit(
+        'continue',
+        this.player,
+        this.opponentPlayer,
+        this.battle,
+        battleId
+      )
     }
   }
 }

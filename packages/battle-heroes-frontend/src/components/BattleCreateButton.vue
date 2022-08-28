@@ -50,8 +50,16 @@ export default {
       type: String,
       required: false,
       default: 'バトルを開始'
+    },
+
+    timeout: {
+      type: Number,
+      required: false,
+      default: 5000
     }
   },
+
+  emits: ['created'],
 
   data() {
     return {
@@ -144,7 +152,7 @@ export default {
           })
       } else {
         // create a new battle
-        this.createBattle(NFT.id)
+        this.createBattle({ NFTId: NFT.id, timeout: this.timeout })
           // eslint-disable-next-line no-unused-vars
           .then(({ message, battle, player }) => {
             this.$router
@@ -161,6 +169,8 @@ export default {
               .then(() => {
                 this.loading = false
                 this.splashScreenShown = false
+
+                this.$emit('created', battle.id)
               })
           })
           .catch(error => {

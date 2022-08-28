@@ -116,13 +116,14 @@ export const actions = {
     commit(REMOVE_BATTLE, { battleId })
   },
 
-  async create({ dispatch }, NFTId) {
+  async create({ dispatch }, { NFTId, timeout }) {
     console.log('battle/create', NFTId)
 
     return new Promise((resolve, reject) => {
       socket.emit(
         'battle:create',
         NFTId,
+        timeout,
         ({ status, message, battle, player }) => {
           console.log('battle:created', status, message, battle, player)
 

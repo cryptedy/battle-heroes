@@ -11,7 +11,6 @@
   z-index: 1;
 
   font-family: PixelMplus;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -67,7 +66,8 @@
     position: absolute;
     top: 12px;
     width: 100%;
-    font-size: 22px;
+    padding-left: 16px;
+    padding-right: 16px;
     word-break: break-all;
     text-align: center;
     font-size: 260%;
@@ -101,9 +101,18 @@
     &-image {
       margin: 0 auto;
       max-width: 250px;
+
       > img {
         width: 100%;
         height: auto;
+      }
+
+      &-loading,
+      &.is-loaded {
+        > img {
+          width: 100%;
+          height: auto;
+        }
       }
     }
   }

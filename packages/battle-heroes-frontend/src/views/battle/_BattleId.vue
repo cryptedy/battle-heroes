@@ -102,6 +102,7 @@
         @leave="onGameLeave"
         @finish="onGameFinished"
         @abort="onGameAbort"
+        @continue="onBattleContinued"
         @online-status="onOnlineStatusChanged"
       />
     </template>
@@ -172,6 +173,7 @@ export default {
 
   data() {
     return {
+      retryActivate: 30,
       cachedBattle: null,
       playable: false,
       rushed: false,
@@ -184,7 +186,8 @@ export default {
       gameError: false,
       splashScreenType: BATTLE_SPLASH_SCREEN_TYPE.LOADING,
       playerFullStats: {},
-      messages: []
+      messages: [],
+      hasNextBattle: false
     }
   },
 
@@ -324,6 +327,7 @@ export default {
 
     this.$socket.on('battle:matched', payload => this.onBattleMatched(payload))
     this.$socket.on('battle:rushed', payload => this.onBattleRushed(payload))
+    this.$socket.on('battle:next', payload => this.onNextBattleCreated(payload))
     this.$socket.on('game:aborted', gameId => this.onGameAborted(gameId))
 
     this.splashScreenType =
@@ -349,6 +353,7 @@ export default {
     this.$socket.off('game:aborted')
     this.$socket.off('battle:matched')
     this.$socket.off('battle:rushed')
+    this.$socket.off('battle:next')
 
     this.stopAudio(MUSIC.BATTLE)
   },
@@ -375,6 +380,44 @@ export default {
 
     onOnlineStatusChanged(player, isOnline) {
       this.addOnlineStatusMessages(player, isOnline)
+    },
+
+    onBattleContinued(player, opponentPlayer, currentBattle, nextBattleId) {
+      console.log(
+        'onBattleContinued',
+        player,
+        opponentPlayer,
+        currentBattle,
+        nextBattleId
+      )
+
+      try {
+        this.$socket.emit(
+          'battle:continue',
+          opponentPlayer.id,
+          currentBattle.id,
+          nextBattleId
+        )
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    onNextBattleCreated({
+      opponentPlayerId,
+      playerId,
+      previousBattleId,
+      nexBattleId
+    }) {
+      console.log(
+        'onNextBattleCreated',
+        opponentPlayerId,
+        playerId,
+        previousBattleId,
+        nexBattleId
+      )
+
+      this.addNextBattleMessages()
     },
 
     leaveBattle() {
@@ -488,8 +531,6 @@ export default {
       if (status) {
         this.gamePreparing = true
 
-        let retry = 30
-
         const waitActivate = async () => {
           return new Promise((resolve, reject) => {
             let intervalId = setTimeout(() => {
@@ -501,15 +542,17 @@ export default {
               } else {
                 console.log('player: game not activated')
 
-                if (retry <= 0) return reject()
+                if (this.retryActivate <= 0) return reject()
 
-                retry--
+                this.retryActivate--
 
-                console.log(`player: check is game activated ${retry} times...`)
+                console.log(
+                  `player: check is game activated ${this.retryActivate} times...`
+                )
 
                 this.loadGame()
               }
-            }, 500)
+            }, 1000)
           })
         }
 
@@ -576,8 +619,6 @@ export default {
         }, splashScreenTimeout)
       } else {
         if (this.isSpectator) {
-          let retry = 30
-
           const waitActivate = async () => {
             return new Promise((resolve, reject) => {
               let intervalId = setTimeout(() => {
@@ -590,16 +631,16 @@ export default {
                   console.log('spectator: game not activated')
 
                   console.log(
-                    `spectator: check is game activated ${retry} times...`
+                    `spectator: check is game activated ${this.retryActivate} times...`
                   )
 
-                  if (retry <= 0) return reject()
+                  if (this.retryActivate <= 0) return reject()
 
-                  retry--
+                  this.retryActivate--
 
                   this.loadGame()
                 }
-              }, 500)
+              }, 1000)
             })
           }
 
@@ -761,6 +802,31 @@ export default {
           timeout: 0
         })
       }
+    },
+
+    async addNextBattleMessages() {
+      this.addMessage({
+        style: `color: ${COLOR.YELLOW}`,
+        words: [
+          {
+            text: '=== 相手プレイヤーが再戦希望中 ==='
+          }
+        ]
+      })
+      this.addMessage({
+        words: [
+          {
+            text: '['
+          },
+          {
+            style: `color: ${COLOR.BLUE}`,
+            text: '続けてバトル'
+          },
+          {
+            text: '] で再戦できる可能性があります'
+          }
+        ]
+      })
     },
 
     addOnlineStatusMessages(player, isOnline) {
