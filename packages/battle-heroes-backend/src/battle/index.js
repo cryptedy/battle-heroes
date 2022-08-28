@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-const { BATTLE_STATE } = require('../utils/constants')
+const { BATTLE_TYPE, BATTLE_STATE } = require('../utils/constants')
 
 const createBattle = (playerId, NFTId) => {
   return {
@@ -14,6 +14,7 @@ const createBattle = (playerId, NFTId) => {
         NFT_id: null
       }
     },
+    type: BATTLE_TYPE.HUMAN,
     state: BATTLE_STATE.CREATED
   }
 }

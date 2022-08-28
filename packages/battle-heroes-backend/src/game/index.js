@@ -22,8 +22,10 @@ const {
   joinBattle
 } = require('../battle/actions')
 const {
+  PLAYER_TYPE,
   PLAYER_STATE,
   PLAYER_MOVE,
+  BATTLE_TYPE,
   BATTLE_STATE,
   DISCORD_POST_TYPE
 } = require('../utils/constants')
@@ -35,6 +37,7 @@ const {
 const {
   selectPlayer,
   selectPlayers,
+  selectCPUPlayers,
   selectUserPlayer
 } = require('../player/selectors')
 
@@ -58,34 +61,16 @@ const waitProcess = name => {
 const getRandomValue = (min, max) =>
   Math.floor(Math.random() * (max - min) + min)
 
-const createStatus = () => {
-  const maxHp = getRandomValue(90, 110)
-  const attack = getRandomValue(15, 25)
-  const defense = getRandomValue(15, 25)
-  const int = getRandomValue(20, 35)
-  const speed = getRandomValue(15, 25)
-
-  return {
-    max_hp: maxHp,
-    hp: maxHp,
-    attack: attack,
-    defense: defense,
-    int: int,
-    speed: speed,
-    criticalRate: 0.05,
-    missRate: 0.1,
-    isDefence: false,
-    mustCritical: false,
-    attack_remains: 3,
-    spell_remains: 1,
-    heal_remains: 1
-  }
+const getPlayerIdsExcepts = (player1, player2) => {
+  return selectPlayers()
+    .filter(player => player.id !== player1.id && player.id !== player2.id)
+    .map(player => player.id)
 }
 
 const createGame = battle => {
   const status = {
-    1: createStatus(),
-    2: createStatus()
+    1: createGamePlayerStatus(),
+    2: createGamePlayerStatus()
   }
 
   let currentPlayer = 1
@@ -125,6 +110,31 @@ const createGame = battle => {
   }
 }
 
+const createGamePlayerStatus = () => {
+  const maxHp = getRandomValue(90, 110)
+  const attack = getRandomValue(15, 25)
+  const defense = getRandomValue(15, 25)
+  const int = getRandomValue(20, 35)
+  const speed = getRandomValue(15, 25)
+
+  return {
+    is_activated: false,
+    max_hp: maxHp,
+    hp: maxHp,
+    attack: attack,
+    defense: defense,
+    int: int,
+    speed: speed,
+    critical_rate: 0.05,
+    miss_rate: 0.1,
+    is_defence: false,
+    must_critical: false,
+    attack_remains: 3,
+    spell_remains: 1,
+    heal_remains: 1
+  }
+}
+
 class GameManager {
   constructor(io, socket) {
     this.io = io
@@ -135,11 +145,11 @@ class GameManager {
     try {
       this.addEventListeners()
 
-      callback()
+      return callback()
     } catch (error) {
       this.removeEventListeners()
 
-      callback(error)
+      return callback(error)
     }
   }
 
@@ -160,7 +170,7 @@ class GameManager {
 
       this.joinPlayerRoom(player.id)
 
-      this.socket.broadcast.emit('player:update', selectPlayer(player.id))
+      this.socket.broadcast.emit('player:updated', selectPlayer(player.id))
     } else {
       try {
         const newUser = await findUser(user.id)
@@ -170,7 +180,7 @@ class GameManager {
 
         this.joinPlayerRoom(newPlayer.id)
 
-        this.socket.broadcast.emit('player:player', selectPlayer(newPlayer.id))
+        this.socket.broadcast.emit('player:created', selectPlayer(newPlayer.id))
       } catch (error) {
         return callback({
           status: false,
@@ -180,13 +190,14 @@ class GameManager {
     }
 
     const players = selectPlayers()
+    const CPUPlayers = selectCPUPlayers()
     const battles = selectBattles()
     const messages = selectMessages()
 
-    callback({
+    return callback({
       status: true,
       message: 'Successfully logged in',
-      players,
+      players: players.concat(CPUPlayers),
       battles,
       messages
     })
@@ -200,22 +211,517 @@ class GameManager {
     if (player) {
       this.leavePlayerRoom(player.id)
 
-      this.io.emit('player:update', selectPlayer(player.id))
+      this.io.emit('player:updated', selectPlayer(player.id))
 
-      callback({
+      return callback({
         status: true,
-        message: 'Successfully logged out'
+        message: 'Successfully logged out',
+        playerId: player.id
       })
     } else {
-      callback({
+      return callback({
         status: false,
         message: 'Failed to logout'
       })
     }
   }
 
+  createBattle(NFTId, callback) {
+    console.log('createBattle', this.socket.id, NFTId)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      return callback({
+        status: false,
+        message: 'Failed to create a battle: The player not found'
+      })
+    }
+
+    if (!player.nft_ids.includes(NFTId)) {
+      return callback({
+        status: false,
+        message: 'Failed to create a battle: The player must be own the NFT',
+        playerId: player.id
+      })
+    }
+
+    const playerBattle = selectPlayerBattle(player.id)
+
+    if (playerBattle) {
+      return callback({
+        status: false,
+        message:
+          'Failed to create a game: The player already has the another battle',
+        playerId: player.id
+      })
+    }
+
+    const battle = createBattle(player.id, NFTId)
+
+    addBattle(battle)
+
+    updatePlayer({
+      playerId: player.id,
+      payload: { state: PLAYER_STATE.STANDBY }
+    })
+
+    const payload = {
+      player: selectPlayer(player.id),
+      battle: selectBattle(battle.id)
+    }
+
+    // send to player
+    callback({
+      status: true,
+      message: 'The battle created',
+      ...payload
+    })
+
+    // send to the other players
+    this.socket.broadcast.emit('player:updated', payload.player)
+    this.socket.broadcast.emit('battle:created', payload.battle)
+
+    postDiscord({
+      type: DISCORD_POST_TYPE.BATTLE_CREATED,
+      payload
+    })
+
+    // start CPU battle after interval
+    let intervalId = setTimeout(() => {
+      const currentBattle = selectBattle(battle.id)
+
+      if (currentBattle.state === BATTLE_STATE.CREATED) {
+        this.joinBattleAsCPU(battle.id)
+      }
+
+      clearTimeout(intervalId)
+    }, 5000)
+  }
+
+  joinBattle(battleId, NFTId, callback) {
+    console.log('joinBattle', this.socket.id, battleId, NFTId)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      return callback({
+        status: false,
+        message: 'Failed to join the battle: The player not found'
+      })
+    }
+
+    if (!player.nft_ids.includes(NFTId)) {
+      return callback({
+        status: false,
+        message: 'Failed to join the battle: The player does not own the NFT'
+      })
+    }
+
+    const playerBattle = selectPlayerBattle(player.id)
+
+    if (playerBattle) {
+      return callback({
+        status: false,
+        message:
+          'Failed to join the battle: The player already has the another battle'
+      })
+    }
+
+    const battle = selectBattle(battleId)
+
+    if (!battle) {
+      return callback({
+        status: false,
+        message: 'Failed to join the battle: Battle not found'
+      })
+    }
+
+    if (battle.type !== BATTLE_TYPE.HUMAN) {
+      return callback({
+        status: false,
+        message: 'Failed to join the battle: Battle is not for human'
+      })
+    }
+
+    if (
+      battle.state !== BATTLE_STATE.CREATED ||
+      battle.state === BATTLE_STATE.RUSHED ||
+      battle.state === BATTLE_STATE.ENDED
+    ) {
+      return callback({
+        status: false,
+        message: `Failed to join the battle: The battle state is "${battle.state} and type is "${battle.type}"`
+      })
+    }
+
+    joinBattle({ battleId: battle.id, playerId: player.id, NFTId })
+
+    const opponentPlayer = this.getBattleOpponentPlayer(
+      selectBattle(battle.id),
+      player.id
+    )
+
+    updatePlayer({
+      playerId: player.id,
+      payload: { state: PLAYER_STATE.BATTLE }
+    })
+
+    updatePlayer({
+      playerId: opponentPlayer.id,
+      payload: { state: PLAYER_STATE.BATTLE }
+    })
+
+    updateBattle({
+      battleId: battle.id,
+      payload: {
+        type: BATTLE_TYPE.HUMAN,
+        state: BATTLE_STATE.READY
+      }
+    })
+
+    const payload = {
+      player1: selectPlayer(player.id),
+      player2: selectPlayer(opponentPlayer.id),
+      battle: selectBattle(battle.id)
+    }
+
+    // send to player
+    callback({
+      status: true,
+      message: 'Join the battle',
+      ...payload
+    })
+
+    // send to opponent player
+    this.io.to(opponentPlayer.id).emit('battle:matched', {
+      status: true,
+      message: 'Join the battle',
+      ...payload
+    })
+
+    // send to the other players
+    const otherPlayerIds = getPlayerIdsExcepts(player, opponentPlayer)
+
+    otherPlayerIds.forEach(otherPlayerId => {
+      this.socket.to(otherPlayerId).emit('player:updated', payload.player1)
+      this.socket.to(otherPlayerId).emit('player:updated', payload.player2)
+      this.socket.to(otherPlayerId).emit('battle:updated', payload.battle)
+    })
+
+    postDiscord({
+      type: DISCORD_POST_TYPE.BATTLE_MATCHED,
+      payload
+    })
+  }
+
+  rushBattle(battleId, NFTId, callback) {
+    console.log('rushBattle', this.socket.id, battleId, NFTId)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      return callback({
+        status: false,
+        message: 'Failed to rush into the battle: The player not found'
+      })
+    }
+
+    if (!player.nft_ids.includes(NFTId)) {
+      return callback({
+        status: false,
+        message:
+          'Failed to rush into the battle: The player does not own the NFT'
+      })
+    }
+
+    const playerBattle = selectPlayerBattle(player.id)
+
+    if (playerBattle) {
+      return callback({
+        status: false,
+        message:
+          'Failed to rush into the battle: The player already has the another battle'
+      })
+    }
+
+    const battle = selectBattle(battleId)
+
+    if (!battle) {
+      return callback({
+        status: false,
+        message: 'Failed to rush into the battle: Battle not found'
+      })
+    }
+
+    if (battle.type !== BATTLE_TYPE.CPU) {
+      return callback({
+        status: false,
+        message: 'Failed to rush into the battle: Battle is for CPU'
+      })
+    }
+
+    if (
+      battle.state !== BATTLE_STATE.STARTED ||
+      battle.state === BATTLE_STATE.RUSHED ||
+      battle.state === BATTLE_STATE.ENDED
+    ) {
+      return callback({
+        status: false,
+        message: `Failed to rush into the battle: The battle state is "${battle.state} and type is "${battle.type}"`
+      })
+    }
+
+    const opponentPlayer = selectPlayer(battle.players[1].id)
+    const opponentNFTId = battle.players[1].NFT_id
+    const CPUPlayer = selectPlayer(battle.players[2].id)
+
+    // change current battle state
+    updateBattle({
+      battleId: battle.id,
+      payload: {
+        state: BATTLE_STATE.RUSHED
+      }
+    })
+
+    // create a new battle
+    const newBattle = createBattle(player.id, NFTId)
+
+    addBattle(newBattle)
+
+    // join a new battle as a opponent player
+    joinBattle({
+      battleId: newBattle.id,
+      playerId: opponentPlayer.id,
+      NFTId: opponentNFTId
+    })
+
+    updatePlayer({
+      playerId: player.id,
+      payload: { state: PLAYER_STATE.BATTLE }
+    })
+
+    updatePlayer({
+      playerId: opponentPlayer.id,
+      payload: { state: PLAYER_STATE.BATTLE }
+    })
+
+    // update CPU state
+    updatePlayer({
+      playerId: CPUPlayer.id,
+      payload: { state: PLAYER_STATE.IDLE }
+    })
+
+    updateBattle({
+      battleId: newBattle.id,
+      payload: {
+        type: BATTLE_TYPE.HUMAN,
+        state: BATTLE_STATE.READY
+      }
+    })
+
+    const game = selectBattleGame(battle.id)
+
+    if (game) {
+      removeGame(game.id)
+    }
+
+    removeBattle(battle.id)
+
+    const payload = {
+      player1: selectPlayer(player.id),
+      player2: selectPlayer(opponentPlayer.id),
+      battle: selectBattle(newBattle.id)
+    }
+
+    // send to player
+    callback({
+      status: true,
+      message: 'Rush into the battle',
+      ...payload
+    })
+
+    // send to opponent player
+    this.io.to(opponentPlayer.id).emit('battle:rushed', {
+      status: true,
+      message: 'Rush into the battle',
+      ...payload
+    })
+
+    // send to the other players
+    const otherPlayerIds = getPlayerIdsExcepts(player, opponentPlayer)
+
+    otherPlayerIds.forEach(otherPlayerId => {
+      this.socket.to(otherPlayerId).emit('player:updated', payload.player1)
+      this.socket.to(otherPlayerId).emit('player:updated', payload.player2)
+      this.socket.to(otherPlayerId).emit('battle:created', payload.battle)
+      this.socket.to(otherPlayerId).emit('battle:deleted', battle.id)
+    })
+
+    // send to all players
+    this.io.emit('player:updated', selectPlayer(CPUPlayer.id))
+
+    postDiscord({
+      type: DISCORD_POST_TYPE.BATTLE_MATCHED,
+      payload
+    })
+  }
+
+  joinBattleAsCPU(battleId) {
+    console.log('joinBattleAsCPU', this.socket.id, battleId)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      throw new Error('Failed to join the battle by CPU: The player not found')
+    }
+
+    const battle = selectBattle(battleId)
+
+    if (!battle) {
+      throw new Error('Failed to join the battle: Battle not found')
+    }
+
+    if (battle.state === BATTLE_STATE.ENDED) {
+      throw new Error('Failed to join the battle: The battle already ended')
+    }
+
+    if (battle.state === BATTLE_TYPE.CPU) {
+      throw new Error(
+        'Failed to join the battle: CPU can not join the CPU battle'
+      )
+    }
+
+    if (battle.state !== BATTLE_STATE.CREATED) {
+      throw new Error(
+        `Failed to join the battle: The battle state is "${battle.state}" and type is "${battle.type}"`
+      )
+    }
+
+    const CPUPlayers = selectCPUPlayers().filter(
+      CPUPlayer => CPUPlayer.state === PLAYER_STATE.IDLE
+    )
+
+    const opponentPlayer =
+      CPUPlayers[Math.floor(Math.random() * CPUPlayers.length)]
+
+    const opponentNFTId =
+      opponentPlayer.nft_ids[
+        Math.floor(Math.random() * opponentPlayer.nft_ids.length)
+      ]
+
+    joinBattle({
+      battleId: battle.id,
+      playerId: opponentPlayer.id,
+      NFTId: opponentNFTId
+    })
+
+    updatePlayer({
+      playerId: player.id,
+      payload: { state: PLAYER_STATE.BATTLE }
+    })
+
+    updatePlayer({
+      playerId: opponentPlayer.id,
+      payload: { state: PLAYER_STATE.BATTLE }
+    })
+
+    updateBattle({
+      battleId: battle.id,
+      payload: {
+        type: BATTLE_TYPE.CPU,
+        state: BATTLE_STATE.READY
+      }
+    })
+
+    const payload = {
+      player1: selectPlayer(player.id),
+      player2: selectPlayer(opponentPlayer.id),
+      battle: selectBattle(battle.id)
+    }
+
+    // send to player
+    this.io.to(player.id).emit('battle:matched', {
+      status: true,
+      message: 'Join the battle',
+      ...payload
+    })
+
+    // send to the other players
+    this.socket.broadcast.emit('player:updated', payload.player1)
+    this.socket.broadcast.emit('player:updated', payload.player2)
+    this.socket.broadcast.emit('battle:updated', payload.battle)
+
+    postDiscord({
+      type: DISCORD_POST_TYPE.BATTLE_MATCHED,
+      payload
+    })
+  }
+
+  deleteBattle(battleId, callback) {
+    console.log('deleteBattle', this.socket.id, battleId)
+
+    const battle = selectBattle(battleId)
+
+    if (!battle) {
+      return callback({
+        status: false,
+        message: 'Failed delete the battle: The battle not found'
+      })
+    }
+
+    const game = selectBattleGame(battleId)
+
+    if (game) {
+      removeGame(game.id)
+    }
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (player) {
+      if (player.state !== PLAYER_STATE.IDLE) {
+        // check if opponent player state has already updated when the battle finished
+        updatePlayer({
+          playerId: player.id,
+          payload: { state: PLAYER_STATE.IDLE }
+        })
+
+        this.io.emit('player:updated', selectPlayer(player.id))
+      }
+
+      const opponentPlayer = this.getBattleOpponentPlayer(battle, player.id)
+
+      if (opponentPlayer && opponentPlayer.state !== PLAYER_STATE.IDLE) {
+        // check if opponent player state has already updated when the battle finished
+        updatePlayer({
+          playerId: opponentPlayer.id,
+          payload: { state: PLAYER_STATE.IDLE }
+        })
+
+        this.io.emit('player:updated', selectPlayer(opponentPlayer.id))
+      }
+    }
+
+    removeBattle(battle.id)
+
+    // send to all players except the player
+    this.socket.broadcast.emit('battle:deleted', battle.id)
+
+    return callback({
+      status: true,
+      message: 'The battle deleted',
+      battleId: battle.id
+    })
+  }
+
   startGame(battleId, callback) {
     console.log('startGame', this.socket.id, battleId)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      throw new Error('Failed to start game: The player not found')
+    }
 
     const battle = selectBattle(battleId)
 
@@ -226,20 +732,55 @@ class GameManager {
       })
     }
 
-    if (battle.state === BATTLE_STATE.ENDED) {
+    const playerBattle = selectPlayerBattle(player.id)
+
+    if (!playerBattle || playerBattle.id !== battle.id) {
+      throw new Error('Failed to start a game: Players can start own battles')
+    }
+
+    if (
+      battle.state === BATTLE_STATE.RUSHED ||
+      battle.state === BATTLE_STATE.ENDED
+    ) {
       return callback({
         status: false,
-        message: 'Failed to start a game: The battle has already ended'
+        message:
+          'Failed to start a game: The battle is rushed or already ended',
+        battleId: battle.id
       })
     }
 
     const game = selectBattleGame(battle.id)
 
+    const playerKey = this.getBattlePlayerKey(battle, player.id)
+
     if (game) {
-      callback({
+      if (battle.type === BATTLE_TYPE.CPU && !game.players[2].is_activated) {
+        updateGamePlayer({
+          gameId: game.id,
+          playerKey: 2,
+          payload: {
+            is_activated: true
+          }
+        })
+      } else if (!game.players[playerKey].is_activated) {
+        updateGamePlayer({
+          gameId: game.id,
+          playerKey,
+          payload: {
+            is_activated: true
+          }
+        })
+
+        const opponentPlayer = this.getBattleOpponentPlayer(battle, player.id)
+        this.io.to(opponentPlayer.id).emit('game:updated', selectGame(game.id))
+      }
+
+      return callback({
         status: true,
-        message: 'Start game',
-        game
+        message: 'Load the game',
+        battleId: battle.id,
+        game: selectGame(game.id)
       })
     } else {
       const newGame = createGame(battle)
@@ -251,10 +792,31 @@ class GameManager {
         payload: { state: BATTLE_STATE.STARTED }
       })
 
-      callback({
+      updateGamePlayer({
+        gameId: newGame.id,
+        playerKey,
+        payload: {
+          is_activated: true
+        }
+      })
+
+      if (battle.type === BATTLE_TYPE.CPU) {
+        updateGamePlayer({
+          gameId: newGame.id,
+          playerKey: 2,
+          payload: {
+            is_activated: true
+          }
+        })
+      }
+
+      this.io.emit('battle:updated', selectBattle(battle.id))
+
+      return callback({
         status: true,
-        message: 'Start game',
-        game: newGame
+        message: 'Start a new game',
+        battleId: battle.id,
+        game: selectGame(newGame.id)
       })
     }
   }
@@ -298,7 +860,9 @@ class GameManager {
       const battle = selectBattle(game.battle_id)
 
       if (battle) {
-        this.deleteBattle(battle.id, () => {})
+        removeBattle(battle.id)
+
+        this.io.emit('battle:deleted', battle.id)
       }
     }
   }
@@ -314,62 +878,47 @@ class GameManager {
       const battle = selectBattle(game.battle_id)
 
       if (battle) {
-        const battleCache = battle
+        const player = this.findSocketPlayer(this.socket.id)
 
-        this.deleteBattle(battle.id, ({ status }) => {
-          if (status) {
-            const player = this.findSocketPlayer(this.socket.id)
+        if (player) {
+          if (player.state !== PLAYER_STATE.IDLE) {
+            updatePlayer({
+              playerId: player.id,
+              payload: { state: PLAYER_STATE.IDLE }
+            })
 
-            if (player) {
-              // updatePlayerStats(player.id, {
-              //   lose: player.lose + 1
-              // })
-              //   .then(() => {
-              //     this.io.emit('player:update', selectPlayer(player.id))
-              //   })
-              //   .catch(error => {
-              //     throw new Error(
-              //       `Failed to update player stats: ${error.message}: ${error.stack}`
-              //     )
-              //   })
-
-              const opponentPlayer = this.getBattleOpponentPlayer(
-                battleCache,
-                player.id
-              )
-
-              if (opponentPlayer) {
-                // updatePlayerStats(opponentPlayer.id, {
-                //   exp: opponentPlayer.exp + 3,
-                //   win: opponentPlayer.win + 1
-                // })
-                //   .then(() => {
-                //     this.io.emit(
-                //       'player:update',
-                //       selectPlayer(opponentPlayer.id)
-                //     )
-                //   })
-                //   .catch(error => {
-                //     throw new Error(
-                //       `Failed to update player stats: ${error.message}: ${error.stack}`
-                //     )
-                //   })
-
-                this.io.to(opponentPlayer.id).emit('game:aborted', game.id)
-              }
-            }
-          } else {
-            // ignore error
+            this.io.emit('player:updated', selectPlayer(player.id))
           }
-        })
+
+          const opponentPlayer = this.getBattleOpponentPlayer(battle, player.id)
+
+          if (opponentPlayer) {
+            // send to opponent player
+            this.io.to(opponentPlayer.id).emit('game:aborted', game.id)
+
+            if (opponentPlayer.state !== PLAYER_STATE.IDLE) {
+              updatePlayer({
+                playerId: opponentPlayer.id,
+                payload: { state: PLAYER_STATE.IDLE }
+              })
+
+              this.io.emit('player:updated', selectPlayer(opponentPlayer.id))
+            }
+          }
+        }
+
+        removeBattle(battle.id)
+
+        this.io.emit('battle:deleted', battle.id)
       }
 
-      callback({
+      return callback({
         status: true,
-        message: 'The game aborted'
+        message: 'The game aborted',
+        gameId: game.id
       })
     } else {
-      callback({
+      return callback({
         status: false,
         message: 'Failed to abort the game'
       })
@@ -389,6 +938,13 @@ class GameManager {
 
     if (!battle) {
       throw new Error('Failed to move: The battle not found')
+    }
+
+    if (
+      battle.state === BATTLE_STATE.RUSHED ||
+      battle.state === BATTLE_STATE.ENDED
+    ) {
+      throw new Error('Failed to move: The battle is rushed or already ended')
     }
 
     const opponentPlayer = this.getBattleOpponentPlayer(
@@ -445,7 +1001,7 @@ class GameManager {
         isCritical: false,
         isMustCritical: false,
         isFinish: false,
-        isOpponentDefence: opponentStatus.isDefence
+        isOpponentDefence: opponentStatus.is_defence
       }
 
       this.attack(payload)
@@ -453,7 +1009,7 @@ class GameManager {
       localMove.payload = {
         damage: 0,
         isFinish: false,
-        isOpponentDefence: opponentStatus.isDefence
+        isOpponentDefence: opponentStatus.is_defence
       }
 
       this.spell(payload)
@@ -490,7 +1046,8 @@ class GameManager {
         win: player.win + 1
       })
         .then(() => {
-          this.io.emit('player:update', selectPlayer(player.id))
+          // update player
+          this.io.emit('player:updated', selectPlayer(player.id))
         })
         .catch(error => {
           throw new Error(
@@ -498,28 +1055,34 @@ class GameManager {
           )
         })
 
-      updatePlayerStats(opponentPlayer.id, {
-        exp: opponentPlayer.exp + 1,
-        lose: opponentPlayer.lose + 1
-      })
-        .then(() => {
-          this.io.emit('player:update', selectPlayer(opponentPlayer.id))
+      if (opponentPlayer.type !== PLAYER_TYPE.CPU) {
+        updatePlayerStats(opponentPlayer.id, {
+          exp: opponentPlayer.exp + 1,
+          lose: opponentPlayer.lose + 1
         })
-        .catch(error => {
-          const { message, stack } = error
-          // send to ooponent player
-          this.io.to(opponentPlayer.id).emit('game:error', {
-            message: `Failed to update player status: ${message}`,
-            stack: stack
+          .then(() => {
+            // update opponent player
+            this.io.emit('player:updated', selectPlayer(opponentPlayer.id))
           })
-        })
+          .catch(error => {
+            const { message, stack } = error
+            // send to ooponent player
+            this.io.to(opponentPlayer.id).emit('game:error', {
+              message: `Failed to update player status: ${message}`,
+              stack: stack
+            })
+          })
+      } else {
+        // update CPU player
+        this.io.emit('player:updated', selectPlayer(opponentPlayer.id))
+      }
 
       updateBattle({
         battleId: battle.id,
         payload: { state: BATTLE_STATE.ENDED }
       })
 
-      this.io.emit('battle:update', selectBattle(battle.id))
+      this.io.emit('battle:updated', selectBattle(battle.id))
 
       postDiscord({
         type: DISCORD_POST_TYPE.BATTLE_ENDED,
@@ -545,7 +1108,185 @@ class GameManager {
       }
     })
 
-    this.io.emit('game:update', selectGame(game.id))
+    this.io.emit('game:updated', selectGame(game.id))
+  }
+
+  async moveCPUGame() {
+    console.log('moveCPUGame', this.socket.id)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      throw new Error('Failed to CPU move: The player not found')
+    }
+
+    const battle = selectPlayerBattle(player.id)
+
+    if (!battle) {
+      throw new Error('Failed to CPU move: The battle not found')
+    }
+
+    if (battle.type !== BATTLE_TYPE.CPU) {
+      // Don't throw an error because CPU battles can be aborted by rush into a player
+      // throw new Error(`Failed to CPU move: The battle type is ${battle.type}`)
+      return
+    }
+
+    if (
+      battle.state === BATTLE_STATE.RUSHED ||
+      battle.state === BATTLE_STATE.ENDED
+    ) {
+      throw new Error(
+        'Failed to CPU move: The battle is rushed or already ended'
+      )
+    }
+
+    const opponentPlayer = this.getBattleOpponentPlayer(battle, player.id)
+
+    if (!opponentPlayer) {
+      throw new Error('Failed to CPU move: The opponent player not found')
+    }
+
+    const game = selectBattleGame(battle.id)
+
+    if (!game) {
+      throw new Error('Failed to CPU move: The game not found')
+    }
+
+    const playerKey = this.getBattlePlayerKey(battle, player.id)
+    const playerNFT = selectNFT(battle.players[playerKey].NFT_id)
+    const playerStatus = game.players[playerKey]
+
+    if (game.current_player === playerKey) {
+      throw new Error('Failed to CPU move: It is the player turn')
+    }
+
+    const opponentPlayerKey = this.getBattlePlayerKey(battle, opponentPlayer.id)
+    const opponentNFT = selectNFT(battle.players[opponentPlayerKey].NFT_id)
+    const opponentStatus = game.players[opponentPlayerKey]
+
+    let move = PLAYER_MOVE.DEFENCE
+
+    if (
+      opponentStatus.hp < 30 &&
+      playerStatus.hp > 25 &&
+      opponentStatus.heal_remains > 0
+    ) {
+      move = PLAYER_MOVE.HEAL
+    } else if (opponentStatus.spell_remains > 0 && playerStatus.is_defence) {
+      move = PLAYER_MOVE.SPELL
+    } else if (opponentStatus.attack_remains === 0) {
+      move = PLAYER_MOVE.DEFENCE
+    } else {
+      move = PLAYER_MOVE.ATTACK
+    }
+
+    const localMove = {
+      playerKey: opponentPlayerKey,
+      move: move,
+      payload: {}
+    }
+
+    const payload = {
+      battle,
+      game,
+      player: opponentPlayer,
+      playerKey: opponentPlayerKey,
+      playerNFT: opponentNFT,
+      playerStatus: opponentStatus,
+      opponentPlayer: player,
+      opponentPlayerKey: playerKey,
+      opponentNFT: playerNFT,
+      opponentStatus: playerStatus,
+      localMove
+    }
+
+    if (move === PLAYER_MOVE.ATTACK) {
+      localMove.payload = {
+        damage: 0,
+        isMiss: false,
+        isCritical: false,
+        isMustCritical: false,
+        isFinish: false,
+        isOpponentDefence: playerStatus.is_defence
+      }
+
+      this.attack(payload)
+    } else if (move === PLAYER_MOVE.SPELL) {
+      localMove.payload = {
+        damage: 0,
+        isFinish: false,
+        isOpponentDefence: playerStatus.is_defence
+      }
+
+      this.spell(payload)
+    } else if (move === PLAYER_MOVE.HEAL) {
+      localMove.payload = {
+        recoveryAmount: 0
+      }
+
+      this.heal(payload)
+    } else if (move === PLAYER_MOVE.DEFENCE) {
+      localMove.payload = {
+        recoveryAmount: 0,
+        mustCritical: false
+      }
+
+      this.defence(payload)
+    } else {
+      throw new Error('Failed to CPU move: Invalid move type')
+    }
+
+    if (localMove.payload.isFinish) {
+      updatePlayer({
+        playerId: player.id,
+        payload: { state: PLAYER_STATE.IDLE }
+      })
+
+      updatePlayer({
+        playerId: opponentPlayer.id,
+        payload: { state: PLAYER_STATE.IDLE }
+      })
+
+      updatePlayerStats(player.id, {
+        exp: player.exp + 3,
+        win: player.win + 1
+      })
+        .then(() => {
+          // update player
+          this.io.emit('player:updated', selectPlayer(player.id))
+        })
+        .catch(error => {
+          throw new Error(
+            `Failed to update player stats: ${error.message}: ${error.stack}`
+          )
+        })
+
+      // update CPU player
+      this.io.emit('player:updated', selectPlayer(opponentPlayer.id))
+
+      updateBattle({
+        battleId: battle.id,
+        payload: { state: BATTLE_STATE.ENDED }
+      })
+
+      this.io.emit('battle:updated', selectBattle(battle.id))
+    }
+
+    const currentPlayer = game.current_player === 1 ? 2 : 1
+    const turn = game.turn + 1
+    const moves = game.moves.concat(localMove)
+
+    updateGame({
+      gameId: game.id,
+      payload: {
+        current_player: currentPlayer,
+        turn,
+        moves
+      }
+    })
+
+    this.io.emit('game:updated', selectGame(game.id))
   }
 
   attack(payload) {
@@ -561,7 +1302,7 @@ class GameManager {
     } = payload
 
     if (playerStatus.attack_remains <= 0) {
-      throw new Error('Failed to move: Can not use attack')
+      throw new Error('Failed to CPU move: Can not use attack')
     }
 
     const nextPlayerStatus = {}
@@ -573,22 +1314,22 @@ class GameManager {
     let isMustCritical = false
     let isFinish = false
 
-    if (!playerStatus.mustCritical && Math.random() < playerStatus.missRate) {
+    if (!playerStatus.must_critical && Math.random() < playerStatus.miss_rate) {
       isMiss = true
     } else {
       damage = Math.floor(
         (playerStatus.attack * 100) / (100 + opponentStatus.defense)
       )
 
-      if (!playerStatus.mustCritical && opponentStatus.isDefence) {
+      if (!playerStatus.must_critical && opponentStatus.is_defence) {
         damage = Math.floor(damage * 0.7)
       }
 
-      if (playerStatus.mustCritical) {
+      if (playerStatus.must_critical) {
         isMustCritical = true
         damage = Math.floor(damage * 1.5)
-        nextPlayerStatus.mustCritical = false
-      } else if (Math.random() < playerStatus.criticalRate) {
+        nextPlayerStatus.must_critical = false
+      } else if (Math.random() < playerStatus.critical_rate) {
         isCritical = true
         damage = Math.floor(damage * 1.5)
       } else {
@@ -615,9 +1356,9 @@ class GameManager {
       isFinish = true
     } else {
       if (oldOpponentHpRate >= 0.25 && newOpponentHpRate < 0.25) {
-        nextOpponentStatus.criticalRate = 0.15
+        nextOpponentStatus.critical_rate = 0.15
       } else if (oldOpponentHpRate >= 0.05 && newOpponentHpRate < 0.05) {
-        nextOpponentStatus.criticalRate = 0.25
+        nextOpponentStatus.critical_rate = 0.25
       }
     }
 
@@ -629,8 +1370,8 @@ class GameManager {
 
     nextPlayerStatus.attack_remains = playerStatus.attack_remains - 1
 
-    if (opponentStatus.isDefence) {
-      nextOpponentStatus.isDefence = false
+    if (opponentStatus.is_defence) {
+      nextOpponentStatus.is_defence = false
     }
 
     updateGamePlayer({
@@ -659,7 +1400,7 @@ class GameManager {
     } = payload
 
     if (playerStatus.spell_remains <= 0) {
-      throw new Error('Failed to move: Can not use spell')
+      throw new Error('Failed to CPU move: Can not use spell')
     }
 
     const nextPlayerStatus = {}
@@ -689,8 +1430,8 @@ class GameManager {
 
     nextPlayerStatus.spell_remains = playerStatus.spell_remains - 1
 
-    if (opponentStatus.isDefence) {
-      nextOpponentStatus.isDefence = false
+    if (opponentStatus.is_defence) {
+      nextOpponentStatus.is_defence = false
     }
 
     updateGamePlayer({
@@ -745,11 +1486,11 @@ class GameManager {
 
     nextPlayerStatus.attack_remains =
       playerStatus.attack_remains + recoveryAmount
-    nextPlayerStatus.mustCritical = mustCritical
-    nextPlayerStatus.isDefence = true
+    nextPlayerStatus.must_critical = mustCritical
+    nextPlayerStatus.is_defence = true
 
-    if (opponentStatus.isDefence) {
-      nextOpponentStatus.isDefence = false
+    if (opponentStatus.is_defence) {
+      nextOpponentStatus.is_defence = false
     }
 
     updateGamePlayer({
@@ -778,7 +1519,7 @@ class GameManager {
     } = payload
 
     if (playerStatus.heal_remains <= 0) {
-      throw new Error('Failed to move: Can not use heal')
+      throw new Error('Failed to CPU move: Can not use heal')
     }
 
     const nextPlayerStatus = {}
@@ -818,8 +1559,8 @@ class GameManager {
     nextPlayerStatus.hp = newPlayerHp
     nextPlayerStatus.heal_remains = playerStatus.heal_remains - 1
 
-    if (opponentStatus.isDefence) {
-      nextOpponentStatus.isDefence = false
+    if (opponentStatus.is_defence) {
+      nextOpponentStatus.is_defence = false
     }
 
     updateGamePlayer({
@@ -835,192 +1576,6 @@ class GameManager {
     })
   }
 
-  createBattle(NFTId, callback) {
-    console.log('createBattle', this.socket.id, NFTId)
-
-    const player = this.findSocketPlayer(this.socket.id)
-
-    if (!player) {
-      return callback({
-        status: false,
-        message: 'Failed to create a battle: The player not found'
-      })
-    }
-
-    if (!player.nft_ids.includes(NFTId)) {
-      return callback({
-        status: false,
-        message: 'Failed to create a battle: The player must be own the NFT'
-      })
-    }
-
-    if (selectPlayerBattle(player.id)) {
-      return callback({
-        status: false,
-        message:
-          'Failed to create a game: The player already has the another battle'
-      })
-    }
-
-    const battle = createBattle(player.id, NFTId)
-
-    addBattle(battle)
-
-    updatePlayer({
-      playerId: player.id,
-      payload: { state: PLAYER_STATE.STANDBY }
-    })
-
-    this.io.emit('player:update', selectPlayer(player.id))
-    this.io.emit('battle:battle', selectBattle(battle.id))
-
-    postDiscord({
-      type: DISCORD_POST_TYPE.BATTLE_CREATED,
-      payload: {
-        player: selectPlayer(player.id),
-        battle: selectBattle(battle.id)
-      }
-    })
-
-    callback({
-      status: true,
-      message: 'The battle created'
-    })
-  }
-
-  deleteBattle(battleId, callback) {
-    console.log('deleteBattle', this.socket.id, battleId)
-
-    const battle = selectBattle(battleId)
-
-    if (!battle) {
-      return callback({
-        status: false,
-        message: 'Failed delete the battle: The battle not found'
-      })
-    }
-
-    const game = selectBattleGame(battleId)
-
-    if (game) {
-      removeGame(game.id)
-    }
-
-    const player = this.findSocketPlayer(this.socket.id)
-
-    if (player) {
-      updatePlayer({
-        playerId: player.id,
-        payload: { state: PLAYER_STATE.IDLE }
-      })
-
-      this.io.emit('player:update', selectPlayer(player.id))
-
-      const opponentPlayer = this.getBattleOpponentPlayer(battle, player.id)
-      console.log('opponentPlayer', opponentPlayer)
-
-      if (opponentPlayer) {
-        updatePlayer({
-          playerId: opponentPlayer.id,
-          payload: { state: PLAYER_STATE.IDLE }
-        })
-
-        this.io.emit('player:update', selectPlayer(opponentPlayer.id))
-      }
-    }
-
-    removeBattle(battleId)
-
-    this.io.emit('battle:delete', battleId)
-
-    callback({
-      status: true,
-      message: 'The battle deleted'
-    })
-  }
-
-  joinBattle(battleId, NFTId) {
-    console.log('joinBattle', this.socket.id, battleId, NFTId)
-
-    const player = this.findSocketPlayer(this.socket.id)
-
-    if (!player) {
-      throw new Error('Failed to join the battle: The player not found')
-    }
-
-    if (!player.nft_ids.includes(NFTId)) {
-      throw new Error(
-        'Failed to join the battle: The player does not own the NFT'
-      )
-    }
-
-    const playerBattle = selectPlayerBattle(player.id)
-
-    if (playerBattle) {
-      throw new Error(
-        'Failed to join the battle: The player already has the another battle'
-      )
-    }
-
-    const battle = selectBattle(battleId)
-
-    if (!battle) {
-      throw new Error('Battle not found')
-    }
-
-    if (battle.state !== BATTLE_STATE.CREATED) {
-      throw new Error(
-        `Failed to join the battle: The battle state is "${battle.state.toLowerCase()}"`
-      )
-    }
-
-    joinBattle({ battleId: battle.id, playerId: player.id, NFTId })
-
-    const opponentPlayer = this.getBattleOpponentPlayer(
-      selectBattle(battle.id),
-      player.id
-    )
-
-    updatePlayer({
-      playerId: player.id,
-      payload: { state: PLAYER_STATE.BATTLE }
-    })
-
-    updatePlayer({
-      playerId: opponentPlayer.id,
-      payload: { state: PLAYER_STATE.BATTLE }
-    })
-
-    updateBattle({
-      battleId: battle.id,
-      payload: { state: BATTLE_STATE.READY }
-    })
-
-    this.io.emit('battle:update', selectBattle(battle.id))
-    this.io.emit('player:update', selectPlayer(player.id))
-    this.io.emit('player:update', selectPlayer(opponentPlayer.id))
-
-    this.io.to(player.id).emit('battle:matched', battle.id)
-    this.io.to(opponentPlayer.id).emit('battle:matched', battle.id)
-
-    postDiscord({
-      type: DISCORD_POST_TYPE.BATTLE_MATCHED,
-      payload: {
-        player1: selectPlayer(player.id),
-        player2: selectPlayer(opponentPlayer.id),
-        battle: selectBattle(battle.id)
-      }
-    })
-  }
-
-  leaveBattle(battleId) {
-    console.log('leaveBattle', battleId, this.socket.id)
-  }
-
-  randomBattle() {
-    console.log('randomBattle', this.socket.id)
-  }
-
   createMessage(text) {
     console.log('createMessage', this.socket.id, text)
 
@@ -1034,7 +1589,7 @@ class GameManager {
 
     addMessage(message)
 
-    this.io.emit('message:message', message)
+    this.io.emit('message:created', message)
   }
 
   deleteMessage(messageId) {
@@ -1048,7 +1603,7 @@ class GameManager {
 
     removeMessage(message.id)
 
-    this.io.emit('message:delete', message.id)
+    this.io.emit('message:deleted', message.id)
   }
 
   async updatePlayer(user, callback) {
@@ -1070,16 +1625,16 @@ class GameManager {
         payload: { ...updatedPlayer }
       })
 
-      callback({
+      this.socket.broadcast.emit(
+        'player:updated',
+        selectPlayer(updatedPlayer.id)
+      )
+
+      return callback({
         status: true,
         message: 'The player updated',
         player: updatedPlayer
       })
-
-      this.socket.broadcast.emit(
-        'player:update',
-        selectPlayer(updatedPlayer.id)
-      )
     } catch (error) {
       return callback({
         status: false,
@@ -1106,9 +1661,9 @@ class GameManager {
 
       const updatedPlayer = selectPlayer(player.id)
 
-      this.io.emit('player:update', updatedPlayer)
+      this.io.emit('player:updated', updatedPlayer)
 
-      this.socket.broadcast.emit('player:update', updatedPlayer)
+      this.socket.broadcast.emit('player:updated', updatedPlayer)
     } catch (error) {
       throw new Error(
         `Failed to update player stats: ${error.message}: ${error.stack}`
@@ -1125,7 +1680,7 @@ class GameManager {
       // ignore player not found error
       this.leavePlayerRoom(player.id)
 
-      this.io.emit('player:update', selectPlayer(player.id))
+      this.io.emit('player:updated', selectPlayer(player.id))
     }
   }
 
@@ -1227,7 +1782,7 @@ class GameManager {
   }
 
   eventListeners = {
-    'game:login': async (...args) => {
+    'auth:login': async (...args) => {
       try {
         await waitProcess(PROCESS_LOGIN)
 
@@ -1242,9 +1797,37 @@ class GameManager {
         this.errorHandler(error)
       }
     },
-    'game:logout': (...args) => {
+    'auth:logout': (...args) => {
       try {
         this.logout(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'battle:create': (...args) => {
+      try {
+        this.createBattle(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'battle:join': (...args) => {
+      try {
+        this.joinBattle(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'battle:rush': (...args) => {
+      try {
+        this.rushBattle(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'battle:delete': (...args) => {
+      try {
+        this.deleteBattle(...args)
       } catch (error) {
         this.errorHandler(error)
       }
@@ -1284,37 +1867,9 @@ class GameManager {
         this.errorHandler(error)
       }
     },
-    'battle:create': (...args) => {
+    'game:moveCPU': (...args) => {
       try {
-        this.createBattle(...args)
-      } catch (error) {
-        this.errorHandler(error)
-      }
-    },
-    'battle:delete': (...args) => {
-      try {
-        this.deleteBattle(...args)
-      } catch (error) {
-        this.errorHandler(error)
-      }
-    },
-    'battle:join': (...args) => {
-      try {
-        this.joinBattle(...args)
-      } catch (error) {
-        this.errorHandler(error)
-      }
-    },
-    'battle:leave': (...args) => {
-      try {
-        this.leaveBattle(...args)
-      } catch (error) {
-        this.errorHandler(error)
-      }
-    },
-    'battle:random': (...args) => {
-      try {
-        this.randomBattle(...args)
+        this.moveCPUGame(...args)
       } catch (error) {
         this.errorHandler(error)
       }
@@ -1340,7 +1895,7 @@ class GameManager {
         this.errorHandler(error)
       }
     },
-    'player:updateStats': (...args) => {
+    'player:updatedStats': (...args) => {
       try {
         this.updatePlayerStats(...args)
       } catch (error) {
@@ -1380,24 +1935,24 @@ class GameManager {
   addEventListeners() {
     console.log('addEventListeners', this.socket.id)
 
-    this.socket.on('game:login', this.eventListeners['game:login'])
-    this.socket.on('game:logout', this.eventListeners['game:logout'])
+    this.socket.on('auth:login', this.eventListeners['auth:login'])
+    this.socket.on('auth:logout', this.eventListeners['auth:logout'])
+    this.socket.on('battle:create', this.eventListeners['battle:create'])
+    this.socket.on('battle:join', this.eventListeners['battle:join'])
+    this.socket.on('battle:rush', this.eventListeners['battle:rush'])
+    this.socket.on('battle:delete', this.eventListeners['battle:delete'])
     this.socket.on('game:start', this.eventListeners['game:start'])
     this.socket.on('game:load', this.eventListeners['game:load'])
     this.socket.on('game:finish', this.eventListeners['game:finish'])
     this.socket.on('game:abort', this.eventListeners['game:abort'])
     this.socket.on('game:move', this.eventListeners['game:move'])
-    this.socket.on('battle:create', this.eventListeners['battle:create'])
-    this.socket.on('battle:delete', this.eventListeners['battle:delete'])
-    this.socket.on('battle:join', this.eventListeners['battle:join'])
-    this.socket.on('battle:leave', this.eventListeners['battle:leave'])
-    this.socket.on('battle:random', this.eventListeners['battle:random'])
+    this.socket.on('game:moveCPU', this.eventListeners['game:moveCPU'])
     this.socket.on('message:create', this.eventListeners['message:create'])
     this.socket.on('message:delete', this.eventListeners['message:delete'])
     this.socket.on('player:update', this.eventListeners['player:update'])
     this.socket.on(
-      'player:updateStats',
-      this.eventListeners['player:updateStats']
+      'player:updatedStats',
+      this.eventListeners['player:updatedStats']
     )
     this.socket.on('disconnecting', this.eventListeners['socket:disconnecting'])
     this.socket.on('disconnect', this.eventListeners['socket:disconnect'])
@@ -1410,25 +1965,25 @@ class GameManager {
   removeEventListeners() {
     console.log('removeEventListeners', this.socket.id)
 
-    this.socket.off('game:login', this.eventListeners['game:login'])
-    this.socket.off('game:logout', this.eventListeners['game:logout'])
+    this.socket.off('auth:login', this.eventListeners['auth:login'])
+    this.socket.off('auth:logout', this.eventListeners['auth:logout'])
+    this.socket.off('battle:create', this.eventListeners['battle:create'])
+    this.socket.off('battle:join', this.eventListeners['battle:join'])
+    this.socket.off('battle:rush', this.eventListeners['battle:rush'])
+    this.socket.off('battle:delete', this.eventListeners['battle:delete'])
     this.socket.off('game:start', this.eventListeners['game:start'])
     this.socket.off('game:load', this.eventListeners['game:load'])
     this.socket.off('game:finish', this.eventListeners['game:finish'])
     this.socket.off('game:abort', this.eventListeners['game:abort'])
     this.socket.off('game:move', this.eventListeners['game:move'])
-    this.socket.off('battle:create', this.eventListeners['battle:create'])
-    this.socket.off('battle:delete', this.eventListeners['battle:delete'])
-    this.socket.off('battle:join', this.eventListeners['battle:join'])
-    this.socket.off('battle:leave', this.eventListeners['battle:leave'])
-    this.socket.off('battle:random', this.eventListeners['battle:random'])
-    this.socket.off('player:update', this.eventListeners['player:update'])
-    this.socket.off(
-      'player:updateStats',
-      this.eventListeners['player:updateStats']
-    )
+    this.socket.off('game:moveCPU', this.eventListeners['game:moveCPU'])
     this.socket.off('message:create', this.eventListeners['message:create'])
     this.socket.off('message:delete', this.eventListeners['message:delete'])
+    this.socket.off('player:update', this.eventListeners['player:update'])
+    this.socket.off(
+      'player:updatedStats',
+      this.eventListeners['player:updatedStats']
+    )
     this.socket.off(
       'disconnecting',
       this.eventListeners['socket:disconnecting']

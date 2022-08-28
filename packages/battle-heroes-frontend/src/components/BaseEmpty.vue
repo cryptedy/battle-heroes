@@ -1,7 +1,11 @@
 <template>
   <div class="empty">
     <div class="empty-content">
-      <p class="empty-text">{{ text }}</p>
+      <p class="empty-text">
+        {{ text }}
+      </p>
+
+      <FontAwesomeIcon icon="ghost" />
     </div>
   </div>
 </template>

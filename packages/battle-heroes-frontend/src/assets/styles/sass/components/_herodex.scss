@@ -1,0 +1,21 @@
+.herodex {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+
+  .nft-list {
+    overflow: auto;
+    margin-top: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+    padding-left: 16px;
+    @include mediaQuery(md) {
+      padding-right: 0;
+      padding-left: 0;
+    }
+  }
+
+  .pagination {
+    border-top: 1px solid color(divider, light);
+  }
+}

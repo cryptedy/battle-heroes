@@ -126,8 +126,25 @@
 
       &-actions {
         display: flex;
-        gap: 16px;
-        align-items: center;
+        flex-direction: column;
+        justify-content: space-evenly;
+        @include mediaQuery(xs) {
+          flex-direction: row;
+          flex-grow: 1;
+          justify-content: flex-end;
+          align-items: flex-start;
+        }
+        gap: 8px;
+        @include mediaQuery(xs) {
+          gap: 16px;
+        }
+
+        .button {
+          padding: 4px 12px;
+          @include mediaQuery(xs) {
+            padding: 8px 16px;
+          }
+        }
       }
     }
 
@@ -144,6 +161,9 @@
 
     .player-stats-list {
       gap: 8px;
+      @include mediaQuery(xs) {
+        gap: 16px;
+      }
     }
   }
 }

@@ -1,36 +1,24 @@
 <template>
-  <div class="battle-splash-screen">
-    <div class="battle-splash-screen-content">
-      <transition name="battle-splash-screen-message">
-        <h1 v-show="showMessage" class="battle-splash-screen-message">
-          <BaseSpinner v-if="type === 'reload'" />
-          {{ message }}
-        </h1>
-      </transition>
-
-      <div v-if="type === 'challenger'" class="battle-splash-screen-challenger">
-        <transition name="battle-splash-screen-nft">
-          <div v-show="showNFTs" class="battle-splash-screen-nft">
-            <div class="battle-splash-screen-nft-image">
-              <img
-                src="@/assets/images/challenger.png"
-                :alt="nft2.name"
-                width="512"
-                height="512"
-              />
-            </div>
-          </div>
+  <teleport to="#teleport">
+    <div class="battle-splash-screen">
+      <div class="battle-splash-screen-content">
+        <transition name="battle-splash-screen-message">
+          <h1 v-show="showMessage" class="battle-splash-screen-message">
+            <BaseSpinner v-if="type === BATTLE_SPLASH_SCREEN_TYPE.LOADING" />
+            {{ message }}
+          </h1>
         </transition>
-      </div>
 
-      <div v-else class="battle-splash-screen-versus">
-        <div class="battle-splash-screen-versus-primary">
+        <div
+          v-if="type === BATTLE_SPLASH_SCREEN_TYPE.RUSHING"
+          class="battle-splash-screen-rushing"
+        >
           <transition name="battle-splash-screen-nft">
             <div v-show="showNFTs" class="battle-splash-screen-nft">
               <div class="battle-splash-screen-nft-image">
                 <img
-                  :src="nft1.image_url"
-                  :alt="nft1.name"
+                  src="@/assets/images/challenger.png"
+                  alt="New challenger"
                   width="512"
                   height="512"
                 />
@@ -39,30 +27,46 @@
           </transition>
         </div>
 
-        <div class="battle-splash-screen-versus-symbol">VS</div>
-
-        <div class="battle-splash-screen-versus-secondary">
-          <transition name="battle-splash-screen-nft">
-            <div v-show="showNFTs" class="battle-splash-screen-nft">
-              <div class="battle-splash-screen-nft-image">
-                <img
-                  :src="nft2.image_url"
-                  :alt="nft2.name"
-                  width="512"
-                  height="512"
+        <div v-else class="battle-splash-screen-matching">
+          <div class="battle-splash-screen-matching-primary">
+            <transition name="battle-splash-screen-nft">
+              <div v-show="showNFTs" class="battle-splash-screen-nft">
+                <NFTImage
+                  :nft="playerNft"
+                  class="battle-splash-screen-nft-image"
                 />
               </div>
-            </div>
-          </transition>
+            </transition>
+          </div>
+
+          <div class="battle-splash-screen-matching-symbol">VS</div>
+
+          <div class="battle-splash-screen-matching-secondary">
+            <transition name="battle-splash-screen-nft">
+              <div v-show="showNFTs" class="battle-splash-screen-nft">
+                <NFTImage
+                  :nft="opponentNft"
+                  class="battle-splash-screen-nft-image"
+                />
+              </div>
+            </transition>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script>
+import NFTImage from '@/components/NFTImage'
+import { BATTLE_SPLASH_SCREEN_TYPE } from '@/utils/constants'
+
 export default {
   name: 'BattleSplashScreen',
+
+  components: {
+    NFTImage
+  },
 
   props: {
     type: {
@@ -70,22 +74,22 @@ export default {
       required: true
     },
 
-    player1: {
+    player: {
       type: Object,
       required: true
     },
 
-    player2: {
+    opponentPlayer: {
       type: Object,
       required: true
     },
 
-    nft1: {
+    playerNft: {
       type: Object,
       required: true
     },
 
-    nft2: {
+    opponentNft: {
       type: Object,
       required: true
     }
@@ -99,13 +103,17 @@ export default {
   },
 
   computed: {
+    BATTLE_SPLASH_SCREEN_TYPE() {
+      return BATTLE_SPLASH_SCREEN_TYPE
+    },
+
     message() {
-      if (this.type === 'challenger') {
+      if (this.type === BATTLE_SPLASH_SCREEN_TYPE.RUSHING) {
         return 'HERE COMES A NEW CHALLENGER!'
       }
 
-      if (this.type === 'reload') {
-        return 'BATTLE LOADING...'
+      if (this.type === BATTLE_SPLASH_SCREEN_TYPE.LOADING) {
+        return 'LOADING BATTLE...'
       }
 
       return 'BATTLE START!'

@@ -7,7 +7,7 @@ import Herodex from '@/components/Herodex'
 import { COLLECTIONS } from '@/utils/constants'
 
 export default {
-  name: 'CollectionShow',
+  name: 'CollectionView',
 
   components: {
     Herodex

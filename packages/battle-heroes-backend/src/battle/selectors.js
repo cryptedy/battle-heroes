@@ -1,4 +1,5 @@
 const store = require('../store')
+const { BATTLE_TYPE } = require('../utils/constants')
 const { createSelector } = require('@reduxjs/toolkit')
 
 const selectBattles = state => state.ids.map(id => state.entities[id])
@@ -14,7 +15,9 @@ const selectors = {
     battles => playerId =>
       battles.find(
         battle =>
-          battle.players[1].id === playerId || battle.players[2].id === playerId
+          battle.players[1].id === playerId ||
+          (battle.players[2].id === playerId &&
+            battle.type === BATTLE_TYPE.HUMAN)
       )
   )
 }

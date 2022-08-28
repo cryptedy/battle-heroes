@@ -8,16 +8,7 @@
         :key="playerNFT.id"
         class="nft-list-item"
       >
-        <div class="nft-image">
-          <img
-            :src="playerNFT.image_url"
-            :alt="playerNFT.name"
-            width="512"
-            height="512"
-            style="cursor: pointer"
-            @click="select(playerNFT)"
-          />
-        </div>
+        <NFTImage :nft="playerNFT" @click="select(playerNFT)" />
       </li>
     </ul>
   </div>
@@ -25,9 +16,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import NFTImage from '@/components/NFTImage'
 
 export default {
   name: 'SelectNFTs',
+
+  components: {
+    NFTImage
+  },
 
   props: {
     player: {

@@ -3,16 +3,9 @@
     <BaseEmpty v-if="!NFTs.length > 0" text="NO NFTs" />
 
     <template v-else>
-      <ThePagination
-        :pagination="pagination"
-        @update-page="onPageUpdate($event)"
-      />
-
-      <BaseTransitionPage type="page">
-        <BaseList :key="pagination" class="nft-list">
-          <NFTListItem v-for="NFT in paginatedNFTs" :key="NFT.id" :nft="NFT" />
-        </BaseList>
-      </BaseTransitionPage>
+      <BaseList :key="pagination" class="nft-list">
+        <NFTListItem v-for="NFT in paginatedNFTs" :key="NFT.id" :nft="NFT" />
+      </BaseList>
 
       <ThePagination
         :pagination="pagination"
@@ -26,15 +19,13 @@
 import { mapGetters } from 'vuex'
 import NFTListItem from '@/components/NFTListItem'
 import ThePagination from '@/components/ThePagination'
-import BaseTransitionPage from './BaseTransitionPage.vue'
 
 export default {
   name: 'Herodex',
 
   components: {
     NFTListItem,
-    ThePagination,
-    BaseTransitionPage
+    ThePagination
   },
 
   props: {
@@ -47,7 +38,7 @@ export default {
   data() {
     return {
       page: 1,
-      perPage: 54
+      perPage: 91
     }
   },
 

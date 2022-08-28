@@ -35,7 +35,9 @@ export const mutations = {
 
   [ADD_PLAYER](state, { player }) {
     state.entities = { ...state.entities, [player.id]: player }
-    state.ids.push(player.id)
+
+    const index = state.ids.findIndex(id => id === player.id)
+    if (index === -1) state.ids.push(player.id)
   },
 
   [UPDATE_PLAYER](state, { player }) {

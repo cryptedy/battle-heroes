@@ -1,70 +1,62 @@
 <template>
-  <BaseListItem class="battle-list-item">
+  <BaseListItem
+    class="battle-list-item"
+    :class="{ 'is-disabled': battle.state === 'ENDED' }"
+  >
     <div class="battle-list-item-primary">
-      <img :src="NFT1.image_url" :alt="NFT1.name" width="64" height="64" />
-      <p>{{ player1.name }}</p>
-      <p>{{ NFT1.name }}</p>
+      <div class="battle-list-nft">
+        <NFTImage class="battle-list-nft-image" :nft="NFT1" />
+      </div>
 
-      <HealthBar v-if="game" :max-hp="status1.max_hp" :hp="status1.hp" />
+      <div class="battle-list-nft">
+        <template v-if="!player2">
+          <NFTImage class="battle-list-nft-image" />
+        </template>
+        <template v-else>
+          <NFTImage class="battle-list-nft-image" :nft="NFT2" />
+        </template>
+      </div>
     </div>
 
-    <div class="battle-list-item-secondary">
-      <template v-if="!player2">
-        <img
-          src="@/assets/images/blank-NFT.png"
-          alt="Opponent Wanted"
-          width="64"
-          height="64"
-        />
-        <p>？？？</p>
-        <p>挑戦者募集中</p>
-      </template>
-
-      <template v-else>
-        <img :src="NFT2.image_url" :alt="NFT2.name" width="64" height="64" />
-        <p>{{ player2.name }}</p>
-        <p>{{ NFT2.name }}</p>
-
-        <HealthBar v-if="game" :max-hp="status2.max_hp" :hp="status2.hp" />
-      </template>
-    </div>
+    <div class="battle-list-item-secondary"></div>
 
     <div class="battle-list-item-actions">
-      <BattleDeleteButton :battle="battle" />
+      <BattleSpectateButton :battle="battle" />
 
       <BattleJoinButton :battle="battle" />
+
+      <BattleRushButton :battle="battle" />
+
+      <BattleDeleteButton :battle="battle" />
     </div>
   </BaseListItem>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import HealthBar from '@/components/HealthBar'
+import NFTImage from '@/components/NFTImage'
 import BattleJoinButton from '@/components/BattleJoinButton'
+import BattleRushButton from '@/components/BattleRushButton'
 import BattleDeleteButton from '@/components/BattleDeleteButton'
+import BattleSpectateButton from '@/components/BattleSpectateButton'
 
 export default {
   name: 'BattleListItem',
 
   components: {
-    HealthBar,
+    NFTImage,
     BattleJoinButton,
-    BattleDeleteButton
+    BattleRushButton,
+    BattleDeleteButton,
+    BattleSpectateButton
   },
 
   props: {
     battle: {
       type: Object,
       required: true
-    },
-
-    games: {
-      type: Array,
-      required: true
     }
   },
-
-  emits: ['game-load'],
 
   computed: {
     ...mapGetters({
@@ -88,32 +80,6 @@ export default {
 
     NFT2() {
       return this.findNFT(this.battle.players[2].NFT_id)
-    },
-
-    game() {
-      return this.games.find(game => game.battle_id === this.battle.id)
-    },
-
-    status1() {
-      return this.game.players[1]
-    },
-
-    status2() {
-      return this.game.players[2]
-    }
-  },
-
-  mounted() {
-    this.$socket.emit('game:load', this.battle.id, this.onGameLoad)
-  },
-
-  methods: {
-    onGameLoad({ status, message, game }) {
-      console.log('onGameLoad', status, message, game)
-
-      if (status) {
-        this.$emit('game-load', game)
-      }
     }
   }
 }

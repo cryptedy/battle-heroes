@@ -10,11 +10,16 @@ const {
 const USERNAME = 'BATTLE HEROES'
 
 const post = data => {
-  return axios.post(DISCORD_WEBHOOK_URL, data, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+  return (
+    axios
+      .post(DISCORD_WEBHOOK_URL, data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      // eslint-disable-next-line no-unused-vars
+      .catch(error => {})
+  )
 }
 
 const createBattleCreatedData = (player, battle) => {

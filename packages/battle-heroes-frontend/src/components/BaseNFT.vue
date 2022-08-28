@@ -2,9 +2,7 @@
   <BaseDialog :title="nft.name">
     <template #trigger>
       <div class="nft">
-        <div class="nft-image">
-          <img :src="nft.image_url" :alt="nft.name" width="512" height="512" />
-        </div>
+        <NFTImage :nft="nft" />
 
         <h1 class="nft-name">
           {{ nft.name }}
@@ -16,9 +14,7 @@
     </template>
 
     <div class="nft">
-      <div class="nft-image">
-        <img :src="nft.image_url" :alt="nft.name" width="512" height="512" />
-      </div>
+      <NFTImage :nft="nft" />
 
       <h1 class="nft-name">
         {{ nft.name }}
@@ -33,6 +29,7 @@
 
 <script>
 import Stars from '@/components/Stars'
+import NFTImage from '@/components/NFTImage'
 import BaseNFTRarity from '@/components/BaseNFTRarity'
 import BaseNFTAttributes from '@/components/BaseNFTAttributes'
 
@@ -41,6 +38,7 @@ export default {
 
   components: {
     Stars,
+    NFTImage,
     BaseNFTRarity,
     BaseNFTAttributes
   },

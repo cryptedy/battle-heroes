@@ -28,25 +28,63 @@
 
   &-image {
     > img {
-      width: 100%;
-      height: auto;
-      border-radius: 2px;
+      visibility: hidden;
+      width: 0;
+      height: 0;
+    }
+
+    &-loading {
+      display: inline;
+      position: relative;
+
+      > img {
+        width: 100%;
+        height: auto;
+      }
+
+      svg {
+        position: absolute;
+        width: 100%;
+        height: auto;
+        padding: 32px;
+      }
+    }
+
+    &.is-loaded {
+      > img {
+        visibility: visible;
+        width: 100%;
+        height: auto;
+      }
+
+      svg {
+        display: none;
+      }
+
+      .nft-image-loading {
+        display: none;
+      }
     }
   }
 
   &-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-
-    @include mediaQuery(sm) {
+    @include mediaQuery(xxs) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @include mediaQuery(xs) {
       grid-template-columns: repeat(4, 1fr);
     }
-    @include mediaQuery(md) {
+    @include mediaQuery(sm) {
       grid-template-columns: repeat(5, 1fr);
     }
-    @include mediaQuery(lg) {
+    @include mediaQuery(md) {
       grid-template-columns: repeat(6, 1fr);
+    }
+    @include mediaQuery(lg) {
+      grid-template-columns: repeat(7, 1fr);
     }
 
     &-item {

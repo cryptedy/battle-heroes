@@ -7,7 +7,7 @@ import { mapActions } from 'vuex'
 import SplashScreen from '@/components/SplashScreen'
 
 export default {
-  name: 'Logout',
+  name: 'LogoutView',
 
   components: {
     SplashScreen
@@ -18,7 +18,7 @@ export default {
 
     await this.logout()
 
-    this.$router.push({ name: 'login' }, () => {})
+    this.$router.push({ name: 'index' }, () => {})
   },
 
   methods: {

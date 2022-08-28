@@ -1,27 +1,48 @@
 <template>
   <div class="collections">
-    <h1 class="collections-title">ヒーロー図鑑</h1>
+    <header class="collections-header">
+      <h1>ヒーロー図鑑</h1>
 
-    <BaseTab>
-      <BaseTabList>
-        <BaseTabListItem v-for="collection in collections" :key="collection.id">
-          <router-link
-            :to="{
-              name: 'collections-show',
-              params: { collectionId: collection.id }
-            }"
+      <BaseTab>
+        <BaseTabList>
+          <BaseTabListItem
+            v-for="collection in collections"
+            :key="collection.id"
+            :rows="collections.length"
           >
-            {{ collection.name }}
-          </router-link>
-        </BaseTabListItem>
-      </BaseTabList>
-    </BaseTab>
+            <router-link
+              v-slot="{ isActive, href, navigate }"
+              custom
+              :to="{
+                name: 'collections.show',
+                params: { collectionId: collection.id }
+              }"
+            >
+              <a
+                :class="{ 'is-active': isActive }"
+                :href="href"
+                @click="navigate"
+              >
+                <span class="collections-name">
+                  {{ collection.name }}
+                </span>
+                <span class="collections-name-short">
+                  {{ collection.name_short }}
+                </span>
+              </a>
+            </router-link>
+          </BaseTabListItem>
+        </BaseTabList>
+      </BaseTab>
+    </header>
 
-    <router-view v-slot="{ Component }">
-      <BaseTabContent type="page">
-        <component :is="Component" :key="$route.path" />
+    <main class="collections-main">
+      <BaseTabContent>
+        <router-view v-slot="{ Component }">
+          <component :is="Component" :key="$route.path" />
+        </router-view>
       </BaseTabContent>
-    </router-view>
+    </main>
   </div>
 </template>
 
@@ -29,7 +50,7 @@
 import { COLLECTIONS } from '@/utils/constants'
 
 export default {
-  name: 'Collections',
+  name: 'CollectionsView',
 
   data() {
     return {

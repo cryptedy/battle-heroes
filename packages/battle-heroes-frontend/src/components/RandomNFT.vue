@@ -12,15 +12,7 @@
           <BaseNFTRarity :nft="randomNFT" />
         </div>
 
-        <div class="random-nft-image" :class="{ 'is-loaded': imageLoaded }">
-          <img
-            :onload="onImageLoad"
-            :src="randomNFT.image_url"
-            :alt="randomNFT.name"
-            width="512"
-            height="512"
-          />
-        </div>
+        <NFTImage :nft="randomNFT" class="random-nft-image" />
 
         <div class="random-nft-attributes">
           <BaseNFTAttributes :nft="randomNFT" />
@@ -33,6 +25,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import Stars from '@/components/Stars'
+import NFTImage from '@/components/NFTImage'
 import BaseNFTRarity from '@/components/BaseNFTRarity'
 import BaseNFTAttributes from '@/components/BaseNFTAttributes'
 
@@ -45,6 +38,7 @@ export default {
 
   components: {
     Stars,
+    NFTImage,
     BaseNFTRarity,
     BaseNFTAttributes
   },
@@ -53,8 +47,7 @@ export default {
 
   data() {
     return {
-      min: 1,
-      imageLoaded: false
+      min: 1
     }
   },
 
@@ -84,14 +77,6 @@ export default {
   beforeUnmount() {
     if (this.$options.intervalId) {
       clearInterval(this.$options.intervalId)
-    }
-  },
-
-  methods: {
-    onImageLoad() {
-      this.$nextTick(() => {
-        this.imageLoaded = true
-      })
     }
   }
 }

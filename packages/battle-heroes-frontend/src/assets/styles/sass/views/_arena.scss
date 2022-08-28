@@ -1,0 +1,74 @@
+.arena {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'arena-header'
+    'arena-main';
+  height: 100%;
+
+  &-header {
+    grid-area: arena-header;
+
+    > h1 {
+      margin-top: 18px;
+      margin-bottom: 18px;
+      font-size: 130%;
+
+      @include mediaQuery(xs) {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        font-size: 160%;
+      }
+
+      text-align: center;
+    }
+  }
+
+  &-main {
+    grid-area: arena-main;
+    overflow: auto;
+  }
+
+  &-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    gap: 8px;
+
+    margin-top: 16px;
+    margin-right: 16px;
+    margin-bottom: 16px;
+    margin-left: 16px;
+    @include mediaQuery(md) {
+      margin-right: 0;
+      margin-left: 0;
+    }
+
+    padding: 16px;
+    border: 1px solid #fedb37;
+    border-radius: 2px;
+
+    .button {
+      background-image: radial-gradient(
+          ellipse farthest-corner at right bottom,
+          #fedb37 0%,
+          #fdb931 8%,
+          #9f7928 30%,
+          #8a6e2f 40%,
+          transparent 80%
+        ),
+        radial-gradient(
+          ellipse farthest-corner at left top,
+          #ffffff 0%,
+          #ffffac 8%,
+          #d1b464 25%,
+          #5d4a1f 62.5%,
+          #5d4a1f 100%
+        );
+      color: color(primary, light);
+      font-size: 120%;
+    }
+  }
+}

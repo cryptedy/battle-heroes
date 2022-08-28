@@ -5,7 +5,7 @@
         <router-link
           v-slot="{ isActive, href, navigate }"
           custom
-          :to="{ name: 'home' }"
+          :to="{ name: 'arena' }"
         >
           <li class="app-bar-nav-list-item">
             <a
@@ -14,15 +14,15 @@
               :href="href"
               @click="navigate"
             >
-              <FontAwesomeIcon icon="house" />
-              <span class="app-bar-nav-list-item-link-text"> HOME </span>
+              <FontAwesomeIcon icon="khanda" />
+              <span class="app-bar-nav-list-item-link-text"> アリーナ </span>
             </a>
           </li>
         </router-link>
         <router-link
           v-slot="{ isActive, href, navigate }"
           custom
-          :to="{ name: 'battles' }"
+          :to="{ name: 'rankings' }"
         >
           <li class="app-bar-nav-list-item">
             <a
@@ -31,15 +31,15 @@
               :class="{ 'is-active': isActive }"
               @click="navigate"
             >
-              <FontAwesomeIcon icon="fire" />
-              <span class="app-bar-nav-list-item-link-text"> BATTLES </span>
+              <FontAwesomeIcon icon="ranking-star" />
+              <span class="app-bar-nav-list-item-link-text"> ランキング </span>
             </a>
           </li>
         </router-link>
         <router-link
           v-slot="{ isActive, href, navigate }"
           custom
-          :to="{ name: 'players' }"
+          :to="{ name: 'exchange' }"
         >
           <li class="app-bar-nav-list-item">
             <a
@@ -48,15 +48,15 @@
               :class="{ 'is-active': isActive }"
               @click="navigate"
             >
-              <FontAwesomeIcon icon="users" />
-              <span class="app-bar-nav-list-item-link-text">PLAYERS</span>
+              <FontAwesomeIcon icon="store" />
+              <span class="app-bar-nav-list-item-link-text"> 取引所 </span>
             </a>
           </li>
         </router-link>
         <router-link
           v-slot="{ isActive, href, navigate }"
           custom
-          :to="{ name: 'messages' }"
+          :to="{ name: 'herodex' }"
         >
           <li class="app-bar-nav-list-item">
             <a
@@ -65,8 +65,10 @@
               :class="{ 'is-active': isActive }"
               @click="navigate"
             >
-              <FontAwesomeIcon icon="message" />
-              <span class="app-bar-nav-list-item-link-text">MESSAGES</span>
+              <FontAwesomeIcon icon="book-journal-whills" />
+              <span class="app-bar-nav-list-item-link-text">
+                ヒーロー図鑑
+              </span>
             </a>
           </li>
         </router-link>
@@ -80,7 +82,38 @@
             <template #trigger>
               <PlayerAvatar :player="player" />
             </template>
-            <AccountMenu :player="player" />
+
+            <div class="account-menu">
+              <BaseList class="account-menu-list">
+                <BaseListItem class="account-menu-list-item">
+                  <router-link
+                    :to="{ name: 'account.settings' }"
+                    class="account-menu-list-item-link"
+                  >
+                    <FontAwesomeIcon icon="user" />
+                    アカウント設定
+                  </router-link>
+                </BaseListItem>
+                <BaseListItem class="account-menu-list-item">
+                  <router-link
+                    :to="{ name: 'account.labs' }"
+                    class="account-menu-list-item-link"
+                  >
+                    <FontAwesomeIcon icon="flask-vial" />
+                    Labs
+                  </router-link>
+                </BaseListItem>
+                <BaseListItem class="account-menu-list-item">
+                  <router-link
+                    :to="{ name: 'logout' }"
+                    class="account-menu-list-item-link"
+                  >
+                    <FontAwesomeIcon icon="arrow-right-from-bracket" />
+                    ログアウト
+                  </router-link>
+                </BaseListItem>
+              </BaseList>
+            </div>
           </BaseMenu>
         </li>
       </ul>
@@ -90,17 +123,17 @@
       <ul class="app-bar-content-list">
         <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">
-            経験値 {{ player.exp }}
+            EXP {{ player.exp }}
           </span>
         </li>
         <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">
-            勝ち {{ player.win }}
+            WIN {{ player.win }}
           </span>
         </li>
         <li class="app-bar-content-list-item">
           <span class="app-bar-content-list-item-text">
-            負け {{ player.lose }}
+            LOSE {{ player.lose }}
           </span>
         </li>
         <li class="app-bar-content-list-item">
@@ -109,15 +142,6 @@
             {{ player.nft_ids.length }}
           </span>
         </li>
-        <li class="app-bar-content-list-item">
-          <BattleCreateButton type="simple" />
-
-          <BattleDeleteButton
-            v-if="playerBattle"
-            :battle="playerBattle"
-            type="simple"
-          />
-        </li>
       </ul>
     </div>
   </div>
@@ -125,19 +149,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import AccountMenu from '@/components/AccountMenu'
 import PlayerAvatar from '@/components/PlayerAvatar'
-import BattleCreateButton from '@/components/BattleCreateButton'
-import BattleDeleteButton from '@/components/BattleDeleteButton'
 
 export default {
   name: 'TheAppBar',
 
   components: {
-    AccountMenu,
-    PlayerAvatar,
-    BattleCreateButton,
-    BattleDeleteButton
+    PlayerAvatar
   },
 
   computed: {

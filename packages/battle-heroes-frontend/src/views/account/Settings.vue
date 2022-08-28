@@ -1,5 +1,8 @@
 <template>
-  <p>{{ player.name }}</p>
+  <p>NAME {{ player.name }}</p>
+  <p>EXP {{ player.exp }}</p>
+  <p>WIN {{ player.win }}</p>
+  <p>LOSE {{ player.lose }}</p>
 
   <hr />
 
@@ -22,7 +25,7 @@ import ToggleAudio from '@/components/ToggleAudio'
 import PlayerUpdateButton from '@/components/PlayerUpdateButton.vue'
 
 export default {
-  name: 'SettingsAccount',
+  name: 'AccountSettingsView',
 
   components: {
     ToggleAudio,

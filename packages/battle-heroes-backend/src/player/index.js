@@ -1,7 +1,7 @@
 const { updatePlayer } = require('./actions')
 const { selectPlayer } = require('./selectors')
 const { getNFTIdsForAddress } = require('../NFT')
-const { PLAYER_STATE } = require('../utils/constants')
+const { PLAYER_TYPE, PLAYER_STATE } = require('../utils/constants')
 const { getUsers, updateUser, getUserProfile } = require('../user')
 
 const getPlayers = async () => {
@@ -39,6 +39,7 @@ const createPlayer = async user => {
           exp: user.exp,
           win: user.win,
           lose: user.lose,
+          type: PLAYER_TYPE.HUMAN,
           state: PLAYER_STATE.IDLE
         })
       } catch (error) {

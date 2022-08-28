@@ -91,11 +91,11 @@ export default {
 
   computed: {
     beforeCurrent() {
-      return 3
+      return 1
     },
 
     afterCurrent() {
-      return 3
+      return 1
     },
 
     lastPage() {

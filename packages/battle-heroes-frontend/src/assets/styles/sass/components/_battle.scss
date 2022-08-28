@@ -36,175 +36,19 @@
     color: inherit;
   }
 
-  &-splash-screen {
-    font-family: PixelMplus;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 12px;
-    @include mediaQuery(xxs) {
-      font-size: 13px;
-    }
-    @include mediaQuery(sm) {
-      font-size: 16px;
-    }
-    @include mediaQuery(md) {
-      font-size: 18px;
-    }
-
-    &-content {
-      position: relative;
-      width: 100%;
-      margin-top: 16px;
-      margin-bottom: 16px;
-      padding-top: 16px;
-      padding-bottom: 16px;
-      border-top: 12px solid palette(yellow, 500);
-      border-bottom: 12px solid palette(yellow, 500);
-
-      background: repeating-conic-gradient(
-          transparent,
-          transparent 12deg,
-          palette(grey, 800) 12deg 15deg
-        ),
-        repeating-conic-gradient(
-          transparent,
-          transparent 19deg,
-          palette(grey, 800) 19deg 22deg
-        ),
-        repeating-conic-gradient(
-          transparent,
-          transparent 6deg,
-          palette(grey, 800) 6deg 8deg
-        );
-    }
-
-    &-message {
-      position: absolute;
-      top: 12px;
-      width: 100%;
-      text-align: center;
-      font-size: 260%;
-      color: palette(grey, 0);
-      text-shadow: 3px 3px 3px palette(grey, 1000);
-      z-index: 2;
-
-      &-enter-active,
-      &-leave-active {
-        transition: transform 1200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-      }
-      &-enter-from,
-      &-leave-to {
-        opacity: 0;
-        transform: translateY(-24px);
-      }
-    }
-
-    &-nft {
-      margin-right: 16px;
-      margin-left: 16px;
-      &-image {
-        margin: 0 auto;
-        max-width: 250px;
-        > img {
-          width: 100%;
-          height: auto;
-        }
-      }
-    }
-
-    &-challenger {
-      .battle-splash-screen-nft {
-        padding-top: 32px;
-
-        &-enter-active,
-        &-leave-active {
-          transition: transform 800ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-        }
-        &-enter-from,
-        &-leave-to {
-          opacity: 0;
-          transform: translateY(24px);
-        }
-      }
-    }
-
-    &-versus {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      max-width: 1024px;
-      margin: 0 auto;
-
-      &-primary {
-        .battle-splash-screen-nft {
-          &-enter-active,
-          &-leave-active {
-            transition: transform 800ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-          }
-          &-enter-from,
-          &-leave-to {
-            opacity: 0;
-            transform: translateX(-32px);
-          }
-        }
-      }
-
-      &-secondary {
-        .battle-splash-screen-nft {
-          &-enter-active,
-          &-leave-active {
-            transition: transform 800ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-          }
-          &-enter-from,
-          &-leave-to {
-            opacity: 0;
-            transform: translateX(32px);
-          }
-        }
-      }
-
-      .battle-splash-screen-nft-image {
-        > img {
-          border: 6px solid palette(grey, 900);
-        }
-      }
-
-      &-symbol {
-        align-self: center;
-        font-size: 160%;
-        color: palette(grey, 0);
-        text-shadow: 3px 3px 3px palette(grey, 1000);
-        @include mediaQuery(xxs) {
-          font-size: 200%;
-        }
-        @include mediaQuery(xs) {
-          font-size: 250%;
-        }
-        @include mediaQuery(sm) {
-          font-size: 280%;
-        }
-        @include mediaQuery(md) {
-          font-size: 300%;
-        }
-        color: palette(grey, 300);
-      }
-    }
-  }
-
   &-status {
     display: flex;
     column-gap: 8px;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
 
     &-primary {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       flex-grow: 1;
-      text-align: center;
+      align-items: center;
     }
 
     &-actions {
@@ -260,6 +104,9 @@
         text-overflow: ellipsis;
         font-size: 90%;
 
+        &.is-cpu {
+          color: palette(yellow, 500);
+        }
         &.is-online {
           color: palette(green, 500);
         }
@@ -559,8 +406,9 @@
     column-gap: 8px;
 
     .twitter-share-button,
-    > button {
+    .button {
       width: 100%;
+      height: auto;
       border-radius: 3px;
       padding: 12px 6px;
       @include mediaQuery(xxs) {
@@ -571,6 +419,18 @@
       }
       text-align: center;
       user-select: none;
+      &:active,
+      &:disabled,
+      &.is-disabled {
+        border-color: transparent;
+        background-image: none;
+        background-color: palette(grey, 800);
+        color: color(disabled, light);
+      }
+    }
+
+    .button {
+      background-color: palette(blue, 500);
     }
 
     .twitter-share-button {
@@ -579,39 +439,11 @@
       color: palette(grey, 0);
     }
 
-    > button {
-      background-color: palette(blue, 800);
+    > .button {
       color: palette(grey, 0);
       transition: background-color 200ms ease-in,
         background-color 100ms ease-out;
       text-shadow: 1px 1px 0 palette(grey, 1000);
-
-      &.is-emphasis {
-        background-image: radial-gradient(
-            ellipse farthest-corner at right bottom,
-            #fedb37 0%,
-            #fdb931 8%,
-            #9f7928 30%,
-            #8a6e2f 40%,
-            transparent 80%
-          ),
-          radial-gradient(
-            ellipse farthest-corner at left top,
-            #ffffff 0%,
-            #ffffac 8%,
-            #d1b464 25%,
-            #5d4a1f 62.5%,
-            #5d4a1f 100%
-          );
-      }
-
-      &:active,
-      &:disabled,
-      &.is-disabled {
-        background-image: none;
-        background-color: palette(grey, 800);
-        color: color(disabled, light);
-      }
     }
   }
 
@@ -619,8 +451,11 @@
     &-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 16px;
+      border-bottom: 1px solid color(divider, light);
+      &:last-child {
+        border-bottom: none;
+      }
+
       padding-top: 12px;
       padding-right: 16px;
       padding-bottom: 12px;
@@ -630,19 +465,73 @@
         padding-left: 0;
       }
 
+      &.is-disabled {
+        position: relative;
+
+        &:after {
+          background-color: palette(grey, 900);
+          opacity: 0.8;
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+        }
+      }
+
       &-primary {
-        flex-grow: 1;
-        max-width: 150px;
+        display: flex;
+        gap: 8px;
+        @include mediaQuery(xs) {
+          gap: 16px;
+        }
       }
 
       &-secondary {
-        flex-grow: 1;
-        max-width: 150px;
+        //
       }
 
       &-actions {
-        flex-grow: 1;
-        text-align: right;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        @include mediaQuery(xs) {
+          gap: 16px;
+        }
+
+        .button {
+          padding: 4px 12px;
+          @include mediaQuery(xs) {
+            padding: 8px 16px;
+          }
+        }
+      }
+    }
+
+    &-nft {
+      width: 50%;
+      height: 100%;
+      min-width: 64px;
+      max-width: 64px;
+      @include mediaQuery(xs) {
+        min-width: 105px;
+        max-width: 105px;
+      }
+
+      &-image {
+        &-loading,
+        &.is-loaded {
+          > img {
+            width: auto;
+            height: 100%;
+            max-height: 64px;
+            @include mediaQuery(xs) {
+              max-height: 105px;
+            }
+          }
+        }
       }
     }
   }

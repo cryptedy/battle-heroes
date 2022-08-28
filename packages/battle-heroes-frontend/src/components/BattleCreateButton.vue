@@ -1,72 +1,97 @@
 <template>
-  <template v-if="canCreateBattle">
-    <BaseDialog
-      :open="dialogShown"
-      title="バトルに使用する NFT を選択"
-      @close="onCloseDialog"
-    >
-      <SelectNFTs :player="player" @select="onSelectNFT" />
-    </BaseDialog>
+  <SplashScreen v-if="splashScreenShown" message="Loading..." />
 
-    <BaseButton type="primary" @click="handleCreateBattle">
-      <template v-if="type === 'simple'">
-        <FontAwesomeIcon icon="plus" />
-        バトル
-      </template>
-      <template v-else> オンラインバトル作成 </template>
-    </BaseButton>
-  </template>
+  <BaseDialog
+    :open="dialogShown"
+    title="バトルに使用する NFT を選択"
+    @close="onCloseDialog"
+  >
+    <SelectNFTs :player="player" @select="onSelectNFT" />
+  </BaseDialog>
+
+  <BaseButton
+    v-if="canStartBattle"
+    type="primary"
+    :disabled="loading"
+    @click="handle"
+  >
+    {{ label }}
+  </BaseButton>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import SelectNFTs from '@/components/SelectNFTs'
-import { PLAYER_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
+import SplashScreen from '@/components/SplashScreen'
+import {
+  BATTLE_TYPE,
+  BATTLE_STATE,
+  PLAYER_STATE,
+  NOTIFICATION_TYPE,
+  BATTLE_SPLASH_SCREEN_TYPE
+} from '@/utils/constants'
 
 export default {
   name: 'BattleCreateButton',
 
   components: {
-    SelectNFTs
+    SelectNFTs,
+    SplashScreen
   },
 
   props: {
-    type: {
-      type: String,
-      required: false,
-      default: 'default',
-      validator: value => ['default', 'simple'].indexOf(value) !== -1
-    },
-
     nft: {
       type: Object,
       required: false,
       default: () => ({})
+    },
+
+    label: {
+      type: String,
+      required: false,
+      default: 'バトルを開始'
     }
   },
 
   data() {
     return {
+      loading: false,
+      splashScreenShown: false,
       dialogShown: false
     }
   },
 
   computed: {
     ...mapGetters({
+      battles: 'battle/all',
       player: 'game/player',
       playerNFT: 'battle/playerNFT',
       playerBattle: 'game/playerBattle'
     }),
 
-    canCreateBattle() {
+    canStartBattle() {
       return !this.playerBattle && this.player.state === PLAYER_STATE.IDLE
+    },
+
+    availableBattles() {
+      return this.battles.filter(
+        battle =>
+          battle.type === BATTLE_TYPE.HUMAN &&
+          battle.state === BATTLE_STATE.CREATED
+      )
     }
   },
 
   methods: {
     ...mapActions({
+      joinBattle: 'battle/join',
+      createBattle: 'battle/create',
       addNotification: 'notification/add'
     }),
+
+    handle() {
+      this.dialogShown = true
+    },
 
     onCloseDialog() {
       this.dialogShown = false
@@ -75,85 +100,80 @@ export default {
     onSelectNFT(NFT) {
       this.dialogShown = false
 
-      this.createBattle(NFT)
+      this.execute(NFT)
     },
 
-    handleCreateBattle() {
-      if (Object.keys(this.nft).length > 0) {
-        this.createBattle(this.nft)
-      } else {
-        this.dialogShown = true
-      }
-    },
+    async execute(NFT) {
+      this.loading = true
+      this.splashScreenShown = true
 
-    createBattle(NFT) {
-      this.$socket.emit('battle:create', NFT.id, ({ status, message }) => {
-        console.log('battle:create', status)
+      if (this.availableBattles.length > 0) {
+        // join other battle
 
-        if (status) {
-          this.addNotification({
-            message,
-            type: NOTIFICATION_TYPE.SUCCESS
-          })
+        // use oldest one
+        const battle = this.availableBattles[0]
 
-          setTimeout(() => {
-            // start a CPU battle if not matched any opponents within 15 seconds.
-            if (
-              this.player.state === PLAYER_STATE.STANDBY &&
-              this.playerBattle
-            ) {
-              this.$dialog.open({
-                title: '対戦相手が見つかりません',
-                message: `
-                  <p>現在対戦相手が見つかりません。</p>
-                  <p>1人用モードの CPU バトルを開始しますか？</p>
-                `,
-                confirmLabel: 'CPU バトルを開始',
-                cancelLabel: '対戦相手を待つ',
-                onConfirm: () => {
-                  return this.$router.push(
-                    {
-                      name: 'battle-offline',
-                      params: {
-                        NFTId: NFT.id
-                      }
-                    },
-                    () => {}
-                  )
-
-                  // abort battle and start CPU battle
-                  // return this.$socket.emit(
-                  //   'battle:delete',
-                  //   this.playerBattle.id,
-                  //   // eslint-disable-next-line no-unused-vars
-                  //   ({ status, message }) => {
-                  //     if (status) {
-                  //       return this.$router.push(
-                  //         {
-                  //           name: 'battle-offline',
-                  //           params: {
-                  //             NFTId: NFT.id
-                  //           }
-                  //         },
-                  //         () => {}
-                  //       )
-                  //     } else {
-                  //       //
-                  //     }
-                  //   }
-                  // )
-                }
+        this.joinBattle({ battleId: battle.id, NFTId: NFT.id })
+          // eslint-disable-next-line no-unused-vars
+          .then(({ message, battle, player1, player2 }) => {
+            this.$router
+              .push(
+                {
+                  name: 'battles.show',
+                  params: {
+                    battleId: battle.id,
+                    splashScreenType: BATTLE_SPLASH_SCREEN_TYPE.MATCHING
+                  }
+                },
+                () => {}
+              )
+              .then(() => {
+                this.loading = false
+                this.splashScreenShown = false
               })
-            }
-          }, 15000)
-        } else {
-          this.addNotification({
-            message,
-            type: NOTIFICATION_TYPE.ERROR,
-            timeout: 0
           })
-        }
-      })
+          .catch(error => {
+            this.addNotification({
+              message: error.message,
+              type: NOTIFICATION_TYPE.ERROR,
+              timeout: 0
+            })
+
+            this.loading = false
+            this.splashScreenShown = false
+          })
+      } else {
+        // create a new battle
+        this.createBattle(NFT.id)
+          // eslint-disable-next-line no-unused-vars
+          .then(({ message, battle, player }) => {
+            this.$router
+              .push(
+                {
+                  name: 'battles.show',
+                  params: {
+                    battleId: battle.id,
+                    splashScreenType: BATTLE_SPLASH_SCREEN_TYPE.MATCHING
+                  }
+                },
+                () => {}
+              )
+              .then(() => {
+                this.loading = false
+                this.splashScreenShown = false
+              })
+          })
+          .catch(error => {
+            this.addNotification({
+              message: error,
+              type: NOTIFICATION_TYPE.ERROR,
+              timeout: 0
+            })
+
+            this.loading = false
+            this.splashScreenShown = false
+          })
+      }
     }
   }
 }

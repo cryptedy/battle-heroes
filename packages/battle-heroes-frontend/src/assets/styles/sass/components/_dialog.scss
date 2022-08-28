@@ -63,6 +63,8 @@
     }
 
     &-actions {
+      margin-left: 16px;
+
       button {
         width: 32px;
         height: 32px;
@@ -93,11 +95,7 @@
     background-color: palette(grey, 0);
     padding: 10px 16px;
     border-top: 1px solid color(divider, dark);
-    // text-align: right;
+    justify-content: flex-end;
     color: color(primary, dark);
-
-    // > .button + .button {
-    //   margin-left: 12px;
-    // }
   }
 }

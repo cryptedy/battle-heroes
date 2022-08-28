@@ -2,8 +2,10 @@ import constants from '../../../battle-heroes-utils/constants'
 
 export const COLLECTION_ID = constants.COLLECTION_ID
 export const COLLECTIONS = constants.COLLECTIONS
+export const PLAYER_TYPE = constants.PLAYER_TYPE
 export const PLAYER_STATE = constants.PLAYER_STATE
 export const PLAYER_MOVE = constants.PLAYER_MOVE
+export const BATTLE_TYPE = constants.BATTLE_TYPE
 export const BATTLE_STATE = constants.BATTLE_STATE
 
 export const BACKEND_URL = process.env.VUE_APP_BACKEND_URL
@@ -35,6 +37,12 @@ export const SOUND_EFFECT = Object.freeze({
   ENCOUNTER: 'ENCOUNTER',
   WIN: 'WIN',
   LOSE: 'LOSE'
+})
+
+export const BATTLE_SPLASH_SCREEN_TYPE = Object.freeze({
+  LOADING: 'LOADING',
+  MATCHING: 'MATCHING',
+  RUSHING: 'RUSHING'
 })
 
 export default Object.freeze({

@@ -33,13 +33,16 @@ export const mutations = {
 
   [ADD_MESSAGE](state, { message }) {
     state.entities = { ...state.entities, [message.id]: message }
-    state.ids.push(message.id)
+
+    const index = state.ids.findIndex(id => id === message.id)
+    if (index === -1) state.ids.push(message.id)
   },
 
   [REMOVE_MESSAGE](state, { messageId }) {
-    delete state.entities[messageId]
     const index = state.ids.findIndex(id => id === messageId)
     if (index !== -1) state.ids.splice(index, 1)
+
+    delete state.entities[messageId]
   }
 }
 

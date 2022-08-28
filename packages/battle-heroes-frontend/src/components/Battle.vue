@@ -15,11 +15,10 @@
         <p class="battle-status-current-turn">=== ターン {{ game.turn }} ===</p>
 
         <template v-if="aborted">
-          <p style="font-weight: bold; color: #4caf50">YOU WINI!</p>
-          <p>Opponent player aborted the battle.</p>
+          <p>対戦相手がゲームを中止しました</p>
         </template>
 
-        <template v-else-if="isGameFinished">
+        <template v-else-if="isGameOver">
           <template v-if="playable">
             <p
               v-if="playerStatus.hp > opponentStatus.hp"
@@ -32,18 +31,18 @@
 
           <template v-else>
             <p
-              v-if="player1.hp > player2.hp"
+              v-if="playerStatus.hp > opponentStatus.hp"
               style="font-weight: bold; color: #4caf50"
             >
-              {{ player1.name }} WIN!
+              {{ player.name }} WIN!
             </p>
             <p v-else style="font-weight: bold; color: #4caf50">
-              {{ player2.name }} WIN!
+              {{ opponentPlayer.name }} WIN!
             </p>
           </template>
 
           <router-link
-            :to="{ name: 'battles' }"
+            :to="{ name: 'arena' }"
             style="font-weight: bold; color: #2196f3"
           >
             <FontAwesomeIcon icon="arrow-left" />
@@ -52,12 +51,7 @@
         </template>
 
         <template v-else>
-          <p
-            v-if="isOpponentPlayerOffline"
-            style="color: rgba(255, 255, 255, 0.5)"
-          >
-            Opponent player is OFFLINE
-          </p>
+          <p v-if="cpuBattle" style="color: #ffeb3b">CPU バトル中</p>
 
           <template v-if="playable">
             <p v-if="canMove" style="font-weight: bold; color: #2196f3">
@@ -69,8 +63,14 @@
           </template>
 
           <template v-else>
-            <p style="color: rgba(255, 255, 255, 0.5)">
-              {{ currentPlayer.name }} のターン.
+            <p
+              v-if="isCurrentPlayerOnline"
+              style="font-weight: bold; color: #2196f3"
+            >
+              {{ currentPlayer.name }} のターン
+            </p>
+            <p v-else style="color: rgba(255, 255, 255, 0.5)">
+              {{ currentPlayer.name }} のターン
             </p>
           </template>
         </template>
@@ -82,26 +82,30 @@
     </div>
 
     <div class="battle-ground">
-      <GamePlayer
+      <BattlePlayer
         :player="opponentPlayer"
-        :player-nft="opponentNFT"
+        :player-nft="opponentNft"
         :player-status="opponentStatus"
+        :player-online="isOpponentPlayerOnline"
         :opponent-player="player"
-        :opponent-nft="playerNFT"
+        :opponent-nft="playerNft"
         :opponent-status="playerStatus"
+        :opponent-online="isPlayerOnline"
         :current-player="currentPlayer"
-        :finished="isGameFinished"
+        :finished="isGameOver"
       />
 
-      <GamePlayer
+      <BattlePlayer
         :player="player"
-        :player-nft="playerNFT"
+        :player-nft="playerNft"
         :player-status="playerStatus"
+        :player-online="isPlayerOnline"
         :opponent-player="opponentPlayer"
-        :opponent-nft="opponentNFT"
+        :opponent-nft="opponentNft"
         :opponent-status="opponentStatus"
+        :opponent-online="isOpponentPlayerOnline"
         :current-player="currentPlayer"
-        :finished="isGameFinished"
+        :finished="isGameOver"
       />
     </div>
 
@@ -125,64 +129,96 @@
 
     <div class="battle-controls">
       <template v-if="playable">
-        <template v-if="isGameFinished">
-          <button v-if="allowContinue" @click="onContinue">続けてバトル</button>
+        <template v-if="isGameOver">
+          <template v-if="!canNextBattle">
+            <BaseButton type="primary" :disabled="true">
+              続けてバトル
+            </BaseButton>
 
-          <a
-            class="twitter-share-button"
-            :href="twitterLink"
-            rel="nofollow"
-            target="_blank"
-            title="結果を Twitter でシェア"
-          >
-            <FontAwesomeIcon :icon="['fab', 'twitter']" />
-            結果を Twitter でシェア
-          </a>
+            <a class="button twitter-share-button is-disabled">
+              <FontAwesomeIcon :icon="['fab', 'twitter']" />
+              結果を Twitterでシェア
+            </a>
+          </template>
+
+          <template v-else>
+            <BattleCreateButton label="続けてバトル" />
+
+            <a
+              class="button twitter-share-button"
+              :href="twitterLink"
+              rel="nofollow"
+              target="_blank"
+              title="結果を Twitter でシェア"
+            >
+              <FontAwesomeIcon :icon="['fab', 'twitter']" />
+              結果を Twitter でシェア
+            </a>
+          </template>
         </template>
 
         <template v-else>
-          <button
+          <BaseButton
+            type="primary"
             :disabled="!canAttack"
             :class="{
               'is-disabled': !canAttack,
-              'is-emphasis': playerStatus.mustCritical
+              'is-type-golden': playerStatus.must_critical
             }"
             @click="attack"
           >
             攻撃 {{ playerStatus.attack_remains }}
-          </button>
-          <button :disabled="!canSpell" @click="spell">
-            {{ $filters.spellLabel(playerNFT) }}
+          </BaseButton>
+          <BaseButton type="primary" :disabled="!canSpell" @click="spell">
+            {{ $filters.spellLabel(playerNft) }}
             {{ playerStatus.spell_remains }}
-          </button>
-          <button :disabled="!canDefence" @click="defence">防御</button>
-          <button :disabled="!canHeal" @click="heal">
+          </BaseButton>
+          <BaseButton type="primary" :disabled="!canDefence" @click="defence"
+            >防御</BaseButton
+          >
+          <BaseButton type="primary" :disabled="!canHeal" @click="heal">
             回復 {{ playerStatus.heal_remains }}
-          </button>
-          <!-- <button :disabled="true">ヘルプ</button> -->
+          </BaseButton>
         </template>
       </template>
 
-      <template v-else> WATCH MODE </template>
+      <template v-else>
+        <BaseButton v-if="canLeaveGame" type="primary" @click="leaveGame">
+          <FontAwesomeIcon icon="arrow-left" />
+          戻る
+        </BaseButton>
+
+        <BattleRushButton :battle="battle" />
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import GamePlayer from '@/components/GamePlayer'
+import { PLAYER_STATE } from '@/utils/constants'
 import { scrollToBottom } from '@/utils/helpers'
 import ToggleAudio from '@/components/ToggleAudio'
+import BattlePlayer from '@/components/BattlePlayer'
+import BattleRushButton from '@/components/BattleRushButton'
+import BattleCreateButton from '@/components/BattleCreateButton'
 
 export default {
-  name: 'Game',
+  name: 'Battle',
 
   components: {
-    GamePlayer,
-    ToggleAudio
+    ToggleAudio,
+    BattlePlayer,
+    BattleRushButton,
+    BattleCreateButton
   },
 
   props: {
+    battle: {
+      type: Object,
+      required: true
+    },
+
     game: {
       type: Object,
       required: true
@@ -193,13 +229,7 @@ export default {
       required: true
     },
 
-    allowContinue: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-
-    aborted: {
+    cpuBattle: {
       type: Boolean,
       required: true
     },
@@ -210,78 +240,84 @@ export default {
       default: false
     },
 
-    player1: {
+    spectate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    aborted: {
+      type: Boolean,
+      required: true
+    },
+
+    finished: {
+      type: Boolean,
+      required: true
+    },
+
+    playerKey: {
+      type: Number,
+      required: true
+    },
+
+    opponentPlayerKey: {
+      type: Number,
+      required: true
+    },
+
+    player: {
       type: Object,
       required: true
     },
 
-    player2: {
+    opponentPlayer: {
       type: Object,
       required: true
     },
 
-    nft1: {
+    playerNft: {
       type: Object,
       required: true
     },
 
-    nft2: {
+    opponentNft: {
       type: Object,
       required: true
     }
   },
 
-  emits: ['attack', 'spell', 'defence', 'heal', 'abort', 'finish', 'continue'],
+  emits: [
+    'attack',
+    'spell',
+    'defence',
+    'heal',
+    'move-cpu',
+    'leave',
+    'abort',
+    'finish',
+    'online-status'
+  ],
 
   data() {
     return {
-      moving: false
+      moving: false,
+      canNextBattle: false
     }
   },
 
   computed: {
     ...mapGetters({
-      findNFT: 'NFT/find',
       gamePlayer: 'game/player',
-      findPlayer: 'player/find'
+      playerBattle: 'game/playerBattle'
     }),
 
-    playerKey() {
-      if (!this.gamePlayer) {
-        return 1
-      }
-
-      if (this.player1.id === this.gamePlayer.id) {
-        return 1
-      } else if (this.player2.id === this.gamePlayer.id) {
-        return 2
-      }
-
-      return 1
-    },
-
-    opponentPlayerKey() {
-      return this.playerKey === 1 ? 2 : 1
-    },
-
-    player() {
-      return this.playerKey === 1 ? this.player1 : this.player2
-    },
-
-    opponentPlayer() {
-      return this.opponentPlayerKey === 1 ? this.player1 : this.player2
-    },
-
-    playerNFT() {
-      return this.playerKey === 1 ? this.nft1 : this.nft2
-    },
-
-    opponentNFT() {
-      return this.opponentPlayerKey === 1 ? this.nft1 : this.nft2
+    players() {
+      return this.game.players
     },
 
     status() {
-      return this.game.players
+      return this.players
     },
 
     playerStatus() {
@@ -297,15 +333,35 @@ export default {
     },
 
     currentPlayer() {
-      return this.currentPlayerKey === 1 ? this.player1 : this.player2
+      return this.currentPlayerKey === this.playerKey
+        ? this.player
+        : this.opponentPlayer
     },
 
-    isGameFinished() {
+    isPlayerOnline() {
+      return this.player.socket_ids.length > 0
+    },
+
+    isOpponentPlayerOnline() {
+      return this.opponentPlayer.socket_ids.length > 0
+    },
+
+    isCurrentPlayerOnline() {
+      return this.currentPlayerKey === this.playerKey
+        ? this.isPlayerOnline
+        : this.isOpponentPlayerOnline
+    },
+
+    isPlayerBattle() {
+      return this.playerBattle && this.playerBattle.id === this.battle.id
+    },
+
+    isGameOver() {
       return this.playerStatus.hp <= 0 || this.opponentStatus.hp <= 0
     },
 
-    isOpponentPlayerOffline() {
-      return !this.opponentPlayer.socket_ids.length > 0
+    canStartBattle() {
+      return !this.playerBattle && this.gamePlayer.state === PLAYER_STATE.IDLE
     },
 
     canAttack() {
@@ -329,16 +385,27 @@ export default {
     },
 
     canLeaveGame() {
-      return !this.playable || this.aborted || this.isGameFinished
+      return !this.playable || this.aborted || this.isGameOver
     },
 
     canMove() {
       return (
         this.playable &&
         !this.aborted &&
-        !this.isGameFinished &&
         !this.moving &&
+        !this.isGameOver &&
         this.currentPlayerKey === this.playerKey
+      )
+    },
+
+    canMoveCPU() {
+      return (
+        this.cpuBattle &&
+        this.playable &&
+        !this.aborted &&
+        !this.moving &&
+        !this.isGameOver &&
+        this.currentPlayerKey !== this.playerKey
       )
     },
 
@@ -368,7 +435,38 @@ export default {
       // eslint-disable-next-line no-unused-vars
       handler(value, oldValue) {
         this.onChangeTurn()
-      }
+      },
+      immediate: true
+    },
+
+    isPlayerOnline: {
+      handler(value, oldValue) {
+        if (value === undefined) return
+        if (oldValue === undefined) return
+        if (value !== oldValue) {
+          this.$emit('online-status', this.player, value)
+        }
+      },
+      immediate: true
+    },
+
+    isOpponentPlayerOnline: {
+      handler(value, oldValue) {
+        if (value === undefined) return
+        if (oldValue === undefined) return
+        if (value !== oldValue) {
+          this.$emit('online-status', this.opponentPlayer, value)
+        }
+      },
+      immediate: true
+    },
+
+    isGameOver: {
+      // eslint-disable-next-line no-unused-vars
+      handler(value, oldValue) {
+        if (value & !oldValue) this.finishGame()
+      },
+      immediate: true
     },
 
     messages: {
@@ -380,14 +478,6 @@ export default {
       },
       immediate: true,
       deep: true
-    },
-
-    isGameFinished: {
-      // eslint-disable-next-line no-unused-vars
-      handler(value, oldValue) {
-        if (value & !oldValue) this.onGameFinished()
-      },
-      immediate: true
     }
   },
 
@@ -403,6 +493,16 @@ export default {
     onChangeTurn() {
       console.log('onChangeTurn')
       this.moving = false
+
+      if (
+        this.cpuBattle &&
+        this.currentPlayerKey !== this.playerKey &&
+        !this.isGameOver
+      ) {
+        setTimeout(() => {
+          this.moveCPU()
+        }, 1200)
+      }
     },
 
     attack() {
@@ -445,40 +545,39 @@ export default {
       this.$emit('heal')
     },
 
+    moveCPU() {
+      console.log('Game:moveCPU')
+
+      if (!this.canMoveCPU) return
+
+      this.moving = true
+
+      this.$emit('move-cpu')
+    },
+
     leaveGame() {
       console.log('leaveGame')
 
-      return this.$router.push(
-        {
-          name: 'battles',
-          replace: true
-        },
-        () => {}
-      )
+      this.$emit('leave')
     },
 
     abortGame() {
       console.log('abortGame')
 
-      if (!this.canLeaveGame) {
-        const answer = window.confirm('Abort the game?')
-
-        if (!answer) return false
-      }
-
       this.$emit('abort')
     },
 
-    onGameFinished() {
-      console.log('onGameFinished')
+    finishGame() {
+      console.log('finishGame')
+
+      // differentiate between players fro better matching
+      const wait = this.playerKey === 1 ? 1000 : 3000
+
+      setTimeout(() => {
+        this.canNextBattle = true
+      }, wait)
 
       this.$emit('finish')
-    },
-
-    onContinue() {
-      console.log('onContinue')
-
-      this.$emit('continue')
     }
   }
 }

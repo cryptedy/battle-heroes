@@ -1,0 +1,32 @@
+.exchange {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'exchange-header'
+    'exchange-main';
+  height: 100%;
+
+  &-header {
+    grid-area: exchange-header;
+
+    > h1 {
+      margin-top: 18px;
+      margin-bottom: 18px;
+      font-size: 130%;
+
+      @include mediaQuery(xs) {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        font-size: 160%;
+      }
+
+      text-align: center;
+    }
+  }
+
+  &-main {
+    grid-area: exchange-main;
+    overflow: auto;
+  }
+}

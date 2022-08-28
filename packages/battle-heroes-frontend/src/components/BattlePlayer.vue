@@ -12,7 +12,8 @@
     <div
       class="battle-ground-player-name"
       :class="{
-        'is-online': isPlayerOnline,
+        'is-cpu': isPlayerCPU,
+        'is-online': playerOnline,
         'is-win': isWin,
         'is-lose': isLose
       }"
@@ -35,20 +36,14 @@
 
       <div class="battle-ground-nft-content">
         <div class="battle-ground-nft-content-primary">
-          <div
+          <NFTImage
+            :nft="playerNft"
             class="battle-ground-nft-image"
             :class="{
               'is-win': isWin,
               'is-lose': isLose
             }"
-          >
-            <img
-              :src="playerNft.image_url"
-              :alt="playerNft.name"
-              width="512"
-              height="512"
-            />
-          </div>
+          />
 
           <HealthBar :max-hp="playerStatus.max_hp" :hp="playerStatus.hp" />
 
@@ -152,11 +147,12 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import { SOUND_EFFECT } from '@/utils/constants'
 import Stars from '@/components/Stars'
+import NFTImage from '@/components/NFTImage'
+import { mapGetters, mapActions } from 'vuex'
 import HealthBar from '@/components/HealthBar'
 import BaseNFTRarity from '@/components/BaseNFTRarity'
+import { PLAYER_TYPE, SOUND_EFFECT } from '@/utils/constants'
 import BaseNFTAttributes from '@/components/BaseNFTAttributes'
 
 const NFT_INFO_TYPE = Object.freeze({
@@ -165,10 +161,11 @@ const NFT_INFO_TYPE = Object.freeze({
 })
 
 export default {
-  name: 'GamePlayer',
+  name: 'BattlePlayer',
 
   components: {
     Stars,
+    NFTImage,
     HealthBar,
     BaseNFTRarity,
     BaseNFTAttributes
@@ -180,17 +177,12 @@ export default {
       required: true
     },
 
-    playerNft: {
-      type: Object,
-      required: true
-    },
-
-    playerStatus: {
-      type: Object,
-      required: true
-    },
-
     opponentPlayer: {
+      type: Object,
+      required: true
+    },
+
+    playerNft: {
       type: Object,
       required: true
     },
@@ -200,8 +192,23 @@ export default {
       required: true
     },
 
+    playerStatus: {
+      type: Object,
+      required: true
+    },
+
     opponentStatus: {
       type: Object,
+      required: true
+    },
+
+    playerOnline: {
+      type: Boolean,
+      required: true
+    },
+
+    opponentOnline: {
+      type: Boolean,
       required: true
     },
 
@@ -236,8 +243,8 @@ export default {
       return this.currentPlayer.id === this.player.id
     },
 
-    isPlayerOnline() {
-      return this.player.socket_ids.length > 0
+    isPlayerCPU() {
+      return this.player.type === PLAYER_TYPE.CPU
     },
 
     isWin() {

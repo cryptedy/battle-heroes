@@ -1,10 +1,11 @@
 <template>
-  <BaseButton v-if="canDeleteBattle" type="danger" @click="deleteBattle">
-    <template v-if="type === 'simple'">
-      <FontAwesomeIcon icon="xmark" />
-      バトル
-    </template>
-    <template v-else> バトル削除 </template>
+  <BaseButton
+    v-if="canDeleteBattle"
+    type="danger"
+    :disabled="loading"
+    @click="execute"
+  >
+    バトルを中止
   </BaseButton>
 </template>
 
@@ -16,16 +17,17 @@ export default {
   name: 'BattleDeleteButton',
 
   props: {
-    type: {
-      type: String,
-      required: false,
-      default: 'default',
-      validator: value => ['default', 'simple'].indexOf(value) !== -1
-    },
-
     battle: {
       type: Object,
       required: true
+    }
+  },
+
+  emits: ['deleted'],
+
+  data() {
+    return {
+      loading: false
     }
   },
 
@@ -46,28 +48,28 @@ export default {
 
   methods: {
     ...mapActions({
+      deleteBattle: 'battle/delete',
       addNotification: 'notification/add'
     }),
 
-    deleteBattle() {
-      this.$socket.emit(
-        'battle:delete',
-        this.playerBattle.id,
-        ({ status, message }) => {
-          if (status) {
-            this.addNotification({
-              message,
-              type: NOTIFICATION_TYPE.SUCCESS
-            })
-          } else {
-            this.addNotification({
-              message,
-              type: NOTIFICATION_TYPE.ERROR,
-              timeout: 0
-            })
-          }
-        }
-      )
+    async execute() {
+      this.loading = true
+
+      this.deleteBattle(this.playerBattle.id)
+        // eslint-disable-next-line no-unused-vars
+        .then(({ status, message, battleId }) => {
+          this.$emit('deleted', battleId)
+        })
+        .catch(error => {
+          this.addNotification({
+            message: error.message,
+            type: NOTIFICATION_TYPE.ERROR,
+            timeout: 0
+          })
+        })
+        .finally(() => {
+          this.loading = false
+        })
     }
   }
 }

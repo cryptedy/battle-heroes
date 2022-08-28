@@ -20,6 +20,12 @@ module.exports = createSlice({
 
       state.entities = entities
       state.ids = NFTs.map(NFT => NFT.id)
+    },
+    add: (state, { payload: NFT }) => {
+      console.log('NFT/add', NFT.id)
+
+      state.entities[NFT.id] = NFT
+      state.ids.push(NFT.id)
     }
   }
 })

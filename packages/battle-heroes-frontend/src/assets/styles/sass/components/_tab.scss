@@ -1,48 +1,46 @@
 .tab {
-  @include clearfix;
+  background-color: palette(grey, 800);
+
   &-list {
     display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    overflow: hidden;
+    justify-content: space-evenly;
+    align-items: stretch;
 
     &-item {
-      flex-grow: 1;
+      flex-shrink: 1;
       text-align: center;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
 
-      a,
-      span {
-        display: inline-block;
-        padding: 16px;
-        border-bottom: 2px solid palette(grey, 800);
-        margin-bottom: -1px;
-        text-decoration: none;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+      > a,
+      > span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 16px;
         width: 100%;
+        height: 100%;
+        text-align: center;
       }
 
-      a {
+      > a {
         color: color(primary, light);
-        &:hover {
-          color: palette(blue, 200);
-        }
 
-        &.is-active,
-        &.router-link-exact-active {
-          border-bottom-color: palette(blue, 500);
-          color: palette(blue, 500);
+        &.is-active {
+          background-color: palette(blue, 500);
         }
       }
 
-      span {
+      > span {
         color: color(disabled, light);
       }
     }
   }
 
   &-content {
+    height: 100%;
+
     &-slide-left-enter-active,
     &-slide-left-leave-active,
     &-slide-right-enter-active,
@@ -50,7 +48,6 @@
       transition-duration: 0.2s;
       transition-property: height, opacity, transform;
       transition-timing-function: cubic-bezier(0.55, 0, 0.1, 1);
-      overflow: hidden;
     }
 
     &-slide-left-enter-from,

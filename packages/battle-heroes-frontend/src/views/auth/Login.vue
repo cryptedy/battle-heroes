@@ -6,7 +6,7 @@
 import LoginButton from '@/components/LoginButton'
 
 export default {
-  name: 'Index',
+  name: 'LoginView',
 
   components: {
     LoginButton

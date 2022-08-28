@@ -1,19 +1,11 @@
 <template>
-  <ul class="tab-list" :class="{ 'is-space-between': spaceBetween }">
+  <ul class="tab-list">
     <slot />
   </ul>
 </template>
 
 <script>
 export default {
-  name: 'BaseTabList',
-
-  props: {
-    spaceBetween: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
-  }
+  name: 'BaseTabList'
 }
 </script>

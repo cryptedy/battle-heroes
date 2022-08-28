@@ -28,17 +28,14 @@
   &-image {
     width: 250px;
     margin: 16px;
-    background-color: palette(grey, 800);
 
+    &-loading,
     &.is-loaded {
-      width: auto;
-      max-width: 250px;
-    }
-
-    > img {
-      width: 100%;
-      height: auto;
-      border-radius: 2px;
+      > img {
+        width: 100%;
+        height: auto;
+        border-radius: 2px;
+      }
     }
   }
 

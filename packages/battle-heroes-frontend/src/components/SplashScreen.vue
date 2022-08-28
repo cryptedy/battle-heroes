@@ -1,14 +1,16 @@
 <template>
-  <div class="splash-screen">
-    <p class="splash-screen-message">
-      <BaseSpinner />
-      {{ message }}
-    </p>
+  <teleport to="#teleport">
+    <div class="splash-screen">
+      <p class="splash-screen-message">
+        <BaseSpinner />
+        {{ message }}
+      </p>
 
-    <div v-if="$slots.default" class="splash-screen-content">
-      <slot />
+      <div v-if="$slots.default" class="splash-screen-content">
+        <slot />
+      </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script>

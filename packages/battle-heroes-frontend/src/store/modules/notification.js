@@ -31,8 +31,9 @@ export const mutations = {
   },
 
   [REMOVE_NOTIFICATION](state, { notificationId }) {
-    delete state.entities[notificationId]
     state.ids = state.ids.filter(id => id !== notificationId)
+
+    delete state.entities[notificationId]
   }
 }
 

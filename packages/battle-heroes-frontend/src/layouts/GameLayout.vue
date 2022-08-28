@@ -30,26 +30,19 @@
   </ErrorScreen>
 
   <template v-else-if="isBattleView">
-    <slot :key="battleComponentKey" />
+    <slot :key="$route.params.battleId" />
   </template>
 
   <div v-else class="game">
-    <header v-if="showHeader" class="game-header" role="banner">
+    <header class="game-header" role="banner">
       <TheAppBar />
     </header>
 
     <main class="game-main" role="main">
-      <div v-if="isPlayerStateStandby && showNotification" class="information">
-        <p class="information-content">
-          <BaseSpinner />
-          対戦相手の参加を待っています...
-        </p>
-      </div>
-
       <slot />
     </main>
 
-    <footer v-if="showFooter" class="game-footer">
+    <footer class="game-footer">
       <TheBottomNav />
     </footer>
   </div>
@@ -60,13 +53,10 @@ import { mapGetters, mapActions } from 'vuex'
 import TheAppBar from '@/components/TheAppBar'
 import RandomNFT from '@/components/RandomNFT'
 import ErrorScreen from '@/components/ErrorScreen'
+import BaseButton from '@/components/BaseButton.vue'
 import SplashScreen from '@/components/SplashScreen'
 import TheBottomNav from '@/components/TheBottomNav'
-import {
-  BATTLE_STATE,
-  PLAYER_STATE,
-  NOTIFICATION_TYPE
-} from '@/utils/constants'
+import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   name: 'GameLayout',
@@ -76,12 +66,12 @@ export default {
     RandomNFT,
     ErrorScreen,
     SplashScreen,
-    TheBottomNav
+    TheBottomNav,
+    BaseButton
   },
 
   data() {
     return {
-      battleComponentKey: false,
       attemptingGameLogin: false,
       reconnectingSocket: false,
       socketConnectError: '',
@@ -97,45 +87,17 @@ export default {
       notifications: 'notification/all'
     }),
 
-    showHeader() {
-      if (this.$route.name === 'battle-offline') {
-        return false
-      }
-
-      return true
-    },
-
-    showNotification() {
-      if (this.$route.name === 'battle-offline') {
-        return false
-      }
-
-      return true
-    },
-
-    showFooter() {
-      if (this.$route.name === 'battle-offline') {
-        return false
-      }
-
-      return true
-    },
-
-    isPlayerStateStandby() {
-      return this.player.state === PLAYER_STATE.STANDBY && this.playerBattle
-    },
-
     isBattleView() {
-      return this.$route.name === 'battle'
+      return this.$route.name === 'battles.show'
     }
   },
 
   beforeMount() {
     console.log('GameLayout:beforeMount')
 
-    if (this.playerBattle && this.playerBattle.state !== BATTLE_STATE.CREATED) {
+    if (this.playerBattle && this.playerBattle.state !== BATTLE_STATE.ENDED) {
       this.$router.push({
-        name: 'battle',
+        name: 'battles.show',
         params: {
           battleId: this.playerBattle.id
         }
@@ -151,8 +113,15 @@ export default {
     this.$socket.on('connect_error', error => this.onSocketConnectError(error))
     this.$socket.io.on('error', error => this.onSocketError(error))
     this.$socket.on('game:error', error => this.onGameError(error))
-    this.$socket.on('battle:matched', battleId =>
-      this.onBattleMatched(battleId)
+
+    this.$socket.on('player:created', player => this.addPlayer(player))
+    this.$socket.on('player:updated', player => this.updatePlayer(player))
+    this.$socket.on('battle:created', battle => this.addBattle(battle))
+    this.$socket.on('battle:updated', battle => this.updateBattle(battle))
+    this.$socket.on('battle:deleted', battleId => this.removeBattle(battleId))
+    this.$socket.on('message:created', message => this.addMessage(message))
+    this.$socket.on('message:deleted', messageId =>
+      this.removeMessage(messageId)
     )
   },
 
@@ -164,13 +133,27 @@ export default {
     this.$socket.off('connect_error')
     this.$socket.io.off('error')
     this.$socket.off('game:error')
-    this.$socket.off('battle:matched')
+
+    this.$socket.off('player:created')
+    this.$socket.off('player:updated')
+    this.$socket.off('battle:created')
+    this.$socket.off('battle:updated')
+    this.$socket.off('battle:deleted')
+    this.$socket.off('message:created')
+    this.$socket.off('message:deleted')
   },
 
   methods: {
     ...mapActions({
       loginGame: 'game/login',
+      addBattle: 'battle/add',
+      addPlayer: 'player/add',
       logoutGame: 'game/logout',
+      addMessage: 'message/add',
+      updateBattle: 'battle/update',
+      removeBattle: 'battle/remove',
+      updatePlayer: 'player/update',
+      removeMessage: 'message/remove',
       addNotification: 'notification/add'
     }),
 
@@ -222,66 +205,6 @@ export default {
         type: NOTIFICATION_TYPE.ERROR,
         timeout: 0
       })
-    },
-
-    onBattleMatched(battleId) {
-      console.log('onBattleMatched', battleId)
-
-      // TODO: user confirmation
-
-      this.addNotification({
-        message: 'Battle matched',
-        type: NOTIFICATION_TYPE.SUCCESS
-      })
-
-      if (this.isBattleView) {
-        if (this.$route.params.battleId === battleId) {
-          this.reloadBattleView()
-        } else {
-          this.$router
-            .replace(
-              {
-                name: 'battle',
-                params: {
-                  battleId: battleId,
-                  splash: 'reload'
-                }
-              },
-              () => {}
-            )
-            .then(() => this.reloadBattleView())
-        }
-      } else {
-        if (this.$route.name === 'battle-offline') {
-          this.$router.push(
-            {
-              name: 'battle',
-              params: {
-                battleId: battleId,
-                splash: 'challenger'
-              }
-            },
-            () => {}
-          )
-        } else {
-          this.$router.push(
-            {
-              name: 'battle',
-              params: {
-                battleId: battleId,
-                splash: 'matched'
-              }
-            },
-            () => {}
-          )
-        }
-      }
-    },
-
-    reloadBattleView() {
-      console.log('reloadBattleView')
-
-      return (this.battleComponentKey = !this.battleComponentKey)
     },
 
     async reloginGame() {

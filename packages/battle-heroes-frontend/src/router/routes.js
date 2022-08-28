@@ -5,6 +5,16 @@ const view = path => () =>
 
 export default [
   {
+    path: '/home',
+    name: 'arena',
+    redirect: () => ({ name: 'arena' })
+  },
+  {
+    path: '/login',
+    name: 'login',
+    redirect: () => ({ name: 'index' })
+  },
+  {
     path: '/',
     name: 'index',
     meta: {
@@ -14,112 +24,150 @@ export default [
     component: view('Index')
   },
   {
-    path: '/login',
-    name: 'login',
-    meta: {
-      layout: 'web',
-      middleware: ['guest']
-    },
-    component: view('Login')
-  },
-  {
     path: '/logout',
     name: 'logout',
     meta: {
       layout: 'web',
       middleware: ['auth']
     },
-    component: view('Logout')
+    component: view('auth/Logout')
   },
   {
     path: '/collections',
     name: 'collections',
-    component: view('collections/Index'),
-    // eslint-disable-next-line no-unused-vars
-    redirect: to => {
-      return { name: 'collections-show', params: { collectionId: 1 } }
+    meta: {
+      layout: 'web',
+      middleware: ['guest']
     },
+    component: view('collections/Index'),
+    redirect: () => ({ name: 'collections.show', params: { collectionId: 1 } }),
     children: [
       {
         path: ':collectionId',
-        name: 'collections-show',
+        name: 'collections.show',
         component: view('collections/_CollectionId')
       }
     ]
   },
   {
-    path: '/home',
-    name: 'home',
+    path: '/arena',
     meta: {
       layout: 'game',
       middleware: ['auth', 'game']
     },
-    component: view('Home')
-  },
-  {
-    path: '/players',
-    name: 'players',
-    meta: {
-      layout: 'game',
-      middleware: ['auth', 'game']
-    },
-    component: view('Players')
-  },
-  {
-    path: '/messages',
-    name: 'messages',
-    meta: {
-      layout: 'game',
-      middleware: ['auth', 'game']
-    },
-    component: view('Messages')
-  },
-  {
-    path: '/battles',
-    name: 'battles',
-    meta: {
-      layout: 'game',
-      middleware: ['auth', 'game']
-    },
-    component: view('Battles')
+    component: view('arena/Index'),
+    children: [
+      {
+        path: '',
+        name: 'arena',
+        component: view('arena/Battles')
+      },
+      {
+        path: 'players',
+        name: 'arena.players',
+        component: view('arena/Players')
+      },
+      {
+        path: 'chat',
+        name: 'arena.chat',
+        component: view('arena/Messages')
+      }
+    ]
   },
   {
     path: '/battles/:battleId',
-    name: 'battle',
+    name: 'battles.show',
     meta: {
       layout: 'game',
       middleware: ['auth', 'game']
     },
-    component: view('Battle')
+    component: view('battle/_BattleId')
   },
   {
-    path: '/battles/offline',
-    name: 'battle-offline',
+    path: '/rankings',
+    name: 'rankings',
     meta: {
       layout: 'game',
       middleware: ['auth', 'game']
     },
-    component: view('BattleOffline')
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    meta: {
-      layout: 'game',
-      middleware: ['auth', 'game']
-    },
-    redirect: { name: 'settings.account' },
-    component: view('settings/Index'),
+    component: view('rankings/Index'),
+    redirect: () => ({ name: 'rankings.total' }),
     children: [
       {
-        path: 'account',
-        name: 'settings.account',
-        component: view('settings/Account')
+        path: 'weekly',
+        name: 'rankings.weekly',
+        component: view('rankings/Weekly')
+      },
+      {
+        path: 'monthly',
+        name: 'rankings.monthly',
+        component: view('rankings/Monthly')
+      },
+      {
+        path: 'total',
+        name: 'rankings.total',
+        component: view('rankings/Total')
+      }
+    ]
+  },
+  {
+    path: '/exchange',
+    name: 'exchange',
+    meta: {
+      layout: 'game',
+      middleware: ['auth', 'game']
+    },
+    component: view('exchange/Index'),
+    redirect: () => ({ name: 'exchange.tokens' }),
+    children: [
+      {
+        path: 'tokens',
+        name: 'exchange.tokens',
+        component: view('exchange/Tokens')
+      },
+      {
+        path: 'items',
+        name: 'exchange.items',
+        component: view('exchange/Items')
+      }
+    ]
+  },
+  {
+    path: '/herodex',
+    name: 'herodex',
+    meta: {
+      layout: 'game',
+      middleware: ['auth', 'game']
+    },
+    component: view('herodex/Index'),
+    redirect: () => ({ name: 'herodex.show', params: { collectionId: 1 } }),
+    children: [
+      {
+        path: ':collectionId',
+        name: 'herodex.show',
+        component: view('herodex/_CollectionId')
+      }
+    ]
+  },
+  {
+    path: '/account',
+    name: 'account',
+    meta: {
+      layout: 'game',
+      middleware: ['auth', 'game']
+    },
+    redirect: { name: 'account.settings' },
+    component: view('account/Index'),
+    children: [
+      {
+        path: '',
+        name: 'account.settings',
+        component: view('account/Settings')
       },
       {
         path: 'labs',
-        name: 'settings.labs',
-        component: view('settings/Labs')
+        name: 'account.labs',
+        component: view('account/Labs')
       }
     ]
   }

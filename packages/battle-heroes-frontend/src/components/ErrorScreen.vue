@@ -1,11 +1,13 @@
 <template>
-  <div class="error-screen">
-    <p class="error-screen-message">{{ message }} 😭</p>
+  <teleport to="#teleport">
+    <div class="error-screen">
+      <p class="error-screen-message">{{ message }}</p>
 
-    <div v-if="$slots.default" class="error-screen-content">
-      <slot />
+      <div v-if="$slots.default" class="error-screen-content">
+        <slot />
+      </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script>

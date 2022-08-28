@@ -24,7 +24,7 @@ import { mapGetters } from 'vuex'
 const DEFAULT_MESSAGE = 'Welcome to Labs'
 
 export default {
-  name: 'SettingsLabs',
+  name: 'AccountLabsView',
 
   data() {
     return {

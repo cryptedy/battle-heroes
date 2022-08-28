@@ -1,22 +1,25 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
-  faFire,
+  faGhost,
   faPlus,
   faStar,
   faUser,
-  faHouse,
+  faStore,
   faUsers,
   faXmark,
+  faKhanda,
   faDiamond,
   faMessage,
   faArrowLeft,
   faFlaskVial,
   faLayerGroup,
   faVolumeHigh,
+  faRankingStar,
   faVolumeXmark,
   faChevronLeft,
   faChevronRight,
+  faBookJournalWhills,
   faArrowRightFromBracket
 } from '@fortawesome/free-solid-svg-icons'
 
@@ -25,13 +28,14 @@ import { faTwitter } from '@fortawesome/free-brands-svg-icons'
 export default {
   install(app) {
     library.add(
-      faFire,
+      faGhost,
       faPlus,
       faStar,
       faUser,
-      faHouse,
+      faStore,
       faUsers,
       faXmark,
+      faKhanda,
       faDiamond,
       faMessage,
       faTwitter,
@@ -39,9 +43,11 @@ export default {
       faFlaskVial,
       faLayerGroup,
       faVolumeHigh,
+      faRankingStar,
       faVolumeXmark,
       faChevronLeft,
       faChevronRight,
+      faBookJournalWhills,
       faArrowRightFromBracket
     )
 

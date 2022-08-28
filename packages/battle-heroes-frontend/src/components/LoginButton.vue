@@ -43,7 +43,7 @@ export default {
       if (this.isLogin) {
         this.$router.push(
           {
-            name: 'home'
+            name: 'arena'
           },
           () => {}
         )
@@ -57,7 +57,7 @@ export default {
 
           this.$router.push(
             {
-              name: 'home'
+              name: 'arena'
             },
             () => {}
           )

@@ -1,0 +1,50 @@
+.herodex {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'herodex-header'
+    'herodex-main';
+  height: 100%;
+
+  &-header {
+    grid-area: herodex-header;
+
+    > h1 {
+      margin-top: 18px;
+      margin-bottom: 18px;
+      font-size: 130%;
+
+      @include mediaQuery(xs) {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        font-size: 160%;
+      }
+
+      text-align: center;
+    }
+
+    .herodex {
+      &-collections {
+        &-name {
+          display: none;
+          @include mediaQuery(sm) {
+            display: inline-block;
+          }
+        }
+
+        &-name-short {
+          display: inline-block;
+          @include mediaQuery(sm) {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  &-main {
+    grid-area: herodex-main;
+    overflow: auto;
+  }
+}

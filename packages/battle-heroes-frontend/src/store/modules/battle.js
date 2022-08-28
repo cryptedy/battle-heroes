@@ -1,3 +1,5 @@
+import { socket } from '@/plugins/socket'
+import { BATTLE_TYPE } from '@/utils/constants'
 import {
   RESET_BATTLES,
   SET_BATTLES,
@@ -18,10 +20,11 @@ export const getters = {
   find: state => id => state.entities[id],
   count: state => state.ids.length,
   byPlayer: (state, getters) => player =>
-    getters.all.find(battle =>
-      Object.keys(battle.players).some(
-        playerKey => battle.players[playerKey].id === player.id
-      )
+    getters.all.find(
+      battle =>
+        battle.players[1].id === player.id ||
+        (battle.players[2].id === player.id &&
+          battle.type === BATTLE_TYPE.HUMAN)
     ),
   playerKey: (state, getters, rootState, rootGetters) => {
     if (!rootGetters['game/isLogin']) return
@@ -65,7 +68,9 @@ export const mutations = {
 
   [ADD_BATTLE](state, { battle }) {
     state.entities = { ...state.entities, [battle.id]: battle }
-    state.ids.push(battle.id)
+
+    const index = state.ids.findIndex(id => id === battle.id)
+    if (index === -1) state.ids.push(battle.id)
   },
 
   [UPDATE_BATTLE](state, { battle }) {
@@ -73,9 +78,10 @@ export const mutations = {
   },
 
   [REMOVE_BATTLE](state, { battleId }) {
-    delete state.entities[battleId]
     const index = state.ids.findIndex(id => id === battleId)
     if (index !== -1) state.ids.splice(index, 1)
+
+    delete state.entities[battleId]
   }
 }
 
@@ -108,5 +114,117 @@ export const actions = {
     console.log('battle/remove', battleId)
 
     commit(REMOVE_BATTLE, { battleId })
+  },
+
+  async create({ dispatch }, NFTId) {
+    console.log('battle/create', NFTId)
+
+    return new Promise((resolve, reject) => {
+      socket.emit(
+        'battle:create',
+        NFTId,
+        ({ status, message, battle, player }) => {
+          console.log('battle:created', status, message, battle, player)
+
+          if (status) {
+            dispatch('add', battle)
+            dispatch('player/update', player, { root: true })
+
+            resolve({ message, battle, player })
+          } else {
+            reject({ message })
+          }
+        }
+      )
+    })
+  },
+
+  async join({ dispatch }, { battleId, NFTId }) {
+    console.log('battle/join', battleId, NFTId)
+
+    return new Promise((resolve, reject) => {
+      socket.emit(
+        'battle:join',
+        battleId,
+        NFTId,
+        ({ status, message, battle, player1, player2 }) => {
+          console.log(
+            'battle:joined',
+            status,
+            message,
+            player1,
+            player2,
+            battle
+          )
+
+          if (status) {
+            dispatch('player/update', player1, { root: true })
+            dispatch('player/update', player2, { root: true })
+            dispatch('update', battle)
+
+            resolve({ message, player1, player2, battle })
+          } else {
+            reject({ message })
+          }
+        }
+      )
+    })
+  },
+
+  async rush({ dispatch }, { battleId, NFTId }) {
+    console.log('battle/rush', battleId, NFTId)
+
+    return new Promise((resolve, reject) => {
+      socket.emit(
+        'battle:rush',
+        battleId,
+        NFTId,
+        ({ status, message, battle, player1, player2 }) => {
+          console.log(
+            'battle:rushed',
+            status,
+            message,
+            battle,
+            player1,
+            player2
+          )
+
+          if (status) {
+            dispatch('player/update', player1, { root: true })
+            dispatch('player/update', player2, { root: true })
+            dispatch('add', battle)
+            // delete old battle
+            dispatch('remove', battleId)
+
+            resolve({ message, battle, player1, player2 })
+          } else {
+            reject({ message })
+          }
+        }
+      )
+    })
+  },
+
+  async delete({ dispatch }, battleId) {
+    console.log('battle/delete', battleId)
+
+    return new Promise((resolve, reject) => {
+      socket.emit(
+        'battle:delete',
+        battleId,
+        // eslint-disable-next-line no-unused-vars
+        ({ status, message, battleId }) => {
+          console.log('battle:deleted', status, message, battleId)
+
+          if (status) {
+            dispatch('remove', battleId)
+
+            resolve({ message, battleId })
+          } else {
+            reject({ message })
+          }
+        }
+      )
+    })
   }
 }

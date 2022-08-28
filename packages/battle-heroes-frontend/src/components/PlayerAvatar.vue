@@ -5,8 +5,15 @@
       src="@/assets/images/blank-avatar.png"
       width="100"
       height="100"
+      alt="NO IMAGE"
     />
-    <img v-else :src="player.avatar_url" width="100" height="100" />
+    <img
+      v-else
+      :src="player.avatar_url"
+      width="100"
+      height="100"
+      :alt="player.name"
+    />
   </div>
 </template>
 

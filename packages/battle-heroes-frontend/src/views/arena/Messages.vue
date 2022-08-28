@@ -1,5 +1,5 @@
 <template>
-  <div class="view-messages">
+  <div class="messages">
     <MessageList
       ref="messageList"
       :messages="messages"
@@ -30,7 +30,7 @@ import { ADD_MESSAGE } from '@/store/mutation-types'
 import { getScrollbarState, scrollToBottom } from '@/utils/helpers'
 
 export default {
-  name: 'Messages',
+  name: 'ChatView',
 
   components: {
     MessageList
@@ -84,13 +84,13 @@ export default {
 
     this.messageFormShown = true
 
-    const $gameMain = document.querySelector('.game-main')
+    const $messages = document.querySelector('.messages')
 
-    if ($gameMain) {
-      $gameMain.classList.add('has-chat-animation')
+    if ($messages) {
+      $messages.classList.add('has-chat-animation')
 
       setTimeout(() => {
-        $gameMain.classList.remove('has-chat-animation')
+        $messages.classList.remove('has-chat-animation')
       }, 2250)
     }
 

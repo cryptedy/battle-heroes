@@ -4,7 +4,7 @@
       <router-link
         v-slot="{ isActive, href, navigate }"
         custom
-        :to="{ name: 'home' }"
+        :to="{ name: 'arena' }"
       >
         <li class="bottom-nav-list-item">
           <a
@@ -13,14 +13,14 @@
             :href="href"
             @click="navigate"
           >
-            <FontAwesomeIcon icon="house" />
+            <FontAwesomeIcon icon="khanda" />
           </a>
         </li>
       </router-link>
       <router-link
         v-slot="{ isActive, href, navigate }"
         custom
-        :to="{ name: 'battles' }"
+        :to="{ name: 'rankings' }"
       >
         <li class="bottom-nav-list-item">
           <a
@@ -29,14 +29,14 @@
             :href="href"
             @click="navigate"
           >
-            <FontAwesomeIcon icon="fire" />
+            <FontAwesomeIcon icon="ranking-star" />
           </a>
         </li>
       </router-link>
       <router-link
         v-slot="{ isActive, href, navigate }"
         custom
-        :to="{ name: 'players' }"
+        :to="{ name: 'exchange' }"
       >
         <li class="bottom-nav-list-item">
           <a
@@ -45,14 +45,14 @@
             :href="href"
             @click="navigate"
           >
-            <FontAwesomeIcon icon="users" />
+            <FontAwesomeIcon icon="store" />
           </a>
         </li>
       </router-link>
       <router-link
         v-slot="{ isActive, href, navigate }"
         custom
-        :to="{ name: 'messages' }"
+        :to="{ name: 'herodex' }"
       >
         <li class="bottom-nav-list-item">
           <a
@@ -61,14 +61,14 @@
             :href="href"
             @click="navigate"
           >
-            <FontAwesomeIcon icon="message" />
+            <FontAwesomeIcon icon="book-journal-whills" />
           </a>
         </li>
       </router-link>
       <router-link
         v-slot="{ isActive, href, navigate }"
         custom
-        :to="{ name: 'settings.account' }"
+        :to="{ name: 'account' }"
       >
         <li class="bottom-nav-list-item">
           <a
