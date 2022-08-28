@@ -93,7 +93,7 @@ const createGame = battle => {
 
   status[secondPlayer].max_hp = secondPlayerMaxHp
   status[secondPlayer].hp = secondPlayerMaxHp
-  status[secondPlayer].attack = secondPlayerAttack * 1000
+  status[secondPlayer].attack = secondPlayerAttack
   status[secondPlayer].defense = secondPlayerDefence
   status[secondPlayer].int = secondPlayerIntelligence
 
