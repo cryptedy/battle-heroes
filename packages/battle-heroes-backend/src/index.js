@@ -146,13 +146,15 @@ const main = async () => {
     })
 
     selectPlayers().forEach((player, index) => {
-      const id = monsterNFTIds.length + (index + 1)
-      const name = `CPU - ${player.name}`
-      const NFTIds = player.nft_ids
+      if (player.nft_ids.length > 0) {
+        const id = monsterNFTIds.length + (index + 1)
+        const name = `CPU - ${player.name}`
+        const NFTIds = player.nft_ids
 
-      const CPUPlayer = createCPUPlayer(id, name, NFTIds)
+        const CPUPlayer = createCPUPlayer(id, name, NFTIds)
 
-      addPlayer(CPUPlayer)
+        addPlayer(CPUPlayer)
+      }
     })
 
     isReady = true

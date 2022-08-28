@@ -18,7 +18,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      players: 'player/all'
+      players: 'player/allHuman'
     }),
 
     sortedPlayers() {

@@ -4,6 +4,7 @@ import {
   ADD_PLAYER,
   UPDATE_PLAYER
 } from '../mutation-types'
+import { PLAYER_TYPE } from '@/utils/constants'
 
 const initialState = () => ({
   entities: {},
@@ -15,7 +16,9 @@ export const state = initialState()
 export const getters = {
   all: state => state.ids.map(id => state.entities[id]),
   find: state => id => state.entities[id],
-  count: state => state.ids.length
+  count: state => state.ids.length,
+  allHuman: (state, getters) =>
+    getters.all.filter(player => player.type === PLAYER_TYPE.HUMAN)
 }
 
 export const mutations = {

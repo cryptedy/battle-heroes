@@ -82,6 +82,7 @@
           #5d4a1f 62.5%,
           #5d4a1f 100%
         );
+      text-shadow: 1px 1px 0 palette(grey, 1000);
       color: color(primary, light);
       font-size: 110%;
       @include mediaQuery(sm) {
