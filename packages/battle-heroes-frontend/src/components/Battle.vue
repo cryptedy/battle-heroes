@@ -77,7 +77,7 @@
       </div>
 
       <div class="battle-status-actions">
-        <ToggleAudio />
+        <ToggleAudioButton />
       </div>
     </div>
 
@@ -202,7 +202,7 @@
 import { mapGetters } from 'vuex'
 import { PLAYER_STATE } from '@/utils/constants'
 import { scrollToBottom } from '@/utils/helpers'
-import ToggleAudio from '@/components/ToggleAudio'
+import ToggleAudioButton from '@/components/ToggleAudioButton'
 import BattlePlayer from '@/components/BattlePlayer'
 import BattleRushButton from '@/components/BattleRushButton'
 import BattleCreateButton from '@/components/BattleCreateButton'
@@ -211,7 +211,7 @@ export default {
   name: 'Battle',
 
   components: {
-    ToggleAudio,
+    ToggleAudioButton,
     BattlePlayer,
     BattleRushButton,
     BattleCreateButton

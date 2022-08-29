@@ -7,6 +7,7 @@ import {
   RESUME_AUDIO
 } from '../mutation-types'
 import { MUSIC, SOUND_EFFECT } from '@/utils/constants'
+import MusicOpening from '@/assets/audio/music/opening.mp3'
 import MusicBattle from '@/assets/audio/music/battle.mp3'
 import MusicStandby from '@/assets/audio/music//standby.mp3'
 import SoundEffectAttack from '@/assets/audio/effects/attack.mp3'
@@ -121,6 +122,7 @@ const initialState = () => {
     error: '',
     audio: audio,
     sounds: {
+      [MUSIC.OPENING]: createAudio(TYPE.MUSIC, MusicOpening),
       [MUSIC.BATTLE]: createAudio(TYPE.MUSIC, MusicBattle),
       [MUSIC.STANDBY]: createAudio(TYPE.MUSIC, MusicStandby),
       [SOUND_EFFECT.ATTACK]: createAudio(TYPE.SOUND_EFFECT, SoundEffectAttack),

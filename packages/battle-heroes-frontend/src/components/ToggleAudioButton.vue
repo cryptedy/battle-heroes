@@ -1,7 +1,8 @@
 <template>
   <BaseButton
+    class="toggle-audio"
     :type="isAudioEnabled ? 'primary' : 'default'"
-    @click="toggleAudio"
+    @click="toggleAudioButton"
   >
     <FontAwesomeIcon v-if="isAudioEnabled" icon="volume-high" />
     <FontAwesomeIcon v-else icon="volume-xmark" />
@@ -12,7 +13,7 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
-  name: 'ToggleAudio',
+  name: 'ToggleAudioButton',
 
   computed: {
     ...mapGetters({
@@ -25,7 +26,7 @@ export default {
       setAudio: 'audio/setAudio'
     }),
 
-    toggleAudio() {
+    toggleAudioButton() {
       const audio = this.isAudioEnabled ? false : true
 
       this.setAudio(audio)

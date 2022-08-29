@@ -23,6 +23,7 @@ export const NOTIFICATION_TYPE = Object.freeze({
 export const DATETIME_FORMAT = 'MM-DD HH:mm:ss'
 
 export const MUSIC = Object.freeze({
+  OPENING: 'OPENING',
   STANDBY: 'STANDBY',
   BATTLE: 'BATTLE'
 })

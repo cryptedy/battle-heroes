@@ -19,7 +19,11 @@
           <p>音量オンオフ</p>
           <p>遊び方</p> -->
 
-          <BattleCreateButton />
+          <div class="battle-start">
+            <BattleCreateButton />
+          </div>
+
+          <ToggleAudioButton />
         </div>
 
         <BaseTab>
@@ -114,6 +118,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { PLAYER_TYPE } from '@/utils/constants'
+import ToggleAudioButton from '@/components/ToggleAudioButton'
 import BattleJoinButton from '@/components/BattleJoinButton'
 import BattleRushButton from '@/components/BattleRushButton'
 import BattleCreateButton from '@/components/BattleCreateButton'
@@ -123,6 +128,7 @@ export default {
   name: 'ArenaView',
 
   components: {
+    ToggleAudioButton,
     BattleJoinButton,
     BattleRushButton,
     BattleCreateButton,

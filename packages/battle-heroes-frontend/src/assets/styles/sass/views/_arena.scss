@@ -66,31 +66,26 @@
     border: 1px solid #fedb37;
     border-radius: 2px;
 
-    .button {
-      background-image: radial-gradient(
-          ellipse farthest-corner at right bottom,
-          #fedb37 0%,
-          #fdb931 8%,
-          #9f7928 30%,
-          #8a6e2f 40%,
-          transparent 80%
-        ),
-        radial-gradient(
-          ellipse farthest-corner at left top,
-          #ffffff 0%,
-          #ffffac 8%,
-          #d1b464 25%,
-          #5d4a1f 62.5%,
-          #5d4a1f 100%
-        );
-      text-shadow: 1px 1px 0 palette(grey, 1000);
-      color: color(primary, light);
-      font-size: 110%;
-      @include mediaQuery(sm) {
-        font-size: 115%;
-      }
-      @include mediaQuery(md) {
-        font-size: 125%;
+    .battle-start {
+      .button {
+        background-image: radial-gradient(
+            ellipse farthest-corner at right bottom,
+            #fedb37 0%,
+            #fdb931 8%,
+            #9f7928 30%,
+            #8a6e2f 40%,
+            transparent 80%
+          ),
+          radial-gradient(
+            ellipse farthest-corner at left top,
+            #ffffff 0%,
+            #ffffac 8%,
+            #d1b464 25%,
+            #5d4a1f 62.5%,
+            #5d4a1f 100%
+          );
+        text-shadow: 1px 1px 0 palette(grey, 1000);
+        color: color(primary, light);
       }
     }
   }

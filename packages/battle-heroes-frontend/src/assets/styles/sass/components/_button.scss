@@ -56,4 +56,14 @@
     background-color: color(inactive-icon, light);
     color: color(disabled, light);
   }
+
+  &.toggle-audio {
+    border-radius: 16px;
+    &.is-type {
+      &-default {
+        background-color: color(inactive-icon, light);
+        border-color: transparent;
+      }
+    }
+  }
 }

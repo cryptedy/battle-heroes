@@ -6,7 +6,7 @@
 
   <hr />
 
-  <ToggleAudio />
+  <ToggleAudioButton />
 
   <hr />
 
@@ -21,14 +21,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import ToggleAudio from '@/components/ToggleAudio'
+import ToggleAudioButton from '@/components/ToggleAudioButton'
 import PlayerUpdateButton from '@/components/PlayerUpdateButton.vue'
 
 export default {
   name: 'AccountSettingsView',
 
   components: {
-    ToggleAudio,
+    ToggleAudioButton,
     PlayerUpdateButton
   },
 

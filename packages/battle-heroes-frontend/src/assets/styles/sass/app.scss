@@ -149,7 +149,10 @@ body {
       @include mediaQuery(md) {
         padding: 0 24px;
       }
-      height: 48px;
+      height: 40px;
+      @include mediaQuery(sm) {
+        height: 48px;
+      }
       @include mediaQuery(md) {
         height: 72px;
       }
@@ -213,7 +216,10 @@ body {
 
     > .bottom-nav {
       display: flex;
-      height: 64px;
+      height: 56px;
+      @include mediaQuery(sm) {
+        height: 64px;
+      }
     }
   }
 }
