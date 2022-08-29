@@ -22,6 +22,7 @@ export const RESET_MESSAGES = 'RESET_MESSAGES'
 export const SET_MESSAGES = 'SET_MESSAGES'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const REMOVE_MESSAGE = 'REMOVE_MESSAGE'
+export const SET_UNREAD_MESSAGE = 'SET_UNREAD_MESSAGE'
 
 // battle
 export const RESET_BATTLES = 'RESET_BATTLES'

@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import store from '@/store'
 import { mapGetters, mapActions } from 'vuex'
 import TheAppBar from '@/components/TheAppBar'
 import RandomNFT from '@/components/RandomNFT'
@@ -56,10 +57,15 @@ import ErrorScreen from '@/components/ErrorScreen'
 import BaseButton from '@/components/BaseButton.vue'
 import SplashScreen from '@/components/SplashScreen'
 import TheBottomNav from '@/components/TheBottomNav'
+import { ADD_MESSAGE } from '@/store/mutation-types'
 import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
   name: 'GameLayout',
+
+  unsubscribe: {
+    newMessage: null
+  },
 
   components: {
     TheAppBar,
@@ -89,6 +95,10 @@ export default {
 
     isBattleView() {
       return this.$route.name === 'battles.show'
+    },
+
+    isChatView() {
+      return this.$route.name === 'arena.chat'
     }
   },
 
@@ -123,6 +133,19 @@ export default {
     this.$socket.on('message:deleted', messageId =>
       this.removeMessage(messageId)
     )
+
+    console.log('SUBSCRIPBE')
+    this.$options.unsubscribe.newMessage = store.subscribe(
+      // eslint-disable-next-line no-unused-vars
+      (mutation, state) => {
+        if (!this.isChatView && mutation.type === `message/${ADD_MESSAGE}`) {
+          console.log('NEW MESSAGE!', this.$route)
+          this.incrementUnread()
+        }
+      }
+    )
+
+    this.resetUnread()
   },
 
   beforeUnmount() {
@@ -141,6 +164,11 @@ export default {
     this.$socket.off('battle:deleted')
     this.$socket.off('message:created')
     this.$socket.off('message:deleted')
+
+    if (this.$options.unsubscribe.newMessage) {
+      console.log('UNSUBSCRIPBE')
+      this.$options.unsubscribe.newMessage()
+    }
   },
 
   methods: {
@@ -154,7 +182,9 @@ export default {
       removeBattle: 'battle/remove',
       updatePlayer: 'player/update',
       removeMessage: 'message/remove',
-      addNotification: 'notification/add'
+      resetUnread: 'message/resetUnread',
+      addNotification: 'notification/add',
+      incrementUnread: 'message/incrementUnread'
     }),
 
     onSocketConnect() {

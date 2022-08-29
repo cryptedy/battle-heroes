@@ -2,18 +2,21 @@ import {
   RESET_MESSAGES,
   SET_MESSAGES,
   ADD_MESSAGE,
-  REMOVE_MESSAGE
+  REMOVE_MESSAGE,
+  SET_UNREAD_MESSAGE
 } from '../mutation-types'
 
 const initialState = () => ({
   entities: {},
-  ids: []
+  ids: [],
+  unread: 0
 })
 
 export const state = initialState()
 
 export const getters = {
-  all: state => state.ids.map(id => state.entities[id])
+  all: state => state.ids.map(id => state.entities[id]),
+  unreadCount: state => state.unread
 }
 
 export const mutations = {
@@ -43,6 +46,10 @@ export const mutations = {
     if (index !== -1) state.ids.splice(index, 1)
 
     delete state.entities[messageId]
+  },
+
+  [SET_UNREAD_MESSAGE](state, { unread }) {
+    state.unread = unread
   }
 }
 
@@ -69,5 +76,19 @@ export const actions = {
     console.log('message/remove', messageId)
 
     commit(REMOVE_MESSAGE, { messageId })
+  },
+
+  resetUnread({ commit }) {
+    console.log('message/resetUnread')
+
+    commit(SET_UNREAD_MESSAGE, { unread: 0 })
+  },
+
+  incrementUnread({ state, commit }) {
+    console.log('message/incrementUnread')
+
+    const unread = state.unread + 1
+
+    commit(SET_UNREAD_MESSAGE, { unread })
   }
 }

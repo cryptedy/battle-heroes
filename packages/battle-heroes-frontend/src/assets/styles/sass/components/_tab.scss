@@ -1,5 +1,5 @@
 .tab {
-  background-color: palette(grey, 800);
+  background-color: darken(palette(grey, 800), 5%);
 
   &-list {
     display: flex;
@@ -18,9 +18,13 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        border-bottom: 2px solid palette(grey, 700);
         padding: 8px 12px;
-        @include mediaQuery(sm) {
+        @include mediaQuery(xs) {
           padding: 10px 14px;
+        }
+        @include mediaQuery(sm) {
+          padding: 12px 16px;
         }
         @include mediaQuery(md) {
           padding: 12px 16px;
@@ -31,10 +35,12 @@
       }
 
       > a {
-        color: color(primary, light);
+        color: color(secondary, light);
 
         &.is-active {
-          background-color: palette(blue, 500);
+          background-color: palette(grey, 800);
+          border-color: palette(blue, 500);
+          color: color(primary, light);
         }
       }
 

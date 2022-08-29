@@ -37,8 +37,14 @@
                   :href="href"
                   @click="navigate"
                 >
-                  <!-- <FontAwesomeIcon icon="users" /> -->
                   バトル
+                  <span
+                    v-if="battleCount > 0"
+                    class="label"
+                    :class="{ 'is-active': battleCount > 0 }"
+                  >
+                    {{ battleCount }}
+                  </span>
                 </a>
               </router-link>
             </BaseTabListItem>
@@ -55,8 +61,14 @@
                   :href="href"
                   @click="navigate"
                 >
-                  <!-- <FontAwesomeIcon icon="users" /> -->
                   プレイヤー
+                  <span
+                    v-if="onlinePlayerCount > 0"
+                    class="label"
+                    :class="{ 'is-active': onlinePlayerCount > 0 }"
+                  >
+                    {{ onlinePlayerCount }}
+                  </span>
                 </a>
               </router-link>
             </BaseTabListItem>
@@ -73,8 +85,14 @@
                   :href="href"
                   @click="navigate"
                 >
-                  <!-- <FontAwesomeIcon icon="message" /> -->
                   チャット
+                  <span
+                    v-if="unreadMessageCount > 0"
+                    class="label"
+                    :class="{ 'is-active': unreadMessageCount > 0 }"
+                  >
+                    {{ unreadMessageCount }}
+                  </span>
                 </a>
               </router-link>
             </BaseTabListItem>
@@ -95,6 +113,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { PLAYER_TYPE } from '@/utils/constants'
 import BattleJoinButton from '@/components/BattleJoinButton'
 import BattleRushButton from '@/components/BattleRushButton'
 import BattleCreateButton from '@/components/BattleCreateButton'
@@ -114,9 +133,22 @@ export default {
     ...mapGetters({
       battles: 'battle/all',
       player: 'game/player',
+      players: 'player/all',
       findPlayer: 'player/find',
-      playerBattle: 'game/playerBattle'
-    })
+      playerBattle: 'game/playerBattle',
+      unreadMessageCount: 'message/unreadCount'
+    }),
+
+    battleCount() {
+      return this.battles.length
+    },
+
+    onlinePlayerCount() {
+      return this.players.filter(
+        player =>
+          player.type === PLAYER_TYPE.HUMAN && player.socket_ids.length > 0
+      ).length
+    }
   }
 }
 </script>

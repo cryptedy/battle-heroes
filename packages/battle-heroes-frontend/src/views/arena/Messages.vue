@@ -24,13 +24,17 @@
 
 <script>
 import store from '@/store'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import MessageList from '@/components/MessageList'
 import { ADD_MESSAGE } from '@/store/mutation-types'
 import { getScrollbarState, scrollToBottom } from '@/utils/helpers'
 
 export default {
   name: 'ChatView',
+
+  unsubscribe: {
+    newMessage: null
+  },
 
   components: {
     MessageList
@@ -72,15 +76,17 @@ export default {
   },
 
   mounted() {
-    // eslint-disable-next-line no-unused-vars
-    this.unsubscribeNewMessage = store.subscribe((mutation, state) => {
-      if (mutation.type === `message/${ADD_MESSAGE}`) {
-        this.$nextTick(() => {
-          scrollToBottom(this.$refs.messageList.$el, true)
-          this.checkVerticalScrollbar()
-        })
+    this.$options.unsubscribe.newMessage = store.subscribe(
+      // eslint-disable-next-line no-unused-vars
+      (mutation, state) => {
+        if (mutation.type === `message/${ADD_MESSAGE}`) {
+          this.$nextTick(() => {
+            scrollToBottom(this.$refs.messageList.$el, true)
+            this.checkVerticalScrollbar()
+          })
+        }
       }
-    })
+    )
 
     this.messageFormShown = true
 
@@ -94,6 +100,8 @@ export default {
       }, 2250)
     }
 
+    this.resetUnread()
+
     this.$nextTick(() => {
       scrollToBottom(this.$refs.messageList.$el, false)
       this.checkVerticalScrollbar()
@@ -101,10 +109,16 @@ export default {
   },
 
   beforeUnmount() {
-    this.unsubscribeNewMessage()
+    if (this.$options.unsubscribe.newMessage) {
+      this.$options.unsubscribe.newMessage()
+    }
   },
 
   methods: {
+    ...mapActions({
+      resetUnread: 'message/resetUnread'
+    }),
+
     checkVerticalScrollbar() {
       try {
         this.hasVerticalScrollbar = getScrollbarState(

@@ -94,4 +94,33 @@
       }
     }
   }
+
+  .label {
+    min-width: 24px;
+    border-radius: 12px;
+    padding-left: 6px;
+    padding-right: 6px;
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 13px;
+    background-color: color(inactive-icon, light);
+    color: color(disabled, light);
+
+    &.is-active {
+      background-color: palette(blue, 500);
+      color: color(primary, light);
+    }
+  }
+
+  .tab {
+    &-list {
+      &-item {
+        > a {
+          .label {
+            margin-left: 6px;
+          }
+        }
+      }
+    }
+  }
 }
