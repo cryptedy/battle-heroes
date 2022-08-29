@@ -25,24 +25,14 @@
 
     &-primary {
       margin-bottom: 8px;
-      font-size: 32px;
       line-height: line-height(32px, 24px);
+      font-size: 32px;
       color: color(primary, light);
     }
 
     &-secondary {
       margin-bottom: 4px;
       color: color(secondary, light);
-    }
-  }
-
-  .online-players-text {
-    margin-bottom: 16px;
-    color: color(secondary, light);
-
-    &-count {
-      font-weight: bold;
-      color: palette(green, 500);
     }
   }
 }

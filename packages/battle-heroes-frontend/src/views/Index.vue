@@ -23,16 +23,6 @@
 
     <LoginButton />
 
-    <p class="online-players-text">
-      <span class="online-players-text-count">
-        {{ onlinePlayers.length }}
-      </span>
-      /
-      {{ players.length }}
-
-      players are now online.
-    </p>
-
     <p class="hero-text-secondary">🚨 注意 🚨</p>
     <p class="hero-text-secondary">
       現在プロトタイプバージョンのためご利用は自己責任でお願いします。
@@ -45,8 +35,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_URL } from '@/utils/constants'
 import LoginButton from '@/components/LoginButton'
 
 export default {
@@ -54,34 +42,6 @@ export default {
 
   components: {
     LoginButton
-  },
-
-  data() {
-    return {
-      players: []
-    }
-  },
-
-  computed: {
-    onlinePlayers() {
-      return this.players.filter(player => player.socket_ids.length > 0)
-    }
-  },
-
-  async created() {
-    await this.getPlayers()
-  },
-
-  methods: {
-    async getPlayers() {
-      try {
-        const { data: players } = await axios.get(`${API_URL}/players`)
-
-        this.players = players
-      } catch (error) {
-        console.log(error)
-      }
-    }
   }
 }
 </script>

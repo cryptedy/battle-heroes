@@ -1,6 +1,6 @@
 <template>
   <BaseButton
-    class="button login-button"
+    class="login-button"
     :disabled="!isMetaMaskEnabled || loading"
     type="primary"
     @click="loginWithMetaMask"
@@ -9,7 +9,7 @@
 
     <template v-else>
       <BaseSpinner v-if="loading" />
-      ログイン
+      ウォレットを接続
     </template>
   </BaseButton>
 </template>

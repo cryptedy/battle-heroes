@@ -83,7 +83,6 @@ body {
 
   &-main {
     grid-area: main;
-    overflow: auto;
 
     > .section {
       height: 100%;
@@ -100,6 +99,7 @@ body {
     grid-area: footer;
     border-top: 1px solid color(divider, light);
     background-color: palette(grey, 800);
+    margin-top: 24px;
 
     > .footer {
       display: flex;
