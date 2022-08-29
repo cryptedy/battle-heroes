@@ -1,23 +1,6 @@
 <template>
-  <div class="nft-image" :class="{ 'is-loaded': loaded }">
-    <img
-      v-if="isBlankNFT"
-      src="@/assets/images/blank-NFT.png"
-      width="100"
-      height="100"
-      alt="NO IMAGE"
-      :onload="onLoaded"
-    />
-    <img
-      v-else
-      :src="nft.image_url"
-      width="512"
-      height="512"
-      :alt="nft.name"
-      :onload="onLoaded"
-    />
-
-    <div class="nft-image-loading">
+  <div class="nft-image" :class="{ 'not-loaded': !loaded }">
+    <template v-if="!loaded">
       <BaseSpinner />
 
       <img
@@ -26,7 +9,26 @@
         height="100"
         alt="IMAGE LOADING..."
       />
-    </div>
+    </template>
+
+    <img
+      v-if="isBlankNFT"
+      src="@/assets/images/blank-NFT.png"
+      width="100"
+      height="100"
+      alt="NO IMAGE"
+      :onload="onLoaded"
+      class="nft-image-content"
+    />
+    <img
+      v-else
+      :src="nft.image_url"
+      width="512"
+      height="512"
+      :alt="nft.name"
+      :onload="onLoaded"
+      class="nft-image-content"
+    />
   </div>
 </template>
 

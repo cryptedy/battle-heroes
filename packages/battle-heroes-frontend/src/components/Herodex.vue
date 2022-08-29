@@ -89,15 +89,15 @@ export default {
     }
   },
 
-  created() {
-    this.$router.beforeEach((to, from, next) => {
-      if (to.params.collectionId !== from.params.collectionId) {
+  watch: {
+    'collection.id': function (value, oldValue) {
+      if (value !== oldValue) {
         this.page = 1
       }
+    }
+  },
 
-      next()
-    })
-
+  created() {
     this.page = Number.parseInt(this.$route.query.page) || 1
   },
 

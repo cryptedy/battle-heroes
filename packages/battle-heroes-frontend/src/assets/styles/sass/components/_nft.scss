@@ -27,42 +27,26 @@
   }
 
   &-image {
-    > img {
-      visibility: hidden;
-      width: 0;
-      height: 0;
+    position: relative;
+
+    img {
+      visibility: visible;
+      width: 100%;
+      height: auto;
     }
 
-    &-loading {
-      display: inline;
-      position: relative;
-
-      > img {
-        width: 100%;
-        height: auto;
-      }
-
-      svg {
-        position: absolute;
-        width: 100%;
-        height: auto;
-        padding: 32px;
-      }
+    svg {
+      position: absolute;
+      width: 100%;
+      height: auto;
+      padding: 32px;
     }
 
-    &.is-loaded {
-      > img {
-        visibility: visible;
-        width: 100%;
-        height: auto;
-      }
-
-      svg {
-        display: none;
-      }
-
-      .nft-image-loading {
-        display: none;
+    &.not-loaded {
+      .nft-image-content {
+        visibility: hidden;
+        width: 0;
+        height: 0;
       }
     }
   }

@@ -29,13 +29,10 @@
     width: 250px;
     margin: 16px;
 
-    &-loading,
-    &.is-loaded {
-      > img {
-        width: 100%;
-        height: auto;
-        border-radius: 2px;
-      }
+    > img {
+      width: 100%;
+      height: auto;
+      border-radius: 2px;
     }
   }
 

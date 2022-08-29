@@ -63,7 +63,7 @@
 
   &-list {
     display: none;
-    @include mediaQuery(xxs) {
+    @include mediaQuery(sm) {
       display: flex;
       gap: 8px;
     }
@@ -118,7 +118,10 @@
   }
 
   &-statistics {
-    display: flex;
+    display: none;
+    @include mediaQuery(sm) {
+      display: flex;
+    }
     align-items: center;
     justify-content: center;
     margin: 0 auto;
