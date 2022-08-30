@@ -1421,10 +1421,11 @@ class GameManager {
 
       if (playerStatus.must_critical) {
         isMustCritical = true
+
         damage = Math.floor(damage * 1.5)
-        nextPlayerStatus.must_critical = false
       } else if (Math.random() < playerStatus.critical_rate) {
         isCritical = true
+
         damage = Math.floor(damage * 1.5)
       } else {
         const adjustDamage = getRandomValue(-2, 2)
@@ -1463,6 +1464,10 @@ class GameManager {
     localMove.payload.isFinish = isFinish
 
     nextPlayerStatus.attack_remains = playerStatus.attack_remains - 1
+
+    if (isMustCritical) {
+      nextPlayerStatus.must_critical = false
+    }
 
     if (opponentStatus.is_defence) {
       nextOpponentStatus.is_defence = false
@@ -1524,6 +1529,10 @@ class GameManager {
 
     nextPlayerStatus.spell_remains = playerStatus.spell_remains - 1
 
+    if (playerStatus.must_critical) {
+      nextPlayerStatus.must_critical = false
+    }
+
     if (opponentStatus.is_defence) {
       nextOpponentStatus.is_defence = false
     }
@@ -1582,6 +1591,10 @@ class GameManager {
       playerStatus.attack_remains + recoveryAmount
     nextPlayerStatus.must_critical = mustCritical
     nextPlayerStatus.is_defence = true
+
+    if (playerStatus.must_critical) {
+      nextPlayerStatus.must_critical = false
+    }
 
     if (opponentStatus.is_defence) {
       nextOpponentStatus.is_defence = false
@@ -1652,6 +1665,10 @@ class GameManager {
 
     nextPlayerStatus.hp = newPlayerHp
     nextPlayerStatus.heal_remains = playerStatus.heal_remains - 1
+
+    if (playerStatus.must_critical) {
+      nextPlayerStatus.must_critical = false
+    }
 
     if (opponentStatus.is_defence) {
       nextOpponentStatus.is_defence = false

@@ -99,10 +99,14 @@ const updatePlayerUser = async (playerId, payload) => {
 
   const playerPayload = {}
 
-  allowedKeys.forEach(allowedKey => {
-    // copy all user latest property for alloews keys
-    // convert key to snake case for player
-    playerPayload[allowedKey] = user[allowedKey]
+  Object.keys(userPayload).forEach(userKey => {
+    const key = _.snakeCase(userKey)
+
+    if (allowedKeys.includes(key)) {
+      // use only updated key
+      // convert key to snake case for player
+      playerPayload[key] = user[key]
+    }
   })
 
   // update player
