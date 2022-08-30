@@ -33,59 +33,67 @@
     overflow: auto;
   }
 
-  &-primary {
+  &-controls {
     display: flex;
+    flex-direction: column;
+    @include mediaQuery(xs) {
+      flex-direction: row;
+    }
     align-items: center;
     justify-content: center;
-    align-content: center;
     gap: 8px;
-
-    margin-top: 12px;
-    margin-right: 12px;
-    margin-bottom: 12px;
-    margin-left: 12px;
     @include mediaQuery(sm) {
-      margin-top: 14px;
-      margin-bottom: 14px;
+      gap: 16px;
     }
-    @include mediaQuery(md) {
-      margin-top: 16px;
-      margin-right: 0;
-      margin-left: 0;
-      margin-bottom: 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    &-primary {
+      &-battle-start {
+        .button {
+          background-image: radial-gradient(
+              ellipse farthest-corner at right bottom,
+              #fedb37 0%,
+              #fdb931 8%,
+              #9f7928 30%,
+              #8a6e2f 40%,
+              transparent 80%
+            ),
+            radial-gradient(
+              ellipse farthest-corner at left top,
+              #ffffff 0%,
+              #ffffac 8%,
+              #d1b464 25%,
+              #5d4a1f 62.5%,
+              #5d4a1f 100%
+            );
+          text-shadow: 1px 1px 0 palette(grey, 1000);
+          color: color(primary, light);
+        }
+      }
     }
 
-    padding: 8px;
-    @include mediaQuery(sm) {
-      padding: 12px;
-    }
-    @include mediaQuery(md) {
-      padding: 14px;
+    &-actions {
+      display: flex;
+      gap: 8px;
+      @include mediaQuery(sm) {
+        gap: 16px;
+      }
     }
 
-    border: 1px solid #fedb37;
-    border-radius: 2px;
+    &-player {
+      display: flex;
+      gap: 8px;
 
-    .battle-start {
-      .button {
-        background-image: radial-gradient(
-            ellipse farthest-corner at right bottom,
-            #fedb37 0%,
-            #fdb931 8%,
-            #9f7928 30%,
-            #8a6e2f 40%,
-            transparent 80%
-          ),
-          radial-gradient(
-            ellipse farthest-corner at left top,
-            #ffffff 0%,
-            #ffffac 8%,
-            #d1b464 25%,
-            #5d4a1f 62.5%,
-            #5d4a1f 100%
-          );
-        text-shadow: 1px 1px 0 palette(grey, 1000);
-        color: color(primary, light);
+      &-name {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      a {
+        color: palette(blue, 500);
+        cursor: pointer;
       }
     }
   }

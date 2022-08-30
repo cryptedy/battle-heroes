@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const { updatePlayer } = require('./actions')
 const { selectPlayer } = require('./selectors')
 const { getNFTIdsForAddress } = require('../NFT')
@@ -31,7 +32,7 @@ const createPlayer = async user => {
         resolve({
           id: user.id,
           user_id: user.id,
-          name: profile.name,
+          name: user.name || profile.name,
           avatar_url: profile.avatar_url,
           address: user.address,
           socket_ids: [],
@@ -49,25 +50,70 @@ const createPlayer = async user => {
   })
 }
 
-const updatePlayerStats = async (playerId, payload) => {
-  console.log('updatePlayerStats', playerId, payload)
+const updatePlayerUser = async (playerId, payload) => {
+  console.log('updatePlayerUser', playerId, payload)
 
   const player = selectPlayer(playerId)
 
-  const user = await updateUser(player.user_id, payload)
+  if (player.type !== PLAYER_TYPE.HUMAN) {
+    throw new Error(
+      `Failed to update player user: The player type is ${player.type}`
+    )
+  }
 
+  const allowedKeys = ['name', 'exp', 'win', 'lose']
+
+  const validate = payload => {
+    const validated = {}
+
+    Object.keys(payload).forEach(key => {
+      console.log(key, payload[key])
+
+      if (!allowedKeys.includes(key)) {
+        throw new Error(`${key} is not allowed`)
+      }
+
+      const value = payload[key]
+
+      if (key === 'name' && value === '') {
+        throw new Error(`${key} must be string`)
+      } else if (key === 'exp' && !Number.isInteger(value)) {
+        throw new Error(`${key} must be integer`)
+      } else if (key === 'win' && !Number.isInteger(value)) {
+        throw new Error(`${key} must be integer`)
+      } else if (key === 'lose' && !Number.isInteger(value)) {
+        throw new Error(`${key} must be integer`)
+      }
+
+      // convert key to camel case for user
+      validated[_.camelCase(key)] = value
+    })
+
+    return validated
+  }
+
+  const userPayload = validate(payload)
+
+  // update user
+  const user = await updateUser(player.user_id, userPayload)
+
+  const playerPayload = {}
+
+  allowedKeys.forEach(allowedKey => {
+    // copy all user latest property for alloews keys
+    // convert key to snake case for player
+    playerPayload[allowedKey] = user[allowedKey]
+  })
+
+  // update player
   updatePlayer({
     playerId,
-    payload: {
-      exp: user.exp,
-      win: user.win,
-      lose: user.lose
-    }
+    payload: playerPayload
   })
 }
 
 module.exports = {
   getPlayers,
   createPlayer,
-  updatePlayerStats
+  updatePlayerUser
 }

@@ -33,7 +33,8 @@ const MONSTERS = {
   GHOST: require('./json/monsters/2.json'),
   BEANS: require('./json/monsters/3.json'),
   WORM: require('./json/monsters/4.json'),
-  DRAGON: require('./json/monsters/5.json')
+  DRAGON: require('./json/monsters/5.json'),
+  AKUNIN: require('./json/monsters/6.json')
 }
 
 const STATIC_RESOURCE_URL = 'https://static.pixelheroes-dao.com'

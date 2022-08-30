@@ -1,5 +1,5 @@
 <template>
-  <BaseButton type="primary" @click="updatePlayer">
+  <BaseButton type="primary" :disabled="loading" @click="renewPlayer">
     <BaseSpinner v-if="loading" />
 
     プレイヤー情報を更新
@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
-  name: 'PlayerUpdateButton',
+  name: 'PlayerRenewButton',
 
   data() {
     return {
@@ -19,27 +19,21 @@ export default {
     }
   },
 
-  computed: {
-    ...mapGetters({
-      user: 'auth/user',
-      player: 'game/player',
-      playerNFT: 'battle/playerNFT',
-      playerBattle: 'game/playerBattle'
-    })
-  },
-
   methods: {
     ...mapActions({
+      updatePlayer: 'player/update',
       addNotification: 'notification/add'
     }),
 
-    updatePlayer() {
+    renewPlayer() {
       this.loading = true
 
-      this.$socket.emit('player:update', this.user, ({ status, message }) => {
-        console.log('player:update', status)
+      this.$socket.emit('player:renew', ({ status, message, player }) => {
+        console.log('player:renewed', status, message, player)
 
         if (status) {
+          this.updatePlayer(player)
+
           this.addNotification({
             message,
             type: NOTIFICATION_TYPE.SUCCESS

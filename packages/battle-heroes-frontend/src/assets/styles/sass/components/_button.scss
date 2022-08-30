@@ -8,6 +8,22 @@
   text-align: center;
   cursor: pointer;
 
+  &.is-shade {
+    &-light {
+      &[disabled] {
+        background-color: color(inactive-icon, light);
+        color: color(disabled, light);
+      }
+    }
+
+    &-dark {
+      &[disabled] {
+        background-color: color(inactive-icon, dark);
+        color: color(disabled, dark);
+      }
+    }
+  }
+
   &.is-type {
     &-default {
       border-color: palette(grey, 500);
@@ -50,11 +66,6 @@
       text-shadow: 1px 1px 0 palette(grey, 1000);
       color: color(primary, light);
     }
-  }
-
-  &[disabled] {
-    background-color: color(inactive-icon, light);
-    color: color(disabled, light);
   }
 
   &.toggle-audio {

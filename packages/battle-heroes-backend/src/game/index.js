@@ -6,7 +6,7 @@ const { selectNFT } = require('../NFT/selectors')
 const { postDiscord } = require('../utils/discord')
 const { selectGame, selectBattleGame } = require('./selectors')
 const { addPlayer, updatePlayer } = require('../player/actions')
-const { createPlayer, updatePlayerStats } = require('../player')
+const { createPlayer, updatePlayerUser } = require('../player')
 const { addMessage, removeMessage } = require('../message/actions')
 const { selectMessages, selectMessage } = require('../message/selectors')
 const {
@@ -222,6 +222,77 @@ class GameManager {
       return callback({
         status: false,
         message: 'Failed to logout'
+      })
+    }
+  }
+
+  async renewPlayer(callback) {
+    console.log('renewPlayer', this.socket.id)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      return callback({
+        status: false,
+        message: 'Failed to renew player: The player not found'
+      })
+    }
+
+    try {
+      const latestUser = await findUser(player.user_id)
+      const nerewedPlayer = await createPlayer(latestUser)
+
+      updatePlayer({
+        playerId: nerewedPlayer.id,
+        payload: { ...nerewedPlayer }
+      })
+
+      this.socket.broadcast.emit(
+        'player:updated',
+        selectPlayer(nerewedPlayer.id)
+      )
+
+      return callback({
+        status: true,
+        message: 'The player renewed',
+        player: nerewedPlayer
+      })
+    } catch (error) {
+      return callback({
+        status: false,
+        message: `Failed to renew player: ${error.message}`
+      })
+    }
+  }
+
+  async updatePlayer(payload, callback) {
+    console.log('updatePlayer', this.socket.id, payload)
+
+    const player = this.findSocketPlayer(this.socket.id)
+
+    if (!player) {
+      return callback({
+        status: false,
+        message: 'Failed to update player: The player not found'
+      })
+    }
+
+    try {
+      await updatePlayerUser(player.id, payload)
+
+      const updatedPlayer = selectPlayer(player.id)
+
+      this.socket.broadcast.emit('player:updated', updatedPlayer)
+
+      return callback({
+        status: true,
+        message: 'The player updated',
+        player: updatedPlayer
+      })
+    } catch (error) {
+      return callback({
+        status: false,
+        message: `Failed to update player: ${error.message}`
       })
     }
   }
@@ -1064,7 +1135,7 @@ class GameManager {
         payload: { state: PLAYER_STATE.IDLE }
       })
 
-      updatePlayerStats(player.id, {
+      updatePlayerUser(player.id, {
         exp: player.exp + 3,
         win: player.win + 1
       })
@@ -1074,12 +1145,12 @@ class GameManager {
         })
         .catch(error => {
           throw new Error(
-            `Failed to update player stats: ${error.message}: ${error.stack}`
+            `Failed to update player user: ${error.message}: ${error.stack}`
           )
         })
 
       if (opponentPlayer.type !== PLAYER_TYPE.CPU) {
-        updatePlayerStats(opponentPlayer.id, {
+        updatePlayerUser(opponentPlayer.id, {
           exp: opponentPlayer.exp + 1,
           lose: opponentPlayer.lose + 1
         })
@@ -1271,7 +1342,7 @@ class GameManager {
         payload: { state: PLAYER_STATE.IDLE }
       })
 
-      updatePlayerStats(player.id, {
+      updatePlayerUser(player.id, {
         exp: player.exp + 3,
         win: player.win + 1
       })
@@ -1281,7 +1352,7 @@ class GameManager {
         })
         .catch(error => {
           throw new Error(
-            `Failed to update player stats: ${error.message}: ${error.stack}`
+            `Failed to update player user: ${error.message}: ${error.stack}`
           )
         })
 
@@ -1629,71 +1700,6 @@ class GameManager {
     this.io.emit('message:deleted', message.id)
   }
 
-  async updatePlayer(user, callback) {
-    console.log('updatePlayer', this.socket.id, user)
-
-    if (!user) {
-      return callback({
-        status: false,
-        message: 'Failed to update player: The user not found'
-      })
-    }
-
-    try {
-      const updatedUser = await findUser(user.id)
-      const updatedPlayer = await createPlayer(updatedUser)
-
-      updatePlayer({
-        playerId: updatedPlayer.id,
-        payload: { ...updatedPlayer }
-      })
-
-      this.socket.broadcast.emit(
-        'player:updated',
-        selectPlayer(updatedPlayer.id)
-      )
-
-      return callback({
-        status: true,
-        message: 'The player updated',
-        player: updatedPlayer
-      })
-    } catch (error) {
-      return callback({
-        status: false,
-        message: `Failed to update player: ${error.message}`
-      })
-    }
-  }
-
-  async updatePlayerStats(stats) {
-    console.log('updatePlayerStats', this.socket.id, stats)
-
-    const player = this.findSocketPlayer(this.socket.id)
-
-    if (!player) {
-      throw new Error('Failed to update player stats : The player not found')
-    }
-
-    try {
-      await updatePlayerStats(player.id, {
-        exp: player.exp + stats.exp,
-        win: player.win + stats.win,
-        lose: player.lose + stats.lose
-      })
-
-      const updatedPlayer = selectPlayer(player.id)
-
-      this.io.emit('player:updated', updatedPlayer)
-
-      this.socket.broadcast.emit('player:updated', updatedPlayer)
-    } catch (error) {
-      throw new Error(
-        `Failed to update player stats: ${error.message}: ${error.stack}`
-      )
-    }
-  }
-
   socketDisconnecting() {
     console.log('socketDisconnecting', this.socket.id)
 
@@ -1827,6 +1833,20 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    'player:renew': (...args) => {
+      try {
+        this.renewPlayer(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'player:update': async (...args) => {
+      try {
+        this.updatePlayer(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
     'battle:create': (...args) => {
       try {
         this.createBattle(...args)
@@ -1918,20 +1938,6 @@ class GameManager {
         this.errorHandler(error)
       }
     },
-    'player:update': (...args) => {
-      try {
-        this.updatePlayer(...args)
-      } catch (error) {
-        this.errorHandler(error)
-      }
-    },
-    'player:updatedStats': (...args) => {
-      try {
-        this.updatePlayerStats(...args)
-      } catch (error) {
-        this.errorHandler(error)
-      }
-    },
     'socket:disconnecting': (...args) => {
       try {
         this.socketDisconnecting(...args)
@@ -1967,6 +1973,8 @@ class GameManager {
 
     this.socket.on('auth:login', this.eventListeners['auth:login'])
     this.socket.on('auth:logout', this.eventListeners['auth:logout'])
+    this.socket.on('player:renew', this.eventListeners['player:renew'])
+    this.socket.on('player:update', this.eventListeners['player:update'])
     this.socket.on('battle:create', this.eventListeners['battle:create'])
     this.socket.on('battle:join', this.eventListeners['battle:join'])
     this.socket.on('battle:rush', this.eventListeners['battle:rush'])
@@ -1980,11 +1988,6 @@ class GameManager {
     this.socket.on('game:moveCPU', this.eventListeners['game:moveCPU'])
     this.socket.on('message:create', this.eventListeners['message:create'])
     this.socket.on('message:delete', this.eventListeners['message:delete'])
-    this.socket.on('player:update', this.eventListeners['player:update'])
-    this.socket.on(
-      'player:updatedStats',
-      this.eventListeners['player:updatedStats']
-    )
     this.socket.on('disconnecting', this.eventListeners['socket:disconnecting'])
     this.socket.on('disconnect', this.eventListeners['socket:disconnect'])
     this.io
@@ -1998,6 +2001,8 @@ class GameManager {
 
     this.socket.off('auth:login', this.eventListeners['auth:login'])
     this.socket.off('auth:logout', this.eventListeners['auth:logout'])
+    this.socket.off('player:renew', this.eventListeners['player:renew'])
+    this.socket.off('player:update', this.eventListeners['player:update'])
     this.socket.off('battle:create', this.eventListeners['battle:create'])
     this.socket.off('battle:join', this.eventListeners['battle:join'])
     this.socket.off('battle:rush', this.eventListeners['battle:rush'])
@@ -2011,11 +2016,6 @@ class GameManager {
     this.socket.off('game:moveCPU', this.eventListeners['game:moveCPU'])
     this.socket.off('message:create', this.eventListeners['message:create'])
     this.socket.off('message:delete', this.eventListeners['message:delete'])
-    this.socket.off('player:update', this.eventListeners['player:update'])
-    this.socket.off(
-      'player:updatedStats',
-      this.eventListeners['player:updatedStats']
-    )
     this.socket.off(
       'disconnecting',
       this.eventListeners['socket:disconnecting']
