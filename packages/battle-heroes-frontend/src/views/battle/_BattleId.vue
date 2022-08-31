@@ -184,6 +184,7 @@ export default {
       gameAborted: false,
       gameFinished: false,
       gameError: false,
+      gameIntervalId: null,
       splashScreenType: BATTLE_SPLASH_SCREEN_TYPE.LOADING,
       playerFullStats: {},
       messages: [],
@@ -356,6 +357,8 @@ export default {
     this.$socket.off('battle:next')
 
     this.stopAudio(MUSIC.BATTLE)
+
+    this.clearWaitNextMove()
   },
 
   methods: {
@@ -376,6 +379,10 @@ export default {
 
     isPlayer(player) {
       return player.id === this.player.id
+    },
+
+    async wait(milliseconds) {
+      return await new Promise(resolve => setTimeout(resolve, milliseconds))
     },
 
     onOnlineStatusChanged(player, isOnline) {
@@ -528,6 +535,8 @@ export default {
     async onGameStarted({ status, message, game }) {
       console.log('onGameStarted', status, message, game)
 
+      this.$socket.off('game:updated')
+
       if (status) {
         this.gamePreparing = true
 
@@ -564,6 +573,7 @@ export default {
         this.cachedBattle = this.battle
 
         this.game = game
+
         this.$socket.on('game:updated', this.onGameUpdated)
 
         if (this.isPlayerBattle) {
@@ -611,6 +621,10 @@ export default {
               await this.addGameStartMessages()
             }
           }
+
+          const { player } = this.getGameContext(game, game.current_player)
+
+          this.waitNextMove(player)
 
           setTimeout(() => {
             this.stopAudio(SOUND_EFFECT.ENCOUNTER)
@@ -686,7 +700,9 @@ export default {
       if (gameId === this.game.id) {
         this.gameAborted = true
 
-        // removeBattle
+        this.$socket.off('game:updated')
+
+        this.clearWaitNextMove()
 
         this.stopAudio(MUSIC.BATTLE)
 
@@ -698,6 +714,10 @@ export default {
       console.log('onGameFinished')
 
       this.gameFinished = true
+
+      this.$socket.off('game:updated')
+
+      this.clearWaitNextMove()
 
       this.stopAudio(MUSIC.BATTLE)
 
@@ -734,8 +754,41 @@ export default {
       this.$socket.emit('game:move', PLAYER_MOVE.HEAL)
     },
 
-    async wait(milliseconds) {
-      return await new Promise(resolve => setTimeout(resolve, milliseconds))
+    waitNextMove(player) {
+      this.clearWaitNextMove()
+
+      console.log('waitNextMove')
+      this.gameIntervalId = setTimeout(() => {
+        if (this.gameAborted || this.gameFinished) return
+
+        this.addNoNextMoveMessages(player)
+      }, 30000)
+    },
+
+    clearWaitNextMove() {
+      console.log('clearWaitNextMove')
+      if (this.gameIntervalId) {
+        clearInterval(this.gameIntervalId)
+      }
+    },
+
+    getGameContext(game, playerKey) {
+      const opponentPlayerKey = playerKey === 1 ? 2 : 1
+
+      const player = this.findPlayer(game.players[playerKey].id)
+      const playerNFT = this.findNFT(game.players[playerKey].NFT_id)
+
+      const opponentPlayer = this.findPlayer(game.players[opponentPlayerKey].id)
+      const opponentNFT = this.findNFT(game.players[opponentPlayerKey].NFT_id)
+
+      return {
+        playerKey,
+        player,
+        playerNFT,
+        opponentPlayerKey,
+        opponentPlayer,
+        opponentNFT
+      }
     },
 
     addMessage(line) {
@@ -901,15 +954,10 @@ export default {
 
       const lastMove = game.moves[game.moves.length - 1]
 
-      const playerKey = lastMove.playerKey
-      const opponentPlayerKey = playerKey === 1 ? 2 : 1
-
-      const player = this.findPlayer(game.players[playerKey].id)
-      const playerNFT = this.findNFT(game.players[playerKey].NFT_id)
-
-      const opponentPlayer = this.findPlayer(game.players[opponentPlayerKey].id)
-      // eslint-disable-next-line no-unused-vars
-      const opponentNFT = this.findNFT(game.players[opponentPlayerKey].NFT_id)
+      const { player, playerNFT, opponentPlayer } = this.getGameContext(
+        game,
+        lastMove.playerKey
+      )
 
       let isGameFinish = false
 
@@ -1103,6 +1151,8 @@ export default {
 
       if (isGameFinish) {
         await this.addGameFinishMessages(player, opponentPlayer)
+      } else {
+        this.waitNextMove(opponentPlayer)
       }
     },
 
@@ -1192,6 +1242,32 @@ export default {
         const { exp, win, lose } = newPlayerStats
         this.playerFullStats = getPlayerFullStats({ exp, win, lose })
         await this.addPlayerStatsMessages(this.player, this.playerFullStats)
+      }
+    },
+
+    addNoNextMoveMessages(player) {
+      const message = this.isPlayer(player)
+        ? 'コマンドを選択してください'
+        : '対戦相手の反応がありません'
+
+      this.addMessage({
+        style: `color: ${COLOR.YELLOW}`,
+        words: [
+          {
+            text: message
+          }
+        ]
+      })
+
+      if (!this.isPlayer(player)) {
+        this.addMessage({
+          style: `color: ${COLOR.YELLOW}`,
+          words: [
+            {
+              text: 'ページを読み込み直すと反映される場合があります'
+            }
+          ]
+        })
       }
     }
   }

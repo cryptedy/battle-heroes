@@ -27,6 +27,8 @@
 
       <BattleRushButton :battle="battle" />
 
+      <BattleRestartButton :battle="battle" />
+
       <BattleDeleteButton :battle="battle" />
     </div>
   </BaseListItem>
@@ -38,6 +40,7 @@ import NFTImage from '@/components/NFTImage'
 import BattleJoinButton from '@/components/BattleJoinButton'
 import BattleRushButton from '@/components/BattleRushButton'
 import BattleDeleteButton from '@/components/BattleDeleteButton'
+import BattleRestartButton from '@/components/BattleRestartButton'
 import BattleSpectateButton from '@/components/BattleSpectateButton'
 
 export default {
@@ -48,6 +51,7 @@ export default {
     BattleJoinButton,
     BattleRushButton,
     BattleDeleteButton,
+    BattleRestartButton,
     BattleSpectateButton
   },
 

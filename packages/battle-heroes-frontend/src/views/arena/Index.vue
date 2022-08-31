@@ -140,9 +140,9 @@ import { PLAYER_TYPE } from '@/utils/constants'
 import PlayerAvatar from '@/components/PlayerAvatar'
 import PlayerDetail from '@/components/PlayerDetail'
 import PlayerNameUpdate from '@/components/PlayerNameUpdate'
-import ToggleAudioButton from '@/components/ToggleAudioButton'
 import BattleJoinButton from '@/components/BattleJoinButton'
 import BattleRushButton from '@/components/BattleRushButton'
+import ToggleAudioButton from '@/components/ToggleAudioButton'
 import BattleCreateButton from '@/components/BattleCreateButton'
 import BattleDeleteButton from '@/components/BattleDeleteButton'
 
@@ -154,9 +154,9 @@ export default {
     PlayerAvatar,
     PlayerDetail,
     PlayerNameUpdate,
-    ToggleAudioButton,
     BattleJoinButton,
     BattleRushButton,
+    ToggleAudioButton,
     BattleCreateButton,
     BattleDeleteButton
   },

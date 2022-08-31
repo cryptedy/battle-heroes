@@ -41,10 +41,7 @@
     }
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    @include mediaQuery(sm) {
-      gap: 16px;
-    }
+    gap: 16px;
     margin-top: 16px;
     margin-bottom: 16px;
 
@@ -75,10 +72,7 @@
 
     &-actions {
       display: flex;
-      gap: 8px;
-      @include mediaQuery(sm) {
-        gap: 16px;
-      }
+      gap: 16px;
     }
 
     &-player {
