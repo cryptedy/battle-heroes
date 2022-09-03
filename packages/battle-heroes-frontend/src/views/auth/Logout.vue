@@ -18,7 +18,7 @@ export default {
 
     await this.logout()
 
-    this.$router.push({ name: 'index' }, () => {})
+    this.$router.push({ name: 'login' }, () => {})
   },
 
   methods: {

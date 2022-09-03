@@ -6,22 +6,16 @@ const view = path => () =>
 export default [
   {
     path: '/home',
-    name: 'arena',
     redirect: () => ({ name: 'arena' })
   },
   {
     path: '/login',
     name: 'login',
-    redirect: () => ({ name: 'index' })
-  },
-  {
-    path: '/',
-    name: 'index',
     meta: {
       layout: 'web',
       middleware: ['guest']
     },
-    component: view('Index')
+    component: view('auth/Login')
   },
   {
     path: '/logout',
@@ -50,7 +44,7 @@ export default [
     ]
   },
   {
-    path: '/arena',
+    path: '/',
     meta: {
       layout: 'game',
       middleware: ['auth', 'game']

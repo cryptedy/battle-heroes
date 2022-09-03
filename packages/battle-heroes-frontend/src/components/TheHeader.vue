@@ -1,8 +1,6 @@
 <template>
   <div class="header">
-    <h1 class="brand-text">
-      <router-link :to="{ name: 'index' }"> Battle Heroes </router-link>
-    </h1>
+    <h1 class="brand-text">Battle Heroes</h1>
 
     <ToggleAudioButton />
   </div>
