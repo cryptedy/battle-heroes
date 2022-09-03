@@ -5,10 +5,6 @@ const view = path => () =>
 
 export default [
   {
-    path: '/home',
-    redirect: () => ({ name: 'arena' })
-  },
-  {
     path: '/login',
     name: 'login',
     meta: {
@@ -164,5 +160,10 @@ export default [
         component: view('account/Labs')
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: '404',
+    component: view('errors/404')
   }
 ]
