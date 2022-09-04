@@ -22,60 +22,58 @@
     <h2 class="subheader">1. 対戦相手を選択</h2>
 
     <div class="player-select">
-      <div class="player-list">
-        <div class="player-list-item">
-          <template v-if="!selectedOpponentPlayer">
-            <div class="player-list-item-secondary">
-              <p>
-                <strong> 対戦相手指定なし </strong>
-              </p>
-              <p>ランダムマッチングバトル</p>
+      <div class="player-select-item">
+        <template v-if="!selectedOpponentPlayer">
+          <div class="player-select-item-primary">
+            <p>
+              <strong> 対戦相手指定なし </strong>
+            </p>
+            <p>ランダムマッチングバトル</p>
+          </div>
+
+          <div class="player-select-item-actions">
+            <BaseButton
+              v-if="canStartBattle"
+              type="primary"
+              :disabled="loading || !Object.keys(availablePlayers).length > 0"
+              @click="selectPlayers"
+            >
+              <template v-if="Object.keys(availablePlayers).length > 0">
+                対戦相手を指名
+              </template>
+              <template v-else> プレイヤーがいません </template>
+            </BaseButton>
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="player-select-item-primary">
+            <PlayerAvatar :player="selectedOpponentPlayer" />
+          </div>
+
+          <div class="player-select-item-secondary">
+            <div
+              class="player-name"
+              :class="{
+                'is-online': selectedOpponentPlayer.socket_ids.length > 0
+              }"
+            >
+              {{ selectedOpponentPlayer.name }}
+
+              <span class="player-devices">
+                {{ selectedOpponentPlayer.socket_ids.length }}
+              </span>
             </div>
 
-            <div class="player-list-item-actions">
-              <BaseButton
-                v-if="canStartBattle"
-                type="primary"
-                :disabled="loading || !Object.keys(availablePlayers).length > 0"
-                @click="selectPlayers"
-              >
-                <template v-if="Object.keys(availablePlayers).length > 0">
-                  対戦相手を指名
-                </template>
-                <template v-else> オンラインプレイヤーがいません </template>
-              </BaseButton>
-            </div>
-          </template>
+            <PlayerStats :player="selectedOpponentPlayer" />
+          </div>
 
-          <template v-else>
-            <div class="player-list-item-primary">
-              <PlayerAvatar :player="selectedOpponentPlayer" />
-            </div>
-
-            <div class="player-list-item-secondary">
-              <div
-                class="player-name"
-                :class="{
-                  'is-online': selectedOpponentPlayer.socket_ids.length > 0
-                }"
-              >
-                {{ selectedOpponentPlayer.name }}
-
-                <span class="player-devices">
-                  {{ selectedOpponentPlayer.socket_ids.length }}
-                </span>
-              </div>
-
-              <PlayerStats :player="selectedOpponentPlayer" />
-            </div>
-
-            <div class="player-list-item-actions">
-              <BaseButton type="danger" @click="onDeselectPlayer">
-                指名をやめる
-              </BaseButton>
-            </div>
-          </template>
-        </div>
+          <div class="player-select-item-actions">
+            <BaseButton type="danger" @click="onDeselectPlayer">
+              指名をやめる
+            </BaseButton>
+          </div>
+        </template>
       </div>
     </div>
 

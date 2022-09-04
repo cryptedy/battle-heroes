@@ -33,45 +33,39 @@
     <BaseDialog
       :open="invitationDraweShown && hasInvitation"
       title="バトルへの招待が届きました"
-      :padding-top="false"
-      :padding-right="false"
-      :padding-bottom="false"
-      :padding-left="false"
       :dismissable="false"
     >
       <div class="battle-invitation">
-        <div class="player-list">
-          <div class="player-list-item">
-            <div class="player-list-item-primary">
-              <PlayerAvatar :player="invitationPlayer" />
+        <div class="battle-invitation-item">
+          <div class="battle-invitation-item-primary">
+            <PlayerAvatar :player="invitationPlayer" />
+          </div>
+
+          <div class="battle-invitation-item-secondary">
+            <div
+              class="player-name"
+              :class="{ 'is-online': invitationPlayer.socket_ids.length > 0 }"
+            >
+              {{ invitationPlayer.name }}
+
+              <span class="player-devices">
+                {{ invitationPlayer.socket_ids.length }}
+              </span>
             </div>
 
-            <div class="player-list-item-secondary">
-              <div
-                class="player-name"
-                :class="{ 'is-online': invitationPlayer.socket_ids.length > 0 }"
-              >
-                {{ invitationPlayer.name }}
+            <PlayerStats :player="invitationPlayer" />
+          </div>
 
-                <span class="player-devices">
-                  {{ invitationPlayer.socket_ids.length }}
-                </span>
-              </div>
+          <div class="battle-invitation-item-actions">
+            <BattleJoinButton
+              :battle="playerBattle"
+              @joined="onInvitationAccepted"
+            />
 
-              <PlayerStats :player="invitationPlayer" />
-            </div>
-
-            <div class="player-list-item-actions">
-              <BattleJoinButton
-                :battle="playerBattle"
-                @joined="onInvitationAccepted"
-              />
-
-              <BattleDeleteButton
-                :battle="playerBattle"
-                @deleted="onInvitationDeclined"
-              />
-            </div>
+            <BattleDeleteButton
+              :battle="playerBattle"
+              @deleted="onInvitationDeclined"
+            />
           </div>
         </div>
       </div>

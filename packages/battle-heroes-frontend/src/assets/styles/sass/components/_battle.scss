@@ -447,11 +447,40 @@
   }
 
   &-invitation {
-    .player-list {
-      &-item {
+    &-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      @include mediaQuery(xs) {
+        gap: 12px;
+      }
+
+      &-primary {
+        .player-avatar {
+          width: 72px;
+          height: 72px;
+        }
+      }
+
+      &-secondary {
+        flex-grow: 1;
+
+        .player-name {
+          text-align: center;
+        }
+      }
+
+      &-actions {
+        display: flex;
         flex-direction: column;
         @include mediaQuery(xxs) {
           flex-direction: row;
+        }
+        gap: 8px;
+        @include mediaQuery(xs) {
+          gap: 12px;
         }
       }
     }

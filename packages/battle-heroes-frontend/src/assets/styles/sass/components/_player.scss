@@ -28,6 +28,10 @@
   &-stats {
     &-list {
       display: flex;
+      gap: 8px;
+      @include mediaQuery(xs) {
+        gap: 16px;
+      }
 
       &-item {
         &-icon {
@@ -105,14 +109,44 @@
   }
 
   &-select {
-    .player-list {
+    padding: 12px;
+    @include mediaQuery(xs) {
+      padding: 16px;
+    }
+    border: 1px solid color(divider, light);
+    @at-root .dialog & {
       border: 1px solid color(divider);
+    }
+    border-radius: 2px;
 
-      &-item {
-        flex-direction: column;
-        @include mediaQuery(xxs) {
-          flex-direction: row;
+    &-item {
+      display: flex;
+      flex-direction: column;
+      @include mediaQuery(xs) {
+        flex-direction: row;
+      }
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      @include mediaQuery(xs) {
+        gap: 12px;
+      }
+
+      &-primary {
+      }
+
+      &-secondary {
+        flex-grow: 1;
+
+        .player-name {
+          text-align: center;
+          @include mediaQuery(xs) {
+            text-align: left;
+          }
         }
+      }
+
+      &-actions {
       }
     }
   }
@@ -183,13 +217,6 @@
         color: color(secondary, dark);
       }
       font-size: 12px;
-    }
-
-    .player-stats-list {
-      gap: 8px;
-      @include mediaQuery(xs) {
-        gap: 16px;
-      }
     }
   }
 }
