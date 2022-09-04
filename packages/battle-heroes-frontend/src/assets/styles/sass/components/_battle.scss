@@ -410,9 +410,9 @@
       width: 100%;
       height: auto;
       border-radius: 3px;
-      padding: 12px 6px;
+      padding: 8px 6px;
       @include mediaQuery(xxs) {
-        padding: 12px 8px;
+        padding: 10px 8px;
       }
       @include mediaQuery(xs) {
         padding: 12px 10px;

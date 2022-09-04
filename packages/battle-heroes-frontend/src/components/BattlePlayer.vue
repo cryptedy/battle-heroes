@@ -110,10 +110,6 @@
                       <FontAwesomeIcon icon="diamond" />
                     </span>
                   </dd>
-                  <dt class="battle-ground-nft-status-list-title">種族</dt>
-                  <dd class="battle-ground-nft-status-list-data">
-                    <span>{{ body(playerNft.attributes) }}</span>
-                  </dd>
                 </dl>
               </div>
 

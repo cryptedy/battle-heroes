@@ -1,10 +1,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
-  faGhost,
   faPlus,
   faStar,
   faUser,
+  faGhost,
   faStore,
   faUsers,
   faXmark,
@@ -28,10 +28,10 @@ import { faTwitter } from '@fortawesome/free-brands-svg-icons'
 export default {
   install(app) {
     library.add(
-      faGhost,
       faPlus,
       faStar,
       faUser,
+      faGhost,
       faStore,
       faUsers,
       faXmark,
