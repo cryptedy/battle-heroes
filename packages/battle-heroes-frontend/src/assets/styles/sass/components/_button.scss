@@ -8,19 +8,12 @@
   text-align: center;
   cursor: pointer;
 
-  &.is-shade {
-    &-light {
-      &[disabled] {
-        background-color: color(inactive-icon, light);
-        color: color(disabled, light);
-      }
-    }
-
-    &-dark {
-      &[disabled] {
-        background-color: color(inactive-icon, dark);
-        color: color(disabled, dark);
-      }
+  &[disabled] {
+    background-color: color(inactive-icon, light);
+    color: color(disabled, light);
+    @at-root .dialog & {
+      background-color: color(inactive-icon, dark);
+      color: color(disabled, dark);
     }
   }
 

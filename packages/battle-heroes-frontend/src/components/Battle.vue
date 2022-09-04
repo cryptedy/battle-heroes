@@ -144,6 +144,7 @@
           <template v-else>
             <BattleCreateButton
               label="続けてバトル"
+              :opponent-player="opponentPlayer"
               :timeout="15000"
               @created="continueBattle"
             />

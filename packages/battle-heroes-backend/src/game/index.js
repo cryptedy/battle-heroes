@@ -297,8 +297,14 @@ class GameManager {
     }
   }
 
-  createBattle(NFTId, timeout, callback) {
-    console.log('createBattle', this.socket.id, NFTId, timeout)
+  createBattle(NFTId, opponentPlayerId, timeout, callback) {
+    console.log(
+      'createBattle',
+      this.socket.id,
+      NFTId,
+      opponentPlayerId,
+      timeout
+    )
 
     const player = this.findSocketPlayer(this.socket.id)
 
@@ -328,7 +334,7 @@ class GameManager {
       })
     }
 
-    const battle = createBattle(player.id, NFTId)
+    const battle = createBattle(player.id, NFTId, opponentPlayerId)
 
     addBattle(battle)
 
@@ -358,16 +364,21 @@ class GameManager {
       payload
     })
 
-    // start CPU battle after interval
-    let intervalId = setTimeout(() => {
-      const currentBattle = selectBattle(battle.id)
+    if (opponentPlayerId) {
+      // send opponent player
+      this.io.to(opponentPlayerId).emit('battle:invited', payload)
+    } else {
+      // start CPU battle after interval
+      let intervalId = setTimeout(() => {
+        const currentBattle = selectBattle(battle.id)
 
-      if (currentBattle.state === BATTLE_STATE.CREATED) {
-        this.joinBattleAsCPU(battle.id)
-      }
+        if (currentBattle.state === BATTLE_STATE.CREATED) {
+          this.joinBattleAsCPU(battle.id)
+        }
 
-      clearTimeout(intervalId)
-    }, timeout)
+        clearTimeout(intervalId)
+      }, timeout)
+    }
   }
 
   joinBattle(battleId, NFTId, callback) {
@@ -391,7 +402,9 @@ class GameManager {
 
     const playerBattle = selectPlayerBattle(player.id)
 
-    if (playerBattle) {
+    const playerKey = this.getBattlePlayerKey(playerBattle, player.id)
+
+    if (playerBattle && playerBattle.players[playerKey].NFT_id) {
       return callback({
         status: false,
         message:

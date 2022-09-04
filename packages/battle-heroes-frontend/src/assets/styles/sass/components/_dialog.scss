@@ -1,3 +1,14 @@
+@keyframes dialog-scale {
+  10%,
+  90% {
+    transform: scale3d(1.005, 1.005, 1.005);
+  }
+  40%,
+  50% {
+    transform: scale3d(1.02, 1.02, 1.02);
+  }
+}
+
 .dialog {
   display: flex;
   justify-content: center;
@@ -28,6 +39,11 @@
       max-width: 1024px;
       margin-right: 24px;
       margin-left: 24px;
+    }
+
+    &.close-attempting {
+      animation: dialog-scale 0.1s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      transform: scale3d(1, 1, 1);
     }
 
     &-enter-active,
@@ -84,8 +100,23 @@
   &-body {
     overflow: auto;
     background-color: palette(grey, 0);
-    padding: 16px;
     color: color(primary, dark);
+
+    &.has-padding-top {
+      padding-top: 16px;
+    }
+
+    &.has-padding-right {
+      padding-right: 16px;
+    }
+
+    &.has-padding-bottom {
+      padding-bottom: 16px;
+    }
+
+    &.has-padding-left {
+      padding-left: 16px;
+    }
   }
 
   &-footer {

@@ -23,6 +23,14 @@ export const getters = {
         (battle.players[2].id === getters.player.id &&
           battle.type === BATTLE_TYPE.HUMAN)
     )
+  },
+  hasInvitation: (state, getters) => {
+    if (!getters.playerBattle) return
+
+    return (
+      getters.playerBattle.players[1].id !== getters.player.id &&
+      !getters.playerBattle.players[2].NFT_id
+    )
   }
 }
 

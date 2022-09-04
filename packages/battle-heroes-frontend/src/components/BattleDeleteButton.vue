@@ -5,7 +5,7 @@
     :disabled="loading"
     @click="execute"
   >
-    バトルを中止
+    {{ label }}
   </BaseButton>
 </template>
 
@@ -34,7 +34,8 @@ export default {
   computed: {
     ...mapGetters({
       player: 'game/player',
-      playerBattle: 'game/playerBattle'
+      playerBattle: 'game/playerBattle',
+      hasInvitation: 'game/hasInvitation'
     }),
 
     isPlayerBattle() {
@@ -43,6 +44,10 @@ export default {
 
     canDeleteBattle() {
       return this.playerBattle && this.isPlayerBattle
+    },
+
+    label() {
+      return this.hasInvitation ? 'バトルを辞退' : 'バトルを中止'
     }
   },
 

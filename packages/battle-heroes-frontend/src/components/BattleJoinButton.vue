@@ -15,7 +15,7 @@
     :disabled="loading"
     @click="handle"
   >
-    バトルを挑む
+    {{ label }}
   </BaseButton>
 </template>
 
@@ -45,6 +45,8 @@ export default {
     }
   },
 
+  emits: ['joined'],
+
   data() {
     return {
       loading: false,
@@ -58,7 +60,8 @@ export default {
       findNFT: 'NFT/find',
       player: 'game/player',
       findPlayer: 'player/find',
-      playerBattle: 'game/playerBattle'
+      playerBattle: 'game/playerBattle',
+      hasInvitation: 'game/hasInvitation'
     }),
 
     isPlayerBattle() {
@@ -67,11 +70,18 @@ export default {
 
     canJoinBattle() {
       return (
-        !this.playerBattle &&
-        !this.isPlayerBattle &&
-        this.battle.type === BATTLE_TYPE.HUMAN &&
-        this.battle.state === BATTLE_STATE.CREATED
+        this.hasInvitation ||
+        (!this.playerBattle &&
+          !this.isPlayerBattle &&
+          this.battle.type === BATTLE_TYPE.HUMAN &&
+          this.battle.state === BATTLE_STATE.CREATED &&
+          // non reserved battle
+          !this.battle.players[2].id)
       )
+    },
+
+    label() {
+      return this.hasInvitation ? 'バトルを受ける' : 'バトルを挑む'
     }
   },
 
@@ -115,6 +125,8 @@ export default {
             .then(() => {
               this.loading = false
               this.splashScreenShown = false
+
+              this.$emit('joined', battle.id)
             })
         })
         .catch(error => {

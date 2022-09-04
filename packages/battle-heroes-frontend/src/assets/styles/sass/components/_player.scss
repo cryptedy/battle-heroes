@@ -16,6 +16,9 @@
   &-name {
     font-weight: bold;
     color: color(disabled, light);
+    @at-root .dialog & {
+      color: color(disabled);
+    }
 
     &.is-online {
       color: palette(green, 500);
@@ -82,6 +85,9 @@
       font-size: 23px;
       margin-bottom: 4px;
       color: color(secondary, dark);
+      @at-root .dialog & {
+        color: color(secondary, light);
+      }
 
       &.is-online {
         color: palette(green, 500);
@@ -98,11 +104,30 @@
     }
   }
 
+  &-select {
+    .player-list {
+      border: 1px solid color(divider);
+
+      &-item {
+        flex-direction: column;
+        @include mediaQuery(xxs) {
+          flex-direction: row;
+        }
+      }
+    }
+  }
+
   &-list {
     &-item {
       display: flex;
+      align-items: center;
       gap: 16px;
+
       border-bottom: 1px solid color(divider, light);
+      @at-root .dialog & {
+        border-bottom: 1px solid color(divider);
+      }
+
       &:last-child {
         border-bottom: none;
       }
@@ -110,10 +135,6 @@
       padding-right: 16px;
       padding-bottom: 12px;
       padding-left: 16px;
-      @include mediaQuery(md) {
-        padding-right: 0;
-        padding-left: 0;
-      }
 
       &-primary {
         //
@@ -158,6 +179,9 @@
     .player-devices {
       margin-left: 8px;
       color: color(secondary, light);
+      @at-root .dialog & {
+        color: color(secondary, dark);
+      }
       font-size: 12px;
     }
 

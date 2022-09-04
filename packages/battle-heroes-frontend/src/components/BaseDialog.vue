@@ -13,23 +13,35 @@
       v-if="overlayShown || dialogContentShown || dialogShown"
       class="dialog"
     >
-      <BaseOverlay :show="overlayShown" appear @click="closeDialog" />
+      <BaseOverlay :show="overlayShown" appear @click="dismissDialog" />
 
       <transition name="dialog-content">
-        <div v-if="dialogContentShown" class="dialog-content">
+        <div
+          v-if="dialogContentShown"
+          class="dialog-content"
+          :class="{ 'close-attempting': closeAttempting }"
+        >
           <header class="dialog-header">
             <h1 class="dialog-header-title">
               {{ title }}
             </h1>
 
             <div class="dialog-header-actions">
-              <button @click="closeDialog">
+              <button @click="dismissDialog">
                 <FontAwesomeIcon icon="xmark" />
               </button>
             </div>
           </header>
 
-          <main class="dialog-body">
+          <main
+            class="dialog-body"
+            :class="{
+              'has-padding-top': paddingTop,
+              'has-padding-right': paddingRight,
+              'has-padding-bottom': paddingBottom,
+              'has-padding-left': paddingLeft
+            }"
+          >
             <template v-if="message">
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-html="message" />
@@ -78,6 +90,24 @@ export default {
       required: false
     },
 
+    programmatic: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    timeout: {
+      type: Number,
+      required: false,
+      default: 0
+    },
+
+    dismissable: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+
     width: {
       type: String,
       required: false,
@@ -90,16 +120,28 @@ export default {
       default: '100%'
     },
 
-    programmatic: {
+    paddingTop: {
       type: Boolean,
       required: false,
-      default: false
+      default: true
     },
 
-    timeout: {
-      type: Number,
+    paddingRight: {
+      type: Boolean,
       required: false,
-      default: 0
+      default: true
+    },
+
+    paddingBottom: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+
+    paddingLeft: {
+      type: Boolean,
+      required: false,
+      default: true
     },
 
     confirmLabel: {
@@ -141,6 +183,7 @@ export default {
       dialogShown: false,
       dialogContentShown: false,
       overlayShown: false,
+      closeAttempting: false,
       attemptingToOpen: false,
       attemptingToClose: false,
       confirmLoading: false,
@@ -210,6 +253,18 @@ export default {
   },
 
   methods: {
+    dismissDialog() {
+      if (this.dismissable) {
+        this.closeDialog()
+      } else {
+        this.closeAttempting = true
+
+        setTimeout(() => {
+          this.closeAttempting = false
+        }, 100)
+      }
+    },
+
     openDialog() {
       if (this.attempting) return
 

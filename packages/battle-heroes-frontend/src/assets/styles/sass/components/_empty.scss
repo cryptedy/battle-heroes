@@ -13,11 +13,19 @@
 
   &-text {
     color: color(disabled, light);
+
+    @at-root .dialog & {
+      color: color(disabled, dark);
+    }
   }
 
   #{$font-awesome-icon-class} {
     font-size: 800%;
     margin-top: 16px;
     color: color(inactive-icon, light);
+
+    @at-root .dialog & {
+      color: color(inactive-icon, dark);
+    }
   }
 }

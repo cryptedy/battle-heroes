@@ -32,7 +32,8 @@ export default {
   computed: {
     ...mapGetters({
       player: 'game/player',
-      playerBattle: 'game/playerBattle'
+      playerBattle: 'game/playerBattle',
+      hasInvitation: 'game/hasInvitation'
     }),
 
     isPlayerBattle() {
@@ -40,7 +41,7 @@ export default {
     },
 
     canRestartBattle() {
-      return this.playerBattle && this.isPlayerBattle
+      return this.playerBattle && this.isPlayerBattle && !this.hasInvitation
     }
   },
 

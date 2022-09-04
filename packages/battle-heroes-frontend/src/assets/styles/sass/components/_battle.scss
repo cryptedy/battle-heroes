@@ -446,6 +446,17 @@
     }
   }
 
+  &-invitation {
+    .player-list {
+      &-item {
+        flex-direction: column;
+        @include mediaQuery(xxs) {
+          flex-direction: row;
+        }
+      }
+    }
+  }
+
   &-list {
     &-item {
       display: flex;
@@ -459,10 +470,6 @@
       padding-right: 16px;
       padding-bottom: 12px;
       padding-left: 16px;
-      @include mediaQuery(md) {
-        padding-right: 0;
-        padding-left: 0;
-      }
 
       &.is-disabled {
         position: relative;

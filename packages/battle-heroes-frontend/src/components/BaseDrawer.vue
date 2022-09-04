@@ -8,13 +8,16 @@
       v-if="overlayShown || drawerContentShown || drawerShown"
       class="drawer"
     >
-      <BaseOverlay :show="overlayShown" appear @click="closeDrawer" />
+      <BaseOverlay :show="overlayShown" appear @click="dismissDrawer" />
 
       <transition :name="transitionName">
         <div
           v-if="drawerContentShown"
           class="drawer-content"
-          :class="`is-direction-${direction}`"
+          :class="[
+            `is-direction-${direction}`,
+            { 'close-attempting': closeAttempting }
+          ]"
           :style="drawerContentStyleObject"
         >
           <header class="drawer-header">
@@ -23,13 +26,21 @@
             </h1>
 
             <div class="drawer-header-actions">
-              <button @click="closeDrawer">
+              <button @click="dismissDrawer">
                 <FontAwesomeIcon icon="xmark" />
               </button>
             </div>
           </header>
 
-          <main class="drawer-body">
+          <main
+            class="drawer-body"
+            :class="{
+              'has-padding-top': paddingTop,
+              'has-padding-right': paddingRight,
+              'has-padding-bottom': paddingBottom,
+              'has-padding-left': paddingLeft
+            }"
+          >
             <slot />
           </main>
         </div>
@@ -62,6 +73,12 @@ export default {
       required: true
     },
 
+    dismissable: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+
     width: {
       type: String,
       required: false,
@@ -72,6 +89,30 @@ export default {
       type: String,
       required: false,
       default: '100%'
+    },
+
+    paddingTop: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+
+    paddingRight: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+
+    paddingBottom: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+
+    paddingLeft: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
 
@@ -83,6 +124,7 @@ export default {
       drawerShown: false,
       drawerContentShown: false,
       overlayShown: false,
+      closeAttempting: false,
       attemptingToOpen: false,
       attemptingToClose: false
     }
@@ -146,6 +188,18 @@ export default {
   },
 
   methods: {
+    dismissDrawer() {
+      if (this.dismissable) {
+        this.closeDrawer()
+      } else {
+        this.closeAttempting = true
+
+        setTimeout(() => {
+          this.closeAttempting = false
+        }, 100)
+      }
+    },
+
     openDrawer() {
       if (this.attempting) return
 

@@ -1,0 +1,19 @@
+.subheader {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: bold;
+  color: color(secondary, light);
+
+  @at-root .dialog & {
+    color: color(secondary, dark);
+  }
+
+  &.is-bordered-top {
+    border-top: 1px solid color(divider);
+  }
+
+  &.is-bordered-bottom {
+    border-bottom: 1px solid color(divider);
+  }
+}

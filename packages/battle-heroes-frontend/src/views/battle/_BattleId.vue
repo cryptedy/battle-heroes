@@ -4,7 +4,9 @@
   </ErrorScreen>
 
   <ErrorScreen v-else-if="!battle" message="バトルが見つかりません">
-    <p>すでにバトルが終了したかプレイヤーにより中止された可能性があります。</p>
+    <p>
+      すでにバトルが終了したかプレイヤーにより中止・辞退された可能性があります。
+    </p>
     <p style="margin-top: 16px">
       <BaseButton type="primary" @click="leaveBattle">
         <FontAwesomeIcon icon="arrow-left" />
@@ -19,7 +21,7 @@
       message="バトルが見つかりません"
     >
       <p>
-        すでにバトルが終了したかプレイヤーにより中止された可能性があります。
+        すでにバトルが終了したかプレイヤーにより中止・辞退された可能性があります。
       </p>
       <p style="margin-top: 16px">
         <BaseButton type="primary" @click="leaveBattle">
@@ -454,6 +456,7 @@ export default {
           message: `
             <p>対戦中にバトルを抜けるとバトルは削除されます。</p>
           `,
+          dismissable: false,
           confirmLabel: 'バトルを終了',
           cancelLabel: 'バトルに戻る',
           onConfirm: () => {

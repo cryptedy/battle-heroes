@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid')
 const { BATTLE_TYPE, BATTLE_STATE } = require('../utils/constants')
 
-const createBattle = (playerId, NFTId) => {
+const createBattle = (playerId, NFTId, opponentPlayerId) => {
   return {
     id: uuidv4(),
     players: {
@@ -10,7 +10,7 @@ const createBattle = (playerId, NFTId) => {
         NFT_id: NFTId
       },
       2: {
-        id: null,
+        id: opponentPlayerId,
         NFT_id: null
       }
     },

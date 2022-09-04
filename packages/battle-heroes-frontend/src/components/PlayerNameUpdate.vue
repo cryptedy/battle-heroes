@@ -1,7 +1,7 @@
 <template>
   <form class="form" @submit.prevent="UpdatePlayer">
     <input id="battle-name" v-model="name" v-focus class="input" type="text" />
-    <BaseButton shade="dark" type="primary" :disabled="loading">
+    <BaseButton type="primary" :disabled="loading">
       <BaseSpinner v-if="loading" />
 
       更新

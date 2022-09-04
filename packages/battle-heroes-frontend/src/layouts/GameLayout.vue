@@ -29,23 +29,72 @@
     <BaseButton type="primary" @click="retry"> リトライ </BaseButton>
   </ErrorScreen>
 
-  <template v-else-if="isBattleView">
-    <slot :key="$route.params.battleId" />
+  <template v-else>
+    <BaseDialog
+      :open="invitationDraweShown && hasInvitation"
+      title="バトルへの招待が届きました"
+      :padding-top="false"
+      :padding-right="false"
+      :padding-bottom="false"
+      :padding-left="false"
+      :dismissable="false"
+    >
+      <div class="battle-invitation">
+        <div class="player-list">
+          <div class="player-list-item">
+            <div class="player-list-item-primary">
+              <PlayerAvatar :player="invitationPlayer" />
+            </div>
+
+            <div class="player-list-item-secondary">
+              <div
+                class="player-name"
+                :class="{ 'is-online': invitationPlayer.socket_ids.length > 0 }"
+              >
+                {{ invitationPlayer.name }}
+
+                <span class="player-devices">
+                  {{ invitationPlayer.socket_ids.length }}
+                </span>
+              </div>
+
+              <PlayerStats :player="invitationPlayer" />
+            </div>
+
+            <div class="player-list-item-actions">
+              <BattleJoinButton
+                :battle="playerBattle"
+                @joined="onInvitationAccepted"
+              />
+
+              <BattleDeleteButton
+                :battle="playerBattle"
+                @deleted="onInvitationDeclined"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </BaseDialog>
+
+    <template v-if="isBattleView">
+      <slot :key="$route.params.battleId" />
+    </template>
+
+    <div v-else class="game">
+      <header class="game-header" role="banner">
+        <TheAppBar />
+      </header>
+
+      <main class="game-main" role="main">
+        <slot />
+      </main>
+
+      <footer class="game-footer">
+        <TheBottomNav />
+      </footer>
+    </div>
   </template>
-
-  <div v-else class="game">
-    <header class="game-header" role="banner">
-      <TheAppBar />
-    </header>
-
-    <main class="game-main" role="main">
-      <slot />
-    </main>
-
-    <footer class="game-footer">
-      <TheBottomNav />
-    </footer>
-  </div>
 </template>
 
 <script>
@@ -54,10 +103,13 @@ import { mapGetters, mapActions } from 'vuex'
 import TheAppBar from '@/components/TheAppBar'
 import RandomNFT from '@/components/RandomNFT'
 import ErrorScreen from '@/components/ErrorScreen'
-import BaseButton from '@/components/BaseButton.vue'
+import PlayerStats from '@/components/PlayerStats'
+import PlayerAvatar from '@/components/PlayerAvatar'
 import SplashScreen from '@/components/SplashScreen'
 import TheBottomNav from '@/components/TheBottomNav'
 import { ADD_MESSAGE } from '@/store/mutation-types'
+import BattleJoinButton from '@/components/BattleJoinButton'
+import BattleDeleteButton from '@/components/BattleDeleteButton'
 import { BATTLE_STATE, NOTIFICATION_TYPE } from '@/utils/constants'
 
 export default {
@@ -71,9 +123,12 @@ export default {
     TheAppBar,
     RandomNFT,
     ErrorScreen,
+    PlayerStats,
+    PlayerAvatar,
     SplashScreen,
     TheBottomNav,
-    BaseButton
+    BattleJoinButton,
+    BattleDeleteButton
   },
 
   data() {
@@ -81,16 +136,19 @@ export default {
       attemptingGameLogin: false,
       reconnectingSocket: false,
       socketConnectError: '',
-      socketError: ''
+      socketError: '',
+      invitationDraweShown: false
     }
   },
 
   computed: {
     ...mapGetters({
       player: 'game/player',
+      findPlayer: 'player/find',
       isGameLogin: 'game/isLogin',
       playerBattle: 'game/playerBattle',
-      notifications: 'notification/all'
+      notifications: 'notification/all',
+      hasInvitation: 'game/hasInvitation'
     }),
 
     isBattleView() {
@@ -99,13 +157,24 @@ export default {
 
     isChatView() {
       return this.$route.name === 'arena.chat'
+    },
+
+    invitationPlayer() {
+      if (!this.hasInvitation) return
+
+      return this.findPlayer(this.playerBattle.players[1].id)
     }
   },
 
   beforeMount() {
     console.log('GameLayout:beforeMount')
 
-    if (this.playerBattle && this.playerBattle.state !== BATTLE_STATE.ENDED) {
+    if (this.hasInvitation) {
+      this.invitationDraweShown = true
+    } else if (
+      this.playerBattle &&
+      this.playerBattle.state !== BATTLE_STATE.ENDED
+    ) {
       this.$router.push({
         name: 'battles.show',
         params: {
@@ -127,6 +196,7 @@ export default {
     this.$socket.on('player:created', player => this.addPlayer(player))
     this.$socket.on('player:updated', player => this.updatePlayer(player))
     this.$socket.on('battle:created', battle => this.addBattle(battle))
+    this.$socket.on('battle:invited', payload => this.onBattleInvited(payload))
     this.$socket.on('battle:updated', battle => this.updateBattle(battle))
     this.$socket.on('battle:deleted', battleId => this.removeBattle(battleId))
     this.$socket.on('message:created', message => this.addMessage(message))
@@ -160,6 +230,7 @@ export default {
     this.$socket.off('player:created')
     this.$socket.off('player:updated')
     this.$socket.off('battle:created')
+    this.$socket.off('battle:invited')
     this.$socket.off('battle:updated')
     this.$socket.off('battle:deleted')
     this.$socket.off('message:created')
@@ -186,6 +257,20 @@ export default {
       addNotification: 'notification/add',
       incrementUnread: 'message/incrementUnread'
     }),
+
+    onBattleInvited({ player, battle }) {
+      console.log('onBattleInvited', player, battle)
+
+      this.invitationDraweShown = true
+    },
+
+    onInvitationAccepted() {
+      this.invitationDraweShown = false
+    },
+
+    onInvitationDeclined() {
+      this.invitationDraweShown = false
+    },
 
     onSocketConnect() {
       console.log('onSocketConnect')
