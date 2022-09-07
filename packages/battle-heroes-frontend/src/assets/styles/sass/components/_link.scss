@@ -1,0 +1,41 @@
+.link {
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    @include mediaQuery(xxs) {
+      flex-direction: row;
+      gap: 8px;
+    }
+
+    &-item {
+      a {
+        color: palette(grey, 0);
+      }
+
+      &.is-microblog {
+        #{$font-awesome-icon-class} {
+          color: palette(blue, 500);
+        }
+      }
+
+      &.is-twitter {
+        #{$font-awesome-icon-class} {
+          color: #289aeb;
+        }
+      }
+
+      &.is-youtube {
+        #{$font-awesome-icon-class} {
+          color: #fc1c19;
+        }
+      }
+
+      &.is-discord {
+        #{$font-awesome-icon-class} {
+          color: #5865eb;
+        }
+      }
+    }
+  }
+}

@@ -10,6 +10,10 @@
 
   <hr />
 
+  <Links />
+
+  <hr />
+
   <PlayerRenewButton />
 
   <hr />
@@ -21,6 +25,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Links from '@/components/Links'
 import ToggleAudioButton from '@/components/ToggleAudioButton'
 import PlayerRenewButton from '@/components/PlayerRenewButton.vue'
 
@@ -28,6 +33,7 @@ export default {
   name: 'AccountSettingsView',
 
   components: {
+    Links,
     ToggleAudioButton,
     PlayerRenewButton
   },

@@ -23,7 +23,12 @@ import {
   faArrowRightFromBracket
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faTwitter } from '@fortawesome/free-brands-svg-icons'
+import {
+  faDiscord,
+  faTwitter,
+  faYoutube,
+  faMicroblog
+} from '@fortawesome/free-brands-svg-icons'
 
 export default {
   install(app) {
@@ -38,9 +43,12 @@ export default {
       faKhanda,
       faDiamond,
       faMessage,
+      faDiscord,
       faTwitter,
+      faYoutube,
       faArrowLeft,
       faFlaskVial,
+      faMicroblog,
       faLayerGroup,
       faVolumeHigh,
       faRankingStar,

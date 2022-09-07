@@ -23,6 +23,8 @@
 
     <LoginButton />
 
+    <Links />
+
     <p class="hero-text-secondary">🚨 注意 🚨</p>
     <p class="hero-text-secondary">
       現在プロトタイプバージョンのためご利用は自己責任でお願いします。
@@ -35,12 +37,14 @@
 </template>
 
 <script>
+import Links from '@/components/Links'
 import LoginButton from '@/components/LoginButton'
 
 export default {
   name: 'LoginView',
 
   components: {
+    Links,
     LoginButton
   }
 }
