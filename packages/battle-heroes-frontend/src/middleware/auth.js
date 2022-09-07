@@ -3,7 +3,7 @@ import store from '@/store'
 export default async (to, from, next) => {
   if (!store.getters['auth/isLogin']) {
     next({
-      name: 'arena'
+      name: 'login'
     })
   } else {
     next()
