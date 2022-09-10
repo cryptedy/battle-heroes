@@ -4,6 +4,17 @@
       <header class="arena-header">
         <h1>バトルアリーナ</h1>
 
+        <p class="how-to-play">
+          <a
+            href="https://www.pixelheroes-dao.com/battleheroes/#index_id5"
+            target="_blank"
+          >
+            <FontAwesomeIcon :icon="['fab', 'microblog']" />
+
+            遊び方
+          </a>
+        </p>
+
         <div class="arena-controls">
           <div class="arena-controls-primary">
             <!-- <p>最新の情報に更新</p> -->
