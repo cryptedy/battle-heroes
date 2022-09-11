@@ -41,6 +41,8 @@ const {
   selectUserPlayer
 } = require('../player/selectors')
 
+const { getMoralisTokenExp } = require('../NFT')
+
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
 
 const PROCESS = {
@@ -1840,6 +1842,12 @@ class GameManager {
     }
   }
 
+  test = (collectionId, tokenId) =>{
+    const tokenExp = getMoralisTokenExp(collectionId, tokenId)
+
+    console.log(`Test function called. Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`)
+  }
+
   eventListeners = {
     'auth:login': async (...args) => {
       try {
@@ -1995,11 +2003,21 @@ class GameManager {
       } catch (error) {
         this.errorHandler(error)
       }
+    },
+    'test:test': (...args) => {
+      console.log(...args)
+      try {
+        this.test(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
     }
   }
 
   addEventListeners() {
     console.log('addEventListeners', this.socket.id)
+
+    this.socket.on('test:test', this.eventListeners['test:test'])
 
     this.socket.on('auth:login', this.eventListeners['auth:login'])
     this.socket.on('auth:logout', this.eventListeners['auth:logout'])
@@ -2028,6 +2046,8 @@ class GameManager {
 
   removeEventListeners() {
     console.log('removeEventListeners', this.socket.id)
+
+    this.socket.off('test:test', this.eventListeners['test:test'])
 
     this.socket.off('auth:login', this.eventListeners['auth:login'])
     this.socket.off('auth:logout', this.eventListeners['auth:logout'])
@@ -2077,6 +2097,7 @@ class GameManager {
     }
   }
 }
+
 
 module.exports = {
   GameManager

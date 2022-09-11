@@ -58,6 +58,7 @@ export default {
     sampleMethod() {
       console.log('sampleMethod called!')
 
+      this.$socket.emit('test:test', 1, 1)
       this.isCalled = true
       this.message = 'sampleMethod caled!'
     }
