@@ -256,22 +256,18 @@ const getMetadata = async collection => {
 
 const getMoralisTokenExp = async (collectionId, tokenId) => {
   console.log('getMoralisTokenExp', collectionId, tokenId )
-  const collectionIds = [collectionId]
-  const tokenIds = [tokenId]
-
   const TokenExp = Moralis.Object.extend("TokenExp")
   const query = new Moralis.Query(TokenExp)
-  query.equalTo("tokenId", 1)
-  const results = await query.find()
-  console.log(results[0].get("exp"))
-  if (!results[0].get("exp")){
-    results[0].set("exp", 100)
-    results[0].save()
+  query.equalTo("tokenId", tokenId)
+  query.equalTo("collectionId", collectionId)
+  const results = await query.find({ useMasterKey: true })
+  const ret = {
+    collectionId : collectionId,
+    tokenId : tokenId,
+    exp : results[0]?.get("exp"),
+    startBlockNumber : results[0]?.get("startBlockNumber"),
   }
-  /*
-  const tokenExps = await Moralis.Cloud.run('getTokenExps', { collectionIds : collectionIds, tokenIds : tokenIds })
-  console.log(tokenExps)*/
-  return results
+  return ret
 }
 
 

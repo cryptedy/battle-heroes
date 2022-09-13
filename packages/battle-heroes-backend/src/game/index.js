@@ -1842,8 +1842,8 @@ class GameManager {
     }
   }
 
-  test = (collectionId, tokenId) =>{
-    const tokenExp = getMoralisTokenExp(collectionId, tokenId)
+  test = async (collectionId, tokenId) =>{
+    const tokenExp = await getMoralisTokenExp(collectionId, tokenId)
 
     console.log(`Test function called. Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`)
   }
