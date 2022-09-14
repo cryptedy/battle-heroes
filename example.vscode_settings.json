@@ -1,0 +1,12 @@
+{
+  "editor.unicodeHighlight.nonBasicASCII": false,
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.format.enable": true,
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "javascript.updateImportsOnFileMove.enabled": "never"
+}

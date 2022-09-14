@@ -252,27 +252,28 @@ const getMetadata = async collection => {
   return axios.get(`${METADATA_URL}/${collection.id}/index.json`)
 }
 
-
-
 const getMoralisTokenExp = async (collectionId, tokenId) => {
-  console.log('getMoralisTokenExp', collectionId, tokenId )
-  const TokenExp = Moralis.Object.extend("TokenExp")
-  const query = new Moralis.Query(TokenExp)
-  query.equalTo("tokenId", tokenId)
-  query.equalTo("collectionId", collectionId)
-  const results = await query.find({ useMasterKey: true })
-  const ret = {
-    collectionId : collectionId,
-    tokenId : tokenId,
-    exp : results[0]?.get("exp"),
-    startBlockNumber : results[0]?.get("startBlockNumber"),
-  }
-  return ret
+  console.log('getMoralisTokenExp', collectionId, tokenId)
+  const tokenExps = await Moralis.Cloud.run('getTokenExps', {
+    collectionIds: [collectionId],
+    tokenIds: [tokenId]
+  })
+  return tokenExps[0]
 }
 
+const getMoralisTokenExpsByCollectionId = async collenctionId => {
+  console.log('getMoralisTokenExpsByCollectionId', collenctionId)
+  const tokenExps = await Moralis.Cloud.run('getTokenExpsByCollectionId', {
+    collectionId: collenctionId
+  })
+  return tokenExps
+}
+
+const getTokenExpsForCollection = async collection => {}
 
 module.exports = {
   getNFTs,
   getNFTIdsForAddress,
-  getMoralisTokenExp
+  getMoralisTokenExp,
+  getMoralisTokenExpsByCollectionId
 }

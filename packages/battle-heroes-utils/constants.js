@@ -10,21 +10,24 @@ const COLLECTIONS = [
     name: 'Pixel Heroes',
     name_short: 'PHS',
     contract_address: '0xe72323d7900f26d13093cafe76b689964cc99ffc',
-    chain: 'matic'
+    chain: 'matic',
+    total_supply: 1000
   },
   {
     id: COLLECTION_ID.PIXEL_HEROES_X,
     name: 'Pixel Heroes X',
     name_short: 'PHX',
     contract_address: '0xba6e421833f6c190a830ce6e142685b3916c9bd0',
-    chain: 'matic'
+    chain: 'matic',
+    total_supply: 5555
   },
   {
     id: COLLECTION_ID.PIXEL_CRYPTO_NINJA_HEROES,
     name: 'Pixel Crypto Ninja Heroes',
     name_short: 'PCNH',
     contract_address: '0xcae19776cb7197676f9b15f1da6d110dddfb181c',
-    chain: 'eth'
+    chain: 'eth',
+    total_supply: 5555
   }
 ]
 
