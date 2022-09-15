@@ -9,9 +9,11 @@
 
   <BaseButton type="primary" @click="sampleMethod"> Get Exp </BaseButton>
   <P>CollectionId:</P>
-  <input type="text" v-model="colId1" style="color: #000000" />
+  <input v-model="colId1" type="text" style="color: #000000" />
   <P>TokenId:</P>
-  <input type="text" v-model="tokenId1" style="color: #000000" />
+  <input v-model="tokenId1" type="text" style="color: #000000" />
+  <P>Exp:</P>
+  <input v-model="exp1" type="text" style="color: #000000" />
 
   <div v-if="isCalled">
     <p>SAMPLE METHOD CALLED!</p>
@@ -34,6 +36,7 @@ export default {
       isCalled: false,
       colId1: 1,
       tokenId1: 1
+      exp1: 0
     }
   },
 
@@ -63,13 +66,15 @@ export default {
       console.log(
         'getExp called!',
         parseInt(this.colId1),
-        parseInt(this.tokenId1)
+        parseInt(this.tokenId1),
+        parseInt(this.exp1)
       )
 
       this.$socket.emit(
         'test:test',
         parseInt(this.colId1),
-        parseInt(this.tokenId1)
+        parseInt(this.tokenId1),
+        parseInt(this.exp1)
       )
       this.isCalled = true
       this.message = 'getExp caled!'

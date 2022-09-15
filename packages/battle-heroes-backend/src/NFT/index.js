@@ -42,6 +42,7 @@ const getNFTsForCollection = async collection => {
     })
   })
 
+  await addExps(NFTs)
   addRarity(NFTs)
   addRank(NFTs)
   addPoint(NFTs)
@@ -241,6 +242,23 @@ const addStars = NFTs => {
   return NFTs
 }
 
+const addExps = async NFTs => {
+  const defaultExp = 0
+  const allTokenExps = await getMoralisAllTokenExps()
+  for (let i = 0; i < NFTs.length; i++) {
+    const findedToken = allTokenExps.find(
+      token =>
+        token.collectionId === NFTs[i].collection_id &&
+        token.tokenId === NFTs[i].token_id
+    )
+    NFTs[i].exp = findedToken?.exp || defaultExp
+    if (findedToken?.exp > 0)
+      console.log(NFTs[i].exp, NFTs[i].collection_id, NFTs[i].token_id)
+    NFTs[i].start_block_number = findedToken?.startBlockNumber
+  }
+  return NFTs
+}
+
 const rarityFormat = rarity => (rarity * 100).toFixed(1)
 
 const scoreFormat = score => Number.parseFloat(score.toFixed(2))
@@ -261,19 +279,42 @@ const getMoralisTokenExp = async (collectionId, tokenId) => {
   return tokenExps[0]
 }
 
-const getMoralisTokenExpsByCollectionId = async collenctionId => {
-  console.log('getMoralisTokenExpsByCollectionId', collenctionId)
-  const tokenExps = await Moralis.Cloud.run('getTokenExpsByCollectionId', {
-    collectionId: collenctionId
-  })
+const getMoralisAllTokenExps = async () => {
+  console.log('getMoralisAllTokenExps')
+  const results = await Moralis.Cloud.run('getAllTokenExps')
+  const tokenExps = []
+  for (const result of results) {
+    let exp = result?.get('exp')
+    if (!exp) exp = 0
+    tokenExps.push({
+      collectionId: result.get('collectionId'),
+      tokenId: result.get('tokenId'),
+      exp: exp,
+      startBlockNumer: result.get('startBlockNumer')
+    })
+  }
+
   return tokenExps
 }
 
-const getTokenExpsForCollection = async collection => {}
+const updateMoralisTokenExp = async (collectionId, tokenId, dexp) => {
+  console.log('getMoralisUpdateTokenExp')
+  const tokenExps = await Moralis.Cloud.run('getTokenExps', {
+    collectionIds: [collectionId],
+    tokenIds: [tokenId]
+  })
+  const newTokenExp = await Moralis.cloud.run('updateTokenExp', {
+    collectionId: collectionId,
+    tokenId: tokenId,
+    payload: {
+      exp: tokenExps.exp + dexp
+    }
+  })
+  return newTokenExp
+}
 
 module.exports = {
   getNFTs,
   getNFTIdsForAddress,
-  getMoralisTokenExp,
-  getMoralisTokenExpsByCollectionId
+  getMoralisTokenExp
 }
