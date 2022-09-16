@@ -1164,6 +1164,29 @@ class GameManager {
           )
         })
 
+      // add exp to NFT
+      addMoralisTokenExp(playerNFT.collection_id, playerNFT.token_id, 3)
+        .then(() => {
+          // update tokenExp
+          /*this.io.emit(
+            'tokenExp:updated',
+            playerNFT.collection_id,
+            playerNFT.tokenId,
+            3
+          )*/
+          console.log(
+            'tokenExp:add',
+            playerNFT.collection_id,
+            playerNFT.token_id,
+            3
+          )
+        })
+        .catch(error => {
+          throw new Error(
+            `Failed to add exp to NFT: ${error.message}: ${error.stack}`
+          )
+        })
+
       if (opponentPlayer.type !== PLAYER_TYPE.CPU) {
         updatePlayerUser(opponentPlayer.id, {
           exp: opponentPlayer.exp + 1,
@@ -1180,6 +1203,29 @@ class GameManager {
               message: `Failed to update player status: ${message}`,
               stack: stack
             })
+          })
+
+        // add exp to NFT
+        addMoralisTokenExp(opponentNFT.collection_id, opponentNFT.token_id, 1)
+          .then(() => {
+            // update tokenExp
+            /*this.io.emit(
+              'tokenExp:updated',
+              playerNFT.collection_id,
+              playerNFT.tokenId,
+              3
+            )*/
+            console.log(
+              'tokenExp:add',
+              opponentNFT.collection_id,
+              opponentNFT.token_id,
+              1
+            )
+          })
+          .catch(error => {
+            throw new Error(
+              `Failed to add exp to NFT: ${error.message}: ${error.stack}`
+            )
           })
       } else {
         // update CPU player
@@ -1373,6 +1419,30 @@ class GameManager {
 
       // update CPU player
       this.io.emit('player:updated', selectPlayer(opponentPlayer.id))
+
+      // add exp to NFT
+      addMoralisTokenExp(playerNFT.collection_id, playerNFT.token_id, 1)
+        .then(() => {
+          // update tokenExp
+          /*this.io.emit(
+                  'tokenExp:updated',
+                  playerNFT.collection_id,
+                  playerNFT.tokenId,
+                  3
+                )*/
+          console.log(
+            'tokenExp:add',
+            playerNFT.collection_id,
+            playerNFT.token_id,
+            1
+          )
+          console.log(playerNFT)
+        })
+        .catch(error => {
+          throw new Error(
+            `Failed to add exp to NFT: ${error.message}: ${error.stack}`
+          )
+        })
 
       updateBattle({
         battleId: battle.id,

@@ -303,6 +303,7 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
     collectionIds: [collectionId],
     tokenIds: [tokenId]
   })
+  console.log(tokenExps[0].exp + dexp)
   let param = {
     collectionId: collectionId,
     tokenId: tokenId,
@@ -311,6 +312,7 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
     }
   }
   if (param.payload.exp < 0) param.payload.exp = 0
+  console.log(param.payload)
   const newTokenExp = await Moralis.Cloud.run('setTokenExp', param)
   return newTokenExp
 }

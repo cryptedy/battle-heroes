@@ -74,21 +74,31 @@ Moralis.Cloud.define('setTokenExp', async request => {
   const query = new Moralis.Query(TokenExp)
   query.equalTo('collectionId', collectionId)
   query.equalTo('tokenId', tokenId)
-  const findedToken = await query.first({ useMasterKey: true })
-  const newToken = new TokenExp()
-  newToken.set('collectionId', collectionId)
-  newToken.set('tokenId', tokenId)
-  //newToken.set('startBlockNumber', findedToken.get('startBlockNumber'))
+  const findedTokens = await query.find({ useMasterKey: true })
+  let token
+  // まだフィールドがない場合
+  if (findedTokens.length == 0) {
+    token = new TokenExp()
+    token.set('collectionId', collectionId)
+    token.set('tokenId', tokenId)
+    token.set('exp', 0)
+    token.set('startBlockNumber', undefined)
+    // すでにフィールドがある場合
+  } else {
+    token = findedTokens[0]
+  }
+  // payloadで更新
   Object.keys(payload).forEach(key => {
     const value = payload[key]
-    newToken.set(key, value)
+    token.set(key, value)
   })
-  await newToken.save({ useMasterKey: true })
+  await token.save(null, { useMasterKey: true })
+
   const ret = {
     collectionId: collectionId,
     tokenId: tokenId,
-    exp: newToken.get('exp'),
-    startBlockNumer: newToken.get('startBlockNumer')
+    exp: token.get('exp'),
+    startBlockNumer: token.get('startBlockNumer')
   }
   return ret
 })

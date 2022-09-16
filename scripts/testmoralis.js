@@ -22,7 +22,7 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
 }
 
 async function main() {
-  console.log(await addMoralisTokenExp(1, 3, 15))
+  console.log(await addMoralisTokenExp(1, 3, 10))
 }
 
 Moralis.start({
