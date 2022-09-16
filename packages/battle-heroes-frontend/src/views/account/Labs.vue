@@ -35,7 +35,7 @@ export default {
       message: DEFAULT_MESSAGE,
       isCalled: false,
       colId1: 1,
-      tokenId1: 1
+      tokenId1: 1,
       exp1: 0
     }
   },

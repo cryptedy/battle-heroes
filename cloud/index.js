@@ -66,24 +66,29 @@ Moralis.Cloud.define('getTokenStartBlockNumber', async request => {
   return token.startBlockNumer
 })
 
-// コレクションID, トークンIDを渡してpayloadに指定された属性を更新する
-Moralis.Cloud.define('updateTokenExp', async request => {
+// コレクションID, トークンIDを渡してpayloadに指定された属性を更新する.
+Moralis.Cloud.define('setTokenExp', async request => {
+  const logger = Moralis.Cloud.getLogger()
   const { collectionId, tokenId, payload } = request.params
   const TokenExp = Moralis.Object.extend('TokenExp')
   const query = new Moralis.Query(TokenExp)
   query.equalTo('collectionId', collectionId)
   query.equalTo('tokenId', tokenId)
-  const token = await query.first({ useMasterKey: true })
+  const findedToken = await query.first({ useMasterKey: true })
+  const newToken = new TokenExp()
+  newToken.set('collectionId', collectionId)
+  newToken.set('tokenId', tokenId)
+  //newToken.set('startBlockNumber', findedToken.get('startBlockNumber'))
   Object.keys(payload).forEach(key => {
     const value = payload[key]
-    token.set(key, value)
+    newToken.set(key, value)
   })
-  await token.save(null, { useMasterKey: true })
+  await newToken.save({ useMasterKey: true })
   const ret = {
     collectionId: collectionId,
     tokenId: tokenId,
-    exp: token.get('exp'),
-    startBlockNumer: token.get('startBlockNumer')
+    exp: newToken.get('exp'),
+    startBlockNumer: newToken.get('startBlockNumer')
   }
   return ret
 })

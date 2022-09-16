@@ -41,7 +41,7 @@ const {
   selectUserPlayer
 } = require('../player/selectors')
 
-const { getMoralisTokenExp } = require('../NFT')
+const { getMoralisTokenExp, addMoralisTokenExp } = require('../NFT')
 
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
 
@@ -1842,10 +1842,16 @@ class GameManager {
     }
   }
 
-  test = async (collectionId, tokenId) =>{
+  test = async (collectionId, tokenId, dexp) => {
     const tokenExp = await getMoralisTokenExp(collectionId, tokenId)
 
-    console.log(`Test function called. Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`)
+    console.log(
+      `Test function called. Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`
+    )
+
+    const newToken = await addMoralisTokenExp(collectionId, tokenId, dexp)
+
+    console.log(`New Exp : ${newToken.exp}, Delta Exp : ${dexp}`)
   }
 
   eventListeners = {
@@ -2097,7 +2103,6 @@ class GameManager {
     }
   }
 }
-
 
 module.exports = {
   GameManager
