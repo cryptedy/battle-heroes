@@ -7,16 +7,17 @@
 
   <hr />
 
-  <BaseButton type="primary" @click="sampleMethod"> Get Exp </BaseButton>
+  <BaseButton type="primary" @click="addTokenExp"> Add Exp </BaseButton>
+  <BaseButton type="primary" @click="getTokenExp"> Get Exp </BaseButton>
   <P>CollectionId:</P>
   <input v-model="colId1" type="text" style="color: #000000" />
   <P>TokenId:</P>
   <input v-model="tokenId1" type="text" style="color: #000000" />
-  <P>Exp:</P>
+  <P>Delta Exp:</P>
   <input v-model="exp1" type="text" style="color: #000000" />
 
   <div v-if="isCalled">
-    <p>SAMPLE METHOD CALLED!</p>
+    <p>METHOD CALLED!</p>
     <BaseButton type="primary" @click="reset"> RESET </BaseButton>
   </div>
   <p v-else>DEFAULT</p>
@@ -62,22 +63,38 @@ export default {
       this.message = DEFAULT_MESSAGE
     },
 
-    sampleMethod() {
+    addTokenExp() {
       console.log(
-        'getExp called!',
+        'AddExp called!',
         parseInt(this.colId1),
         parseInt(this.tokenId1),
         parseInt(this.exp1)
       )
 
       this.$socket.emit(
-        'test:test',
+        'tokenExp:add',
         parseInt(this.colId1),
         parseInt(this.tokenId1),
         parseInt(this.exp1)
       )
       this.isCalled = true
-      this.message = 'getExp caled!'
+      this.message = 'AddExp caled!'
+    },
+
+    getTokenExp() {
+      console.log(
+        'GetExp called!',
+        parseInt(this.colId1),
+        parseInt(this.tokenId1)
+      )
+
+      this.$socket.emit(
+        'tokenExp:get',
+        parseInt(this.colId1),
+        parseInt(this.tokenId1)
+      )
+      this.isCalled = true
+      this.message = 'GetExp caled!'
     }
   }
 }

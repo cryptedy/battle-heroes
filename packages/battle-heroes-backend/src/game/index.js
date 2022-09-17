@@ -1912,16 +1912,23 @@ class GameManager {
     }
   }
 
-  test = async (collectionId, tokenId, dexp) => {
+  tokenExpAdd = async (collectionId, tokenId, dexp) => {
+    const newToken = await addMoralisTokenExp(collectionId, tokenId, dexp)
+
+    console.log(
+      `Show added tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${newToken.exp}, startBlockNumber : ${newToken.startBlockNumber}`
+    )
+    return newToken
+  }
+
+  tokenExpGet = async (collectionId, tokenId) => {
     const tokenExp = await getMoralisTokenExp(collectionId, tokenId)
 
     console.log(
-      `Test function called. Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`
+      `Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`
     )
 
-    const newToken = await addMoralisTokenExp(collectionId, tokenId, dexp)
-
-    console.log(`New Exp : ${newToken.exp}, Delta Exp : ${dexp}`)
+    return tokenExp
   }
 
   eventListeners = {
@@ -2080,10 +2087,28 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    /*
     'test:test': (...args) => {
       console.log(...args)
       try {
         this.test(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    */
+    'tokenExp:get': (...args) => {
+      console.log(...args)
+      try {
+        this.tokenExpGet(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'tokenExp:add': (...args) => {
+      console.log(...args)
+      try {
+        this.tokenExpSet(...args)
       } catch (error) {
         this.errorHandler(error)
       }
@@ -2093,7 +2118,8 @@ class GameManager {
   addEventListeners() {
     console.log('addEventListeners', this.socket.id)
 
-    this.socket.on('test:test', this.eventListeners['test:test'])
+    this.socket.on('tokenExp:get', this.eventListeners['tokenExp:get'])
+    this.socket.on('tokenExp:add', this.eventListeners['tokenExp:add'])
 
     this.socket.on('auth:login', this.eventListeners['auth:login'])
     this.socket.on('auth:logout', this.eventListeners['auth:logout'])
@@ -2123,7 +2149,8 @@ class GameManager {
   removeEventListeners() {
     console.log('removeEventListeners', this.socket.id)
 
-    this.socket.off('test:test', this.eventListeners['test:test'])
+    this.socket.off('tokenExp:get', this.eventListeners['tokenExp:get'])
+    this.socket.off('tokenExp:add', this.eventListeners['tokenExp:add'])
 
     this.socket.off('auth:login', this.eventListeners['auth:login'])
     this.socket.off('auth:logout', this.eventListeners['auth:logout'])
