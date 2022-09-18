@@ -3,6 +3,11 @@ const Moralis = require('moralis/node')
 const { selectNFTs } = require('./selectors')
 const { selectCollections } = require('../collection/selectors')
 const { METADATA_URL, IMAGE_URL } = require('../utils/constants')
+const { updateNFT } = require('./actions')
+
+//ethersモジュール読み込み
+const { ethers } = require('ethers')
+const { BigNumber } = require('ethers')
 
 const getNFTs = async () => {
   const NFTs = []
@@ -271,6 +276,13 @@ const getMetadata = async collection => {
 }
 
 const getMoralisTokenExp = async (collectionId, tokenId) => {
+  //Temporally code
+  const NFT = selectNFTs().find(
+    e => e.collection_id === collectionId && e.token_id === tokenId
+  )
+  console.log('Data from redux(exp, sbn)', NFT.exp, NFT.startBlockNumber)
+  //Temporally code
+
   console.log('getMoralisTokenExp', collectionId, tokenId)
   const tokenExps = await Moralis.Cloud.run('getTokenExps', {
     collectionIds: [collectionId],
@@ -298,12 +310,15 @@ const getMoralisAllTokenExps = async () => {
 }
 
 const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
+  const maxTrial = 3
   console.log('getMoralisUpdateTokenExp')
   const tokenExps = await Moralis.Cloud.run('getTokenExps', {
     collectionIds: [collectionId],
     tokenIds: [tokenId]
   })
-  console.log(tokenExps[0].exp + dexp)
+  if (tokenExps.length == 0)
+    throw 'addMoralisTokenExp : Token as given id cannot be founded'
+  console.log(tokenExps[0]?.exp + dexp)
   let param = {
     collectionId: collectionId,
     tokenId: tokenId,
@@ -311,9 +326,32 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
       exp: tokenExps[0].exp + dexp
     }
   }
+  // Exp should be positive
   if (param.payload.exp < 0) param.payload.exp = 0
-  console.log(param.payload)
-  const newTokenExp = await Moralis.Cloud.run('setTokenExp', param)
+  let newTokenExp
+  for (let i = 0; i < maxTrial; i++) {
+    try {
+      newTokenExp = await Moralis.Cloud.run('setTokenExp', param)
+      console.log(newTokenExp)
+      // exit loop
+      i = maxTrial
+    } catch (err) {
+      console.log('Error in setTokenExp:', err.message)
+    }
+  }
+  if (newTokenExp) {
+    // update redux
+    let NFT = selectNFTs().find(
+      e =>
+        e.collection_id === newTokenExp.collectionId &&
+        e.token_id === newTokenExp.tokenId
+    )
+    NFT.exp = newTokenExp.exp
+    updateNFT({ NFTId: NFT.id, payload: { exp: newTokenExp.exp } })
+  } else {
+    throw 'Cannot set new tokenExp on Moralis DB'
+  }
+
   return newTokenExp
 }
 

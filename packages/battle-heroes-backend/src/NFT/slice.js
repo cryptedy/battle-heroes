@@ -26,6 +26,12 @@ module.exports = createSlice({
 
       state.entities[NFT.id] = NFT
       state.ids.push(NFT.id)
+    },
+    update: (state, { payload }) => {
+      console.log('NFT/update', payload)
+      const { NFTId, payload: newState } = payload
+
+      state.entities[NFTId] = { ...state.entities[NFTId], ...newState }
     }
   }
 })

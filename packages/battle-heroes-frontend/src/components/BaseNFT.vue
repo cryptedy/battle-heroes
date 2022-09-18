@@ -10,6 +10,7 @@
 
         <Stars :stars="nft.stars" />
         {{ nft.rank }}
+        <p>EXP: {{ nft.exp }}</p>
       </div>
     </template>
 

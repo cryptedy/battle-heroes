@@ -1918,6 +1918,7 @@ class GameManager {
     console.log(
       `Show added tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${newToken.exp}, startBlockNumber : ${newToken.startBlockNumber}`
     )
+
     return newToken
   }
 
@@ -2108,7 +2109,7 @@ class GameManager {
     'tokenExp:add': (...args) => {
       console.log(...args)
       try {
-        this.tokenExpSet(...args)
+        this.tokenExpAdd(...args)
       } catch (error) {
         this.errorHandler(error)
       }
