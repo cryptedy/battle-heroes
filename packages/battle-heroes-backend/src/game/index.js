@@ -43,6 +43,10 @@ const {
 
 const { getMoralisTokenExp, addMoralisTokenExp } = require('../NFT')
 
+//ethersモジュール読み込み
+const { ethers } = require('ethers')
+const { BigNumber } = require('ethers')
+
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
 
 const PROCESS = {
