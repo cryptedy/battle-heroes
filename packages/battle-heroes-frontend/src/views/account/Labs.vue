@@ -9,6 +9,9 @@
 
   <BaseButton type="primary" @click="addTokenExp"> Add Exp </BaseButton>
   <BaseButton type="primary" @click="getTokenExp"> Get Exp </BaseButton>
+  <BaseButton type="primary" @click="mintTokenExp">
+    Transfer Exp to Chain
+  </BaseButton>
   <P>CollectionId:</P>
   <input v-model="colId1" type="text" style="color: #000000" />
   <P>TokenId:</P>
@@ -25,6 +28,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { NOTIFICATION_TYPE } from '../../utils/constants'
 
 const DEFAULT_MESSAGE = 'Welcome to Labs'
 
@@ -95,6 +99,49 @@ export default {
       )
       this.isCalled = true
       this.message = 'GetExp caled!'
+    },
+
+    mintTokenExp() {
+      console.log(
+        'Transfer Exp called!',
+        parseInt(this.colId1),
+        parseInt(this.tokenId1),
+        parseInt(this.exp1)
+      )
+
+      this.$socket.emit(
+        'tokenExp:mint',
+        parseInt(this.colId1),
+        parseInt(this.tokenId1),
+        parseInt(this.exp1),
+        ({ status, message, payload }) => {
+          console.log('tokenExp:minted', status, message, payload)
+          if (status) {
+            // トランザクション発行処理
+            const {
+              startBlockNumber,
+              collectionId,
+              tokenId,
+              dexp,
+              nonce,
+              hash
+            } = payload
+
+            this.addNotification({
+              message,
+              type: NOTIFICATION_TYPE.SUCCESS
+            })
+          } else {
+            this.addNotification({
+              message,
+              type: NOTIFICATION_TYPE.ERROR,
+              timeout: 0
+            })
+          }
+        }
+      )
+      this.isCalled = true
+      this.message = 'AddExp caled!'
     }
   }
 }

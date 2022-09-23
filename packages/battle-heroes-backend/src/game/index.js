@@ -41,11 +41,16 @@ const {
   selectUserPlayer
 } = require('../player/selectors')
 
-const { getMoralisTokenExp, addMoralisTokenExp } = require('../NFT')
+const {
+  getMoralisTokenExp,
+  addMoralisTokenExp,
+  getOwnerOfTokenId
+} = require('../NFT')
 
 //ethersモジュール読み込み
-const { ethers } = require('ethers')
-const { BigNumber } = require('ethers')
+const { selectCollections } = require('src/collection/selectors')
+const { selectContracts } = require('src/contract/selectors')
+const { signature } = require('../utils/signature')
 
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
 
@@ -1936,6 +1941,88 @@ class GameManager {
     return tokenExp
   }
 
+  tokenExpMint = async (collectionId, tokenId, dexp, callback) => {
+    const player = this.findSocketPlayer(this.socket.id)
+    // TODO どこかにidチェックを入れたほうがいい？
+    const tokenExp = await getMoralisTokenExp(collectionId, tokenId)
+    // 請求Expの検証
+    if (dexp > tokenExp.exp) {
+      return callback({
+        status: false,
+        message: 'Failed to prepare signed hash : Minting Exp is exceed.'
+      })
+    }
+
+    const collections = selectCollections()
+    const ownerAddress = await getOwnerOfTokenId(
+      collections.find(collection => collection.id === collectionId),
+      tokenId
+    )
+    if (ownerAddress != player.address) {
+      console.log(`expect:${player.address} but actual:${ownerAddress}`)
+      return callback({
+        status: false,
+        message: 'Failed to prepare signed hash : Minter is not owner.'
+      })
+    }
+
+    const contracts = selectContracts()
+    let bn
+    if (tokenExp.startBlockNumber) {
+      bn = await contracts.provider.getBlockNumber()
+      if (
+        (await contracts.vault.expireDuration()) + tokenExp.startBlockNumber >=
+        bn
+      ) {
+        return callback({
+          status: false,
+          message:
+            'Failed to prepare signed hash : Previous minting does not finish.'
+        })
+      }
+    }
+
+    const nonce = await contracts.vault.nonce(player.address)
+
+    const hashbytes = signature.makeMsgExpBytes(
+      player.address,
+      nonce,
+      bn,
+      collectionId,
+      tokenId,
+      dexp,
+      true
+    )
+
+    const signedMsg = await contracts.signer.signMessage(hashbytes)
+
+    tokenExp.startBlockNumber = bn
+
+    console.log(
+      `Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`
+    )
+
+    return callback({
+      status: true,
+      message: '',
+      payload: {
+        startBlockNumber: tokenExp.startBlockNumber,
+        collectionId,
+        tokenId,
+        dexp,
+        nonce,
+        hash: signedMsg
+      }
+    })
+    /*  } else {
+    return callback({
+      status: false,
+      message: 'Failed to abort the game'
+    })
+  }
+*/
+  }
+
   eventListeners = {
     'auth:login': async (...args) => {
       try {
@@ -2117,6 +2204,14 @@ class GameManager {
       } catch (error) {
         this.errorHandler(error)
       }
+    },
+    'tokenExp:mint': (...args) => {
+      console.log(...args)
+      try {
+        this.tokenExpMint(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
     }
   }
 
@@ -2125,6 +2220,7 @@ class GameManager {
 
     this.socket.on('tokenExp:get', this.eventListeners['tokenExp:get'])
     this.socket.on('tokenExp:add', this.eventListeners['tokenExp:add'])
+    this.socket.on('tokenExp:mint', this.eventListeners['tokenExp:mint'])
 
     this.socket.on('auth:login', this.eventListeners['auth:login'])
     this.socket.on('auth:logout', this.eventListeners['auth:logout'])
@@ -2156,6 +2252,7 @@ class GameManager {
 
     this.socket.off('tokenExp:get', this.eventListeners['tokenExp:get'])
     this.socket.off('tokenExp:add', this.eventListeners['tokenExp:add'])
+    this.socket.off('tokenExp:mint', this.eventListeners['tokenExp:mint'])
 
     this.socket.off('auth:login', this.eventListeners['auth:login'])
     this.socket.off('auth:logout', this.eventListeners['auth:logout'])

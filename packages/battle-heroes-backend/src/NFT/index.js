@@ -135,6 +135,20 @@ const getNFTsForContract = async (collection, address) => {
   return NFTs
 }
 
+const getOwnerOfTokenId = async (collection, tokenId) => {
+  const response = await Moralis.Web3API.token.getTokenIdOwners({
+    chain: collection.chain,
+    address: collection.address,
+    token_id: tokenId
+  })
+
+  console.log(
+    `CollectionId:${collection.id}, TokenId:${tokenId}, Owner:${response[0].owner_of}`
+  )
+
+  return response[0].owner_of
+}
+
 const getTraits = NFTs => {
   const traits = {}
 
@@ -359,5 +373,6 @@ module.exports = {
   getNFTs,
   getNFTIdsForAddress,
   getMoralisTokenExp,
-  addMoralisTokenExp
+  addMoralisTokenExp,
+  getOwnerOfTokenId
 }
