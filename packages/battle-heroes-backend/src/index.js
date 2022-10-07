@@ -24,6 +24,10 @@ const {
   FRONTEND_URL,
   PLAYER_STATE
 } = require('./utils/constants')
+//const { initializeContracts } = require('./contract/actions')
+const { initialize } = require('./contract')
+const { selectContracts } = require('./contract/selectors')
+//const store = require('./store')
 
 Moralis.start({
   serverUrl: process.env.MORALIS_SERVER_URL,
@@ -79,6 +83,10 @@ const main = async () => {
       console.log(`Game manager listen for ${socket.id}`)
     })
   })
+
+  // Tokenコントラクト関係のreduxを初期化
+  await initialize()
+  console.log('Contract interfaces initialized:', selectContracts().initialized)
 
   server.listen(PORT, async error => {
     if (error) throw new Error(error)

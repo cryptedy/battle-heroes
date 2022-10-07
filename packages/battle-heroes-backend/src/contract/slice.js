@@ -1,36 +1,37 @@
 const { createSlice } = require('@reduxjs/toolkit')
-//ethersモジュール読み込み
-const { ethers } = require('ethers')
-//const { BigNumber } = require('ethers')
-const {
-  CONTRACTS,
-  LOCAL_SIGNKEY
-} = require('../../../battle-heroes-utils/constants')
+//const store = require('../store')
 
-const initialState = async () => {
-  const provider = await new ethers.getDefaultProvider(
-    process.env.DEFAULT_RPC_URL
-  )
-  const signer = await new ethers.Wallet(LOCAL_SIGNKEY.key)
-  const vault = await new ethers.Contract(
-    CONTRACTS.VAULT.address,
-    CONTRACTS.VAULT.abi,
-    provider
-  )
-  const exchange = await new ethers.Contract(
-    CONTRACTS.EXCHANGE.address,
-    CONTRACTS.EXCHANGE.abi,
-    provider
-  )
-  const erc20 = await new ethers.Contract(
-    CONTRACTS.ERC20.address,
-    CONTRACTS.ERC20.abi,
-    provider
-  )
-  return { provider, signer, vault, exchange, erc20 }
+const initialState = {
+  provider: {},
+  signer: {},
+  vault: {},
+  exchange: {},
+  erc20: {},
+  initialized: false
 }
 
 module.exports = createSlice({
   name: 'contract',
-  initialState: initialState()
+  initialState,
+  reducers: {
+    set: (state, { payload: contracts }) => {
+      console.log('contract/set')
+      state['initialized'] = true
+      state['provider'] = contracts.provider
+      state['signer'] = contracts.signer
+      state['vault'] = contracts.vault
+      state['exchange'] = contracts.exchange
+      state['erc20'] = contracts.erc20
+    }
+  }
+  /*  extraReducers: builder => {
+    // 正常終了時
+    builder.addCase(this.initialize.fulfilled, (state, action) => {
+      state.contract = action.payload.initialize // payloadCreatorでreturnされた値
+    })
+    // 正常終了時
+    builder.addCase(this.initialize.rejected, (state, action) => {
+      state.contract = { status: 'failed' }
+    })
+  }*/
 })

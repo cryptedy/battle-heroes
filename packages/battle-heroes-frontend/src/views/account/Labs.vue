@@ -29,6 +29,8 @@
 <script>
 import { mapGetters } from 'vuex'
 import { NOTIFICATION_TYPE } from '../../utils/constants'
+//import Moralis from 'moralis/dist/moralis.min.js'
+const Moralis = require('moralis/node')
 
 const DEFAULT_MESSAGE = 'Welcome to Labs'
 
@@ -115,7 +117,7 @@ export default {
         parseInt(this.tokenId1),
         parseInt(this.exp1),
         ({ status, message, payload }) => {
-          console.log('tokenExp:minted', status, message, payload)
+          console.log('Signature was issued', status, message, payload)
           if (status) {
             // トランザクション発行処理
             const {
@@ -126,6 +128,13 @@ export default {
               nonce,
               hash
             } = payload
+
+            //TODO
+            const tx = await Moralis.Web3API.native.send()
+
+            //成功した場合の処理
+            if (true) {
+            }
 
             this.addNotification({
               message,

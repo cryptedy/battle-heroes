@@ -44,12 +44,16 @@ const {
 const {
   getMoralisTokenExp,
   addMoralisTokenExp,
-  getOwnerOfTokenId
+  getOwnerOfTokenId,
+  updateMoralisStartBlockNumber
 } = require('../NFT')
 
-//ethersモジュール読み込み
-const { selectCollections } = require('src/collection/selectors')
-const { selectContracts } = require('src/contract/selectors')
+const { selectCollections } = require('../collection/selectors')
+const {
+  selectProvider,
+  selectVault,
+  selectSigner
+} = require('../contract/selectors')
 const { signature } = require('../utils/signature')
 
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
@@ -1966,14 +1970,12 @@ class GameManager {
       })
     }
 
-    const contracts = selectContracts()
-    let bn
+    //const contracts = selectContracts()
+    const provider = selectProvider()
+    const vault = selectVault()
+    const bn = await provider.getBlockNumber()
     if (tokenExp.startBlockNumber) {
-      bn = await contracts.provider.getBlockNumber()
-      if (
-        (await contracts.vault.expireDuration()) + tokenExp.startBlockNumber >=
-        bn
-      ) {
+      if ((await vault.expireDuration()) + tokenExp.startBlockNumber >= bn) {
         return callback({
           status: false,
           message:
@@ -1982,7 +1984,7 @@ class GameManager {
       }
     }
 
-    const nonce = await contracts.vault.nonce(player.address)
+    const nonce = await vault.nonce(player.address)
 
     const hashbytes = signature.makeMsgExpBytes(
       player.address,
@@ -1994,13 +1996,10 @@ class GameManager {
       true
     )
 
-    const signedMsg = await contracts.signer.signMessage(hashbytes)
+    const signer = selectSigner()
+    const signedMsg = await signer.signMessage(hashbytes)
 
-    tokenExp.startBlockNumber = bn
-
-    console.log(
-      `Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`
-    )
+    await updateMoralisStartBlockNumber(collectionId, tokenId, bn)
 
     return callback({
       status: true,

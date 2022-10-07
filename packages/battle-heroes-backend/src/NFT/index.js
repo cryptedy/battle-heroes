@@ -325,7 +325,7 @@ const getMoralisAllTokenExps = async () => {
 
 const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
   const maxTrial = 3
-  console.log('getMoralisUpdateTokenExp')
+  console.log('addMoralisTokenExp')
   const tokenExps = await Moralis.Cloud.run('getTokenExps', {
     collectionIds: [collectionId],
     tokenIds: [tokenId]
@@ -360,8 +360,61 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
         e.collection_id === newTokenExp.collectionId &&
         e.token_id === newTokenExp.tokenId
     )
-    NFT.exp = newTokenExp.exp
+    //NFT.exp = newTokenExp.exp
     updateNFT({ NFTId: NFT.id, payload: { exp: newTokenExp.exp } })
+  } else {
+    throw 'Cannot set new tokenExp on Moralis DB'
+  }
+
+  return newTokenExp
+}
+const updateMoralisStartBlockNumber = async (
+  collectionId,
+  tokenId,
+  newBlockNumber
+) => {
+  const maxTrial = 3
+  console.log('updateMoralisStartBlockNumber')
+  const tokenExps = await Moralis.Cloud.run('getTokenExps', {
+    collectionIds: [collectionId],
+    tokenIds: [tokenId]
+  })
+  if (tokenExps.length == 0)
+    throw 'updateMoralisStartBlockNumber : Token as given id cannot be founded'
+  console.log(`Collection Id:${collectionId}, Token Id:${tokenId}`)
+  console.log(
+    `startBlockNumber Previous:${tokenExps[0]?.startBlockNumber}, New:${newBlockNumber}`
+  )
+  let param = {
+    collectionId: collectionId,
+    tokenId: tokenId,
+    payload: {
+      startBlockNumber: newBlockNumber
+    }
+  }
+  let newTokenExp
+  for (let i = 0; i < maxTrial; i++) {
+    try {
+      newTokenExp = await Moralis.Cloud.run('setTokenExp', param)
+      console.log(newTokenExp)
+      // exit loop
+      i = maxTrial
+    } catch (err) {
+      console.log('Error in setTokenExp:', err.message)
+    }
+  }
+  if (newTokenExp) {
+    // update redux
+    let NFT = selectNFTs().find(
+      e =>
+        e.collection_id === newTokenExp.collectionId &&
+        e.token_id === newTokenExp.tokenId
+    )
+    //NFT.startBlockNumber = newTokenExp.startBlockNumber
+    updateNFT({
+      NFTId: NFT.id,
+      payload: { start: newTokenExp.startBlockNumber }
+    })
   } else {
     throw 'Cannot set new tokenExp on Moralis DB'
   }
@@ -374,5 +427,6 @@ module.exports = {
   getNFTIdsForAddress,
   getMoralisTokenExp,
   addMoralisTokenExp,
-  getOwnerOfTokenId
+  getOwnerOfTokenId,
+  updateMoralisStartBlockNumber
 }
