@@ -10,9 +10,7 @@ const { setContracts } = require('./actions')
 
 exports.initialize = async () => {
   console.log('Start initializing contract store')
-  const provider = await new ethers.getDefaultProvider(
-    process.env.DEFAULT_RPC_URL
-  )
+  const provider = await new ethers.getDefaultProvider('http://127.0.0.1:8545/')
   const signer = await new ethers.Wallet(LOCAL_SIGNER.key)
   const vault = await new ethers.Contract(
     CONTRACTS.VAULT.address,

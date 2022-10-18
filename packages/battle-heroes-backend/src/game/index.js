@@ -1974,6 +1974,7 @@ class GameManager {
     const provider = selectProvider()
     const vault = selectVault()
     const bn = await provider.getBlockNumber()
+    console.log('block number:', bn)
     if (tokenExp.startBlockNumber) {
       if ((await vault.expireDuration()) + tokenExp.startBlockNumber >= bn) {
         return callback({
@@ -2005,7 +2006,7 @@ class GameManager {
       status: true,
       message: '',
       payload: {
-        startBlockNumber: tokenExp.startBlockNumber,
+        blockNumber: bn,
         collectionId,
         tokenId,
         dexp,
