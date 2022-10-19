@@ -1974,10 +1974,18 @@ class GameManager {
     //const contracts = selectContracts()
     const provider = selectProvider()
     const vault = selectVault()
-    const bn = await provider.getBlockNumber()
+    const bn = parseInt(await provider.getBlockNumber())
     console.log('block number:', bn)
     if (tokenExp.startBlockNumber) {
-      if ((await vault.expireDuration()) + tokenExp.startBlockNumber >= bn) {
+      const expireDuration = parseInt(await vault.expireDuration())
+      console.log(
+        `expireDuration:${expireDuration}, start:${tokenExp.startBlockNumber}, current:${bn}`
+      )
+      console.log(
+        'expire condition:',
+        expireDuration + tokenExp.startBlockNumber >= bn
+      )
+      if (expireDuration + tokenExp.startBlockNumber >= bn) {
         return callback({
           status: false,
           message:

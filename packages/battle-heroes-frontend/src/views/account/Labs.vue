@@ -181,8 +181,7 @@ export default {
           } else {
             this.addNotification({
               message: 'Minting token was failed.',
-              type: NOTIFICATION_TYPE.ERROR,
-              timeout: 0
+              type: NOTIFICATION_TYPE.ERROR
             })
           }
         }
