@@ -316,14 +316,27 @@ const getMoralisAllTokenExps = async () => {
       collectionId: result.get('collectionId'),
       tokenId: result.get('tokenId'),
       exp: exp,
-      startBlockNumer: result.get('startBlockNumer')
+      startBlockNumber: result.get('startBlockNumber')
     })
   }
 
   return tokenExps
 }
 
-const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
+/**
+ *
+ * @param {*} collectionId is the collection id of NFTs
+ * @param {*} tokenId is the token id of NFT
+ * @param {*} dexp is the added exp amount. Negative value means subtracting.
+ * @param {*} unlock is the logical to execute unlocking to change on chain status
+ * @returns
+ */
+const addMoralisTokenExp = async (
+  collectionId,
+  tokenId,
+  dexp,
+  unlock = false
+) => {
   const maxTrial = 3
   console.log('addMoralisTokenExp')
   const tokenExps = await Moralis.Cloud.run('getTokenExps', {
@@ -340,6 +353,11 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
       exp: tokenExps[0].exp + dexp
     }
   }
+  // If unlock is directed, add startBlockNumber is undefined on payload
+  if (unlock) {
+    param.payload['startBlockNumber'] = 0
+  }
+  console.log('addMoralisTokenExp param for cloud function:', param)
   // Exp should be positive
   if (param.payload.exp < 0) param.payload.exp = 0
   let newTokenExp
@@ -361,7 +379,17 @@ const addMoralisTokenExp = async (collectionId, tokenId, dexp) => {
         e.token_id === newTokenExp.tokenId
     )
     //NFT.exp = newTokenExp.exp
-    updateNFT({ NFTId: NFT.id, payload: { exp: newTokenExp.exp } })
+    if (unlock) {
+      updateNFT({
+        NFTId: NFT.id,
+        payload: {
+          exp: newTokenExp.exp,
+          startBlockNumber: newTokenExp.startBlockNumber
+        }
+      })
+    } else {
+      updateNFT({ NFTId: NFT.id, payload: { exp: newTokenExp.exp } })
+    }
   } else {
     throw 'Cannot set new tokenExp on Moralis DB'
   }
@@ -413,7 +441,7 @@ const updateMoralisStartBlockNumber = async (
     //NFT.startBlockNumber = newTokenExp.startBlockNumber
     updateNFT({
       NFTId: NFT.id,
-      payload: { start: newTokenExp.startBlockNumber }
+      payload: { startBlockNumber: newTokenExp.startBlockNumber }
     })
   } else {
     throw 'Cannot set new tokenExp on Moralis DB'

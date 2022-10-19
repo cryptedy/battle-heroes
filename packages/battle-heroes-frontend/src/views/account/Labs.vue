@@ -159,14 +159,13 @@ export default {
             //TODO
             try {
               console.log(blockNumber, collectionId, tokenId, dexp, nonce, hash)
-              const tx = await vault.mintExp(
+              await vault.mintExp(
                 blockNumber,
                 collectionId,
                 tokenId,
                 dexp,
                 hash
               )
-              await tx.wait()
             } catch (err) {
               console.log(err)
             }
@@ -175,7 +174,8 @@ export default {
             //            if (true) {
             //            }
             this.addNotification({
-              message: 'Token was minted on chain.',
+              message:
+                'The transaction minting EXP is under going. Waiting a moment.',
               type: NOTIFICATION_TYPE.SUCCESS
             })
           } else {

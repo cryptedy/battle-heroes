@@ -41,7 +41,7 @@ Moralis.Cloud.define('getTokenExps', async request => {
       collectionId: collectionIds[i],
       tokenId: tokenIds[i],
       exp: exp,
-      startBlockNumer: results[0]?.get('startBlockNumer')
+      startBlockNumber: results[0]?.get('startBlockNumber')
     })
   }
   return tokenExps
@@ -63,7 +63,7 @@ Moralis.Cloud.define('getTokenStartBlockNumber', async request => {
   query.equalTo('collectionId', collectionId)
   query.equalTo('tokenId', tokenId)
   const token = await query.first({ useMasterKey: true })
-  return token.startBlockNumer
+  return token.get('startBlockNumber')
 })
 
 // コレクションID, トークンIDを渡してpayloadに指定された属性を更新する.
@@ -92,13 +92,14 @@ Moralis.Cloud.define('setTokenExp', async request => {
     const value = payload[key]
     token.set(key, value)
   })
+
   await token.save(null, { useMasterKey: true })
 
   const ret = {
     collectionId: collectionId,
     tokenId: tokenId,
     exp: token.get('exp'),
-    startBlockNumer: token.get('startBlockNumer')
+    startBlockNumber: token.get('startBlockNumber')
   }
   return ret
 })

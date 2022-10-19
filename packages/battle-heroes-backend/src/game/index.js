@@ -55,6 +55,7 @@ const {
   selectSigner
 } = require('../contract/selectors')
 const { signature } = require('../utils/signature')
+const { Contract } = require('ethers')
 
 const PROCESS_LOGIN = 'PROCESS_LOGIN'
 
@@ -2023,6 +2024,16 @@ class GameManager {
 */
   }
 
+  tokenExpMinted = async tx => {
+    const updatedNFT = await addMoralisTokenExp(
+      tx.args.collectionId.toNumber(),
+      tx.args.tokenId.toNumber(),
+      -tx.args.dExp.toNumber(),
+      true
+    )
+    console.log(updatedNFT)
+  }
+
   eventListeners = {
     'auth:login': async (...args) => {
       try {
@@ -2212,6 +2223,14 @@ class GameManager {
       } catch (error) {
         this.errorHandler(error)
       }
+    },
+    'vault:minted': (...args) => {
+      console.log(...args)
+      try {
+        this.tokenExpMinted(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
     }
   }
 
@@ -2245,6 +2264,14 @@ class GameManager {
       .of('/')
       .adapter.on('create-room', this.eventListeners['room:created'])
     this.io.of('/').adapter.on('join-room', this.eventListeners['room:joined'])
+
+    const provider = selectProvider()
+    const vault = selectVault()
+    const filters = vault.filters['MintExp']
+
+    provider.once('block', () => {
+      vault.on(filters, this.eventListeners['vault:minted'])
+    })
   }
 
   removeEventListeners() {
@@ -2280,6 +2307,11 @@ class GameManager {
       .of('/')
       .adapter.off('create-room', this.eventListeners['room:created'])
     this.io.of('/').adapter.off('join-room', this.eventListeners['room:joined'])
+
+    const vault = selectVault()
+    const filters = vault.filters['MintExp']
+
+    vault.off(filters, this.eventListeners['vault:minted'])
   }
 
   removeAllEventListeners() {
