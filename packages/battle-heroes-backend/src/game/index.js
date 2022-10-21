@@ -1926,24 +1926,45 @@ class GameManager {
     }
   }
 
-  tokenExpAdd = async (collectionId, tokenId, dexp) => {
+  tokenExpAdd = async (collectionId, tokenId, dexp, callback) => {
     const newToken = await addMoralisTokenExp(collectionId, tokenId, dexp)
 
     console.log(
       `Show added tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${newToken.exp}, startBlockNumber : ${newToken.startBlockNumber}`
     )
+    const payload = {
+      collectionId: collectionId,
+      tokenId: tokenId,
+      exp: newToken.exp,
+      startBlockNumber: newToken.startBlockNumber
+    }
 
-    return newToken
+    return callback({
+      status: true,
+      message: '',
+      payload: payload
+    })
   }
 
-  tokenExpGet = async (collectionId, tokenId) => {
+  tokenExpGet = async (collectionId, tokenId, callback) => {
     const tokenExp = await getMoralisTokenExp(collectionId, tokenId)
 
     console.log(
       `Show tokenExp from Moralis DB. ID:${collectionId} - ${tokenId}, Exp : ${tokenExp.exp}, startBlockNumber : ${tokenExp.startBlockNumber}`
     )
 
-    return tokenExp
+    const payload = {
+      collectionId: collectionId,
+      tokenId: tokenId,
+      exp: tokenExp.exp,
+      startBlockNumber: tokenExp.startBlockNumber
+    }
+
+    return callback({
+      status: true,
+      message: '',
+      payload: payload
+    })
   }
 
   tokenExpMint = async (collectionId, tokenId, dexp, callback) => {

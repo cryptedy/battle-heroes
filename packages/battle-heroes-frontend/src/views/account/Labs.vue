@@ -7,24 +7,28 @@
 
   <hr />
 
-  <BaseButton type="primary" @click="addTokenExp"> Add Exp </BaseButton>
-  <BaseButton type="primary" @click="getTokenExp"> Get Exp </BaseButton>
+  <BaseButton type="primary" @click="addTokenExp"> Add Exp </BaseButton>&nbsp;
+  <BaseButton type="primary" @click="getTokenExp"> Get Exp </BaseButton>&nbsp;
   <BaseButton type="primary" @click="mintTokenExp">
-    Transfer Exp to Chain
-  </BaseButton>
+    Transfer Exp to Chain </BaseButton
+  >&nbsp;
   <BaseButton type="primary" @click="connect"> Connect Wallet </BaseButton>
-  <P>CollectionId:</P>
+  <div>CollectionId:</div>
   <input v-model="colId1" type="number" style="color: #000000" />
-  <P>TokenId:</P>
+  <div>TokenId:</div>
   <input v-model="tokenId1" type="number" style="color: #000000" />
-  <P>Delta Exp:</P>
+  <div>Delta Exp:</div>
   <input v-model="exp1" type="number" style="color: #000000" />
 
-  <div v-if="isCalled">
-    <p>METHOD CALLED!</p>
-    <BaseButton type="primary" @click="reset"> RESET </BaseButton>
+  <div v-if="shownResult">
+    <hr />
+    <h3 style="white-space: pre-wrap">{{ result.title }}</h3>
+    <div
+      style="word-wrap: break-word; white-space: pre-wrap"
+      v-text="result.content"
+    ></div>
+    <BaseButton type="primary" @click="close"> CLOSE </BaseButton>
   </div>
-  <p v-else>DEFAULT</p>
 </template>
 
 <script>
@@ -47,10 +51,11 @@ export default {
   data() {
     return {
       message: DEFAULT_MESSAGE,
-      isCalled: false,
+      shownResult: false,
       colId1: 1,
       tokenId1: 1,
-      exp1: 0
+      exp1: 0,
+      result: { title: '', content: '' }
     }
   },
 
@@ -75,9 +80,12 @@ export default {
 
     reset() {
       console.log('reset!')
+    },
 
-      this.isCalled = false
-      this.message = DEFAULT_MESSAGE
+    close() {
+      console.log('close result!')
+
+      this.shownResult = false
     },
 
     addTokenExp() {
@@ -92,9 +100,18 @@ export default {
         'tokenExp:add',
         parseInt(this.colId1),
         parseInt(this.tokenId1),
-        parseInt(this.exp1)
+        parseInt(this.exp1),
+        ({ status, message, payload }) => {
+          console.log('Received callback to add exp', message, payload)
+          this.shownResult = true
+          if (status) {
+            this.result.title = 'AddExpの結果:'
+            this.result.content = `NFT Id: [${payload.collectionId}, ${payload.tokenId}], `
+            this.result.content += `Exp : ${payload.exp}, `
+            this.result.content += `StartBlockNumber : ${payload.startBlockNumber}`
+          }
+        }
       )
-      this.isCalled = true
       this.message = 'AddExp caled!'
     },
 
@@ -108,9 +125,18 @@ export default {
       this.$socket.emit(
         'tokenExp:get',
         parseInt(this.colId1),
-        parseInt(this.tokenId1)
+        parseInt(this.tokenId1),
+        ({ status, message, payload }) => {
+          console.log('Received callback to get exp', message, payload)
+          this.shownResult = true
+          if (status) {
+            this.result.title = 'GetExpの結果:'
+            this.result.content = `NFT Id: [${payload.collectionId}, ${payload.tokenId}], `
+            this.result.content += `Exp : ${payload.exp}, `
+            this.result.content += `StartBlockNumber : ${payload.startBlockNumber}`
+          }
+        }
       )
-      this.isCalled = true
       this.message = 'GetExp caled!'
     },
 
@@ -186,7 +212,6 @@ export default {
           }
         }
       )
-      this.isCalled = true
       this.message = 'AddExp caled!'
     },
 
