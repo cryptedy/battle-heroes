@@ -103,3 +103,87 @@ Moralis.Cloud.define('setTokenExp', async request => {
   }
   return ret
 })
+
+// configの属性を更新する。nameがない場合falseを返す。
+Moralis.Cloud.define('setConfig', async request => {
+  let result = {
+    status: false,
+    message: 'specified name does not exist'
+  }
+  try {
+    const logger = Moralis.Cloud.getLogger()
+    const { name, data } = request.params
+    const config = Moralis.Object.extend('config')
+    const query = new Moralis.Query(config)
+    query.equalTo('name', name)
+    const findedTokens = await query.find({ useMasterKey: true })
+    // フィールドがある場合
+    if (findedTokens.length != 0) {
+      let savedata = findedTokens[0]
+      savedata.set('data', JSON.stringify(data))
+      await savedata.save(null, { useMasterKey: true })
+      result.status = true
+      result.message = ''
+    }
+    return result
+  } catch (err) {
+    result.message = err.message
+    return result
+  }
+})
+
+// configに新たな属性を作成する。nameがある場合falseを返す
+Moralis.Cloud.define('createConfig', async request => {
+  let result = {
+    status: false,
+    message: 'specified name already exists'
+  }
+  try {
+    const logger = Moralis.Cloud.getLogger()
+    const { name, data } = request.params
+    const config = Moralis.Object.extend('config')
+    const query = new Moralis.Query(config)
+    query.equalTo('name', name)
+    const findedTokens = await query.find({ useMasterKey: true })
+    // フィールドがない場合
+    if (findedTokens.length == 0) {
+      let savedata = new config()
+      savedata.set('name', name)
+      savedata.set('data', JSON.stringify(data))
+      await savedata.save(null, { useMasterKey: true })
+      result.status = true
+      result.message = ''
+    }
+    return result
+  } catch (err) {
+    result.message = err.message
+    return result
+  }
+})
+
+// configの属性ｗｐ取得する。
+Moralis.Cloud.define('getConfig', async request => {
+  let result = {
+    status: false,
+    message: 'specified name does not exist'
+  }
+  try {
+    const logger = Moralis.Cloud.getLogger()
+    const { name } = request.params
+    const config = Moralis.Object.extend('config')
+    const query = new Moralis.Query(config)
+    query.equalTo('name', name)
+    const findedTokens = await query.find({ useMasterKey: true })
+    // フィールドがある場合
+    if (findedTokens.length != 0) {
+      let getdata = findedTokens[0]
+      result['data'] = JSON.parse(getdata.get('data'))
+      result.status = true
+      result.message = ''
+    }
+    return result
+  } catch (err) {
+    result.message = err.message
+    return result
+  }
+})

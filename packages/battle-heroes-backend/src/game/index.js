@@ -45,7 +45,10 @@ const {
   getMoralisTokenExp,
   addMoralisTokenExp,
   getOwnerOfTokenId,
-  updateMoralisStartBlockNumber
+  updateMoralisStartBlockNumber,
+  getMoralisConfig,
+  setMoralisConfig,
+  createMoralisConfig
 } = require('../NFT')
 
 const { selectCollections } = require('../collection/selectors')
@@ -2063,6 +2066,55 @@ class GameManager {
     console.log(updatedNFT)
   }
 
+  getConfig = async (_name, callback) => {
+    console.log('getConfig:', _name, callback)
+    const response = await getMoralisConfig(_name)
+    console.log(response)
+    if (response.status) {
+      return callback({
+        status: response.status,
+        message: response.message,
+        payload: {
+          name: _name,
+          data: response.data
+        }
+      })
+    } else {
+      return callback({
+        status: response.status,
+        message: response.message,
+        payload: {
+          name: _name
+        }
+      })
+    }
+  }
+
+  setConfig = async (_name, _data, callback) => {
+    console.log('setConfig:', _name, _data, callback)
+    const response = await setMoralisConfig(_name, _data)
+    console.log(response)
+    return callback({
+      status: response.status,
+      message: response.message,
+      payload: {
+        name: _name
+      }
+    })
+  }
+  createConfig = async (_name, _data, callback) => {
+    console.log('createConfig:', _name, _data, callback)
+    const response = await createMoralisConfig(_name, _data)
+    console.log(response)
+    return callback({
+      status: response.status,
+      message: response.message,
+      payload: {
+        name: _name
+      }
+    })
+  }
+
   eventListeners = {
     'auth:login': async (...args) => {
       try {
@@ -2253,6 +2305,31 @@ class GameManager {
         this.errorHandler(error)
       }
     },
+    'config:get': (...args) => {
+      console.log(...args)
+      try {
+        this.getConfig(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'config:set': (...args) => {
+      console.log(...args)
+      try {
+        this.setConfig(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+    'config:create': (...args) => {
+      console.log(...args)
+      try {
+        this.createConfig(...args)
+      } catch (error) {
+        this.errorHandler(error)
+      }
+    },
+
     'vault:minted': (...args) => {
       console.log(...args)
       try {
@@ -2269,6 +2346,10 @@ class GameManager {
     this.socket.on('tokenExp:get', this.eventListeners['tokenExp:get'])
     this.socket.on('tokenExp:add', this.eventListeners['tokenExp:add'])
     this.socket.on('tokenExp:mint', this.eventListeners['tokenExp:mint'])
+
+    this.socket.on('config:get', this.eventListeners['config:get'])
+    this.socket.on('config:set', this.eventListeners['config:set'])
+    this.socket.on('config:create', this.eventListeners['config:create'])
 
     this.socket.on('auth:login', this.eventListeners['auth:login'])
     this.socket.on('auth:logout', this.eventListeners['auth:logout'])
@@ -2309,6 +2390,10 @@ class GameManager {
     this.socket.off('tokenExp:get', this.eventListeners['tokenExp:get'])
     this.socket.off('tokenExp:add', this.eventListeners['tokenExp:add'])
     this.socket.off('tokenExp:mint', this.eventListeners['tokenExp:mint'])
+
+    this.socket.off('config:get', this.eventListeners['config:get'])
+    this.socket.off('config:set', this.eventListeners['config:set'])
+    this.socket.off('config:create', this.eventListeners['config:create'])
 
     this.socket.off('auth:login', this.eventListeners['auth:login'])
     this.socket.off('auth:logout', this.eventListeners['auth:logout'])

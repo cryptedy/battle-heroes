@@ -10,8 +10,9 @@
   <BaseButton type="primary" @click="addTokenExp"> Add Exp </BaseButton>&nbsp;
   <BaseButton type="primary" @click="getTokenExp"> Get Exp </BaseButton>&nbsp;
   <BaseButton type="primary" @click="mintTokenExp">
-    Transfer Exp to Chain </BaseButton
-  >&nbsp;
+    Transfer Exp to Chain
+  </BaseButton>
+  &nbsp;
   <BaseButton type="primary" @click="connect"> Connect Wallet </BaseButton>
   <div>CollectionId:</div>
   <input v-model="colId1" type="number" style="color: #000000" />
@@ -20,13 +21,22 @@
   <div>Delta Exp:</div>
   <input v-model="exp1" type="number" style="color: #000000" />
 
+  <hr />
+  <h3>Config</h3>
+  <BaseButton type="primary" @click="getConfig"> Get </BaseButton>&nbsp;
+  <BaseButton type="primary" @click="setConfig"> Set </BaseButton>&nbsp;
+  <BaseButton type="primary" @click="createConfig"> Create </BaseButton>
+  <div>CollectionId:</div>
+  <input v-model="configName" style="color: #000000" />
+  <div>TokenId:</div>
+  <input v-model="configData" style="color: #000000" />
+
   <div v-if="shownResult">
     <hr />
     <h3 style="white-space: pre-wrap">{{ result.title }}</h3>
-    <div
-      style="word-wrap: break-word; white-space: pre-wrap"
-      v-text="result.content"
-    ></div>
+    <div style="word-wrap: break-word; white-space: pre-wrap">
+      {{ result.content }}
+    </div>
     <BaseButton type="primary" @click="close"> CLOSE </BaseButton>
   </div>
 </template>
@@ -55,6 +65,8 @@ export default {
       colId1: 1,
       tokenId1: 1,
       exp1: 0,
+      configName: 'processedBlockNumber',
+      configData: '-1',
       result: { title: '', content: '' }
     }
   },
@@ -95,6 +107,7 @@ export default {
         parseInt(this.tokenId1),
         parseInt(this.exp1)
       )
+      this.clearResult()
 
       this.$socket.emit(
         'tokenExp:add',
@@ -121,6 +134,7 @@ export default {
         parseInt(this.colId1),
         parseInt(this.tokenId1)
       )
+      this.clearResult()
 
       this.$socket.emit(
         'tokenExp:get',
@@ -147,6 +161,7 @@ export default {
         parseInt(this.tokenId1),
         parseInt(this.exp1)
       )
+      this.clearResult()
 
       let res = await handleEthereum()
       if (!res) {
@@ -213,6 +228,76 @@ export default {
         }
       )
       this.message = 'AddExp caled!'
+    },
+
+    getConfig() {
+      console.log('GetConfig called!', this.configName)
+      this.clearResult()
+
+      this.$socket.emit(
+        'config:get',
+        this.configName,
+        ({ status, message, payload }) => {
+          console.log('Received callback to get config', message, payload)
+          this.result.title = 'Get Configの結果:'
+          this.shownResult = true
+          if (status) {
+            this.result.content = `name: ${payload.name}, `
+            this.result.content += `data : ${payload.data}`
+          } else {
+            this.result.content = `エラー: ${message}`
+          }
+        }
+      )
+      this.message = 'GetConfig caled!'
+    },
+
+    setConfig() {
+      console.log('SetConfig called!', this.configName, this.configData)
+      this.clearResult()
+
+      this.$socket.emit(
+        'config:set',
+        this.configName,
+        parseInt(this.configData),
+        ({ status, message, payload }) => {
+          console.log('Received callback to set config', message)
+          this.shownResult = true
+          this.result.title = 'Set Configの結果:'
+          this.result.content = `${payload.name} : ${status} `
+          if (!status) {
+            this.result.content += `エラー : ${message}`
+          }
+        }
+      )
+      this.message = 'SetConfig caled!'
+    },
+
+    createConfig() {
+      console.log('CreateConfig called!', this.configName, this.configData)
+      this.clearResult()
+
+      this.$socket.emit(
+        'config:create',
+        this.configName,
+        parseInt(this.configData),
+        ({ status, message, payload }) => {
+          console.log('Received callback to create config', message)
+          this.shownResult = true
+          this.result.title = 'Set Configの結果:'
+          this.result.content = `${payload.name} : ${status} `
+          if (!status) {
+            this.result.content += `エラー : ${message}`
+          }
+        }
+      )
+      this.message = 'CreateConfig caled!'
+    },
+
+    clearResult() {
+      this.shownResult = false
+      this.result.title = ''
+      this.result.content = ''
     },
 
     async connect() {

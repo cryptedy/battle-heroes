@@ -450,11 +450,37 @@ const updateMoralisStartBlockNumber = async (
   return newTokenExp
 }
 
+const getMoralisConfig = async _name => {
+  console.log('getMoralisConfig', _name)
+  return await Moralis.Cloud.run('getConfig', {
+    name: _name
+  })
+}
+
+const setMoralisConfig = async (_name, _data) => {
+  console.log('setMoralisConfig', _name, _data)
+  return await Moralis.Cloud.run('setConfig', {
+    name: _name,
+    data: _data
+  })
+}
+
+const createMoralisConfig = async (_name, _data) => {
+  console.log('createtMoralisConfig', _name, _data)
+  return await Moralis.Cloud.run('createConfig', {
+    name: _name,
+    data: _data
+  })
+}
+
 module.exports = {
   getNFTs,
   getNFTIdsForAddress,
   getMoralisTokenExp,
   addMoralisTokenExp,
   getOwnerOfTokenId,
-  updateMoralisStartBlockNumber
+  updateMoralisStartBlockNumber,
+  getMoralisConfig,
+  setMoralisConfig,
+  createMoralisConfig
 }
