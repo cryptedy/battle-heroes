@@ -26,9 +26,9 @@
   <BaseButton type="primary" @click="getConfig"> Get </BaseButton>&nbsp;
   <BaseButton type="primary" @click="setConfig"> Set </BaseButton>&nbsp;
   <BaseButton type="primary" @click="createConfig"> Create </BaseButton>
-  <div>CollectionId:</div>
+  <div>name:</div>
   <input v-model="configName" style="color: #000000" />
-  <div>TokenId:</div>
+  <div>data:</div>
   <input v-model="configData" style="color: #000000" />
 
   <div v-if="shownResult">
